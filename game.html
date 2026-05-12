@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2a1810">
+<title>Egg Clicker — Ferme du Coq Francis</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5ead4;
+    --cream-warm: #ead8b0;
+    --paper: #fbf3df;
+    --wine: #6b1a1a;
+    --wine-dark: #4a0f0f;
+    --yolk: #e8a834;
+    --yolk-deep: #c8841d;
+    --leaf: #4a5d3a;
+    --ink: #2a1810;
+    --ink-muted: #5a4030;
+    --shadow: 0 4px 0 rgba(42, 24, 16, 0.15);
+    --shadow-lg: 0 8px 24px rgba(42, 24, 16, 0.25);
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
+  
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--cream);
+    background-image: radial-gradient(ellipse at top, var(--cream-warm) 0%, var(--cream) 50%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3CfeColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.09 0 0 0 0 0.06 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    z-index: 100;
+  }
+  
+  /* === TOP BAR === */
+  .stats-bar {
+    background: var(--wine);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-bottom: 3px solid var(--wine-dark);
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+  }
+  
+  .stats-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .plumes-badge { color: var(--yolk); font-weight: 900; }
+  .plumes-badge::before { content: '🪶 '; }
+  
+  .trial-pill {
+    background: rgba(232, 168, 52, 0.2);
+    color: var(--yolk);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(232, 168, 52, 0.4);
+  }
+  
+  .stats-row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+  
+  .egg-count {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 144;
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .egg-count::before { content: '🥚 '; font-size: 20px; }
+  
+  .eps {
+    font-family: 'Fraunces', serif;
+    font-size: 11px;
+    font-style: italic;
+    opacity: 0.85;
+    text-align: right;
+    line-height: 1.3;
+  }
+  .eps-value { font-weight: 600; font-style: normal; }
+  
+  /* === PLAYFIELD === */
+  .playfield {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 0 0;
+    position: relative;
+    z-index: 5;
+    min-height: 340px;
+    overflow: hidden;
+  }
+  
+  /* Background scene */
+  .scene-stack { position: absolute; inset: 0; z-index: 1; }
+  .scene { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease; }
+  .scene.active { opacity: 1; }
+  .scene svg { width: 100%; height: 100%; display: block; }
+  
+  /* === SPRITE LAYER === */
+  .sprite-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .sprite {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: all 0.4s cubic-bezier(.34,1.56,.64,1);
+    pointer-events: auto;
+    opacity: 0;
+    filter: drop-shadow(0 3px 0 rgba(42, 24, 16, 0.25));
+  }
+  
+  .sprite.visible {
+    opacity: 1;
+    animation: spawn 0.5s cubic-bezier(.34,1.56,.64,1);
+  }
+  
+  @keyframes spawn {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    60% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+  
+  .sprite img, .sprite .sprite-emoji {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .sprite .sprite-emoji {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: inherit;
+    line-height: 1;
+  }
+  
+  .sprite-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: var(--wine);
+    color: var(--paper);
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1.5px solid var(--cream);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+    min-width: 22px;
+    text-align: center;
+  }
+  
+  /* === HEN ANIMATION === */
+  .sprite-hen {
+    animation: hen-bob 1.8s ease-in-out infinite;
+  }
+  @keyframes hen-bob {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); }
+    50% { transform: translate(-50%, -55%) rotate(2deg); }
+  }
+  
+  .sprite-coq:active { transform: translate(-50%, -50%) scale(0.92); }
+  
+  /* === FLYING EGGS === */
+  .egg-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  
+  .flying-egg {
+    position: absolute;
+    width: 22px;
+    height: 28px;
+    font-size: 22px;
+    line-height: 1;
+    pointer-events: none;
+    will-change: transform;
+  }
+  
+  /* === FARM INFO === */
+  .farm-info {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    text-align: center;
+    pointer-events: none;
+    width: 100%;
+  }
+  
+  .farm-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 10px;
+    color: var(--ink-muted);
+    letter-spacing: 0.06em;
+    background: rgba(245, 234, 212, 0.85);
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+  }
+  
+  .farm-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: 'opsz' 144;
+    font-size: 18px;
+    color: var(--wine);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    background: rgba(245, 234, 212, 0.85);
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 8px;
+  }
+  .farm-name::before, .farm-name::after {
+    content: '✦';
+    color: var(--yolk-deep);
+    margin: 0 5px;
+    font-size: 10px;
+    vertical-align: middle;
+  }
+  
+  /* === COQ (main button) === */
+  .coq-area {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    z-index: 5;
+    margin: 0 auto 8px;
+  }
+  
+  .coq-base {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 18px;
+    background: radial-gradient(ellipse, rgba(42, 24, 16, 0.35), transparent 70%);
+    z-index: 1;
+  }
+  
+  .coq-btn {
+    width: 150px;
+    height: 150px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 130px;
+    line-height: 1;
+    transition: transform 0.08s cubic-bezier(.4,2,.6,1);
+    z-index: 2;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    filter: drop-shadow(0 5px 0 rgba(42, 24, 16, 0.25));
+  }
+  .coq-btn:active {
+    transform: scale(0.92) translateY(4px);
+    filter: drop-shadow(0 2px 0 rgba(42, 24, 16, 0.3));
+  }
+  
+  @keyframes float-up {
+    0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; }
+    20% { opacity: 1; transform: translate(-50%, -10px) scale(1.1); }
+    100% { transform: translate(-50%, -120px) scale(0.9); opacity: 0; }
+  }
+  .pop {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--wine);
+    pointer-events: none;
+    animation: float-up 1s ease-out forwards;
+    z-index: 3;
+    text-shadow: 0 2px 0 var(--cream);
+  }
+  .pop::before { content: '+'; }
+  
+  /* === TABS === */
+  .tabs {
+    display: flex;
+    border-top: 2px solid var(--ink);
+    background: var(--paper);
+    position: relative;
+    z-index: 10;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px 2px;
+    border: none;
+    background: transparent;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 10px;
+    color: var(--ink-muted);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-right: 1px solid rgba(42, 24, 16, 0.12);
+    position: relative;
+  }
+  .tab:last-child { border-right: none; }
+  .tab.active { background: var(--ink); color: var(--cream); }
+  .tab .dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    background: var(--yolk);
+    border-radius: 50%;
+    display: none;
+  }
+  .tab.has-new .dot { display: block; }
+  
+  .panel {
+    background: var(--paper);
+    border-top: 1px solid rgba(42, 24, 16, 0.1);
+    padding: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 10;
+    -webkit-overflow-scrolling: touch;
+  }
+  .panel.hidden { display: none; }
+  
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--cream);
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+  }
+  .item:active:not(.locked):not(.maxed) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(42, 24, 16, 0.15);
+  }
+  .item.locked { opacity: 0.45; cursor: not-allowed; background: var(--cream-warm); }
+  .item.maxed { background: var(--leaf); color: var(--cream); cursor: default; }
+  .item-icon { font-size: 28px; line-height: 1; flex-shrink: 0; width: 40px; text-align: center; }
+  .item-body { flex: 1; min-width: 0; }
+  .item-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.15;
+    margin-bottom: 2px;
+  }
+  .item-detail { font-size: 10.5px; color: var(--ink-muted); line-height: 1.3; }
+  .item.maxed .item-detail { color: rgba(245, 234, 212, 0.8); }
+  .item-right { flex-shrink: 0; text-align: right; }
+  .item-cost {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--wine);
+    line-height: 1;
+  }
+  .item.locked .item-cost { color: var(--ink-muted); }
+  .item.maxed .item-cost { color: var(--yolk); }
+  .item-owned { font-size: 10px; color: var(--ink-muted); margin-top: 2px; font-weight: 500; letter-spacing: 0.05em; }
+  .item.maxed .item-owned { color: rgba(245, 234, 212, 0.7); }
+  
+  /* Achievement */
+  .achievement {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    background: var(--cream);
+    border: 1.5px solid var(--ink-muted);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    opacity: 0.5;
+  }
+  .achievement.unlocked {
+    opacity: 1;
+    border-color: var(--yolk-deep);
+    background: linear-gradient(135deg, var(--cream) 0%, #f5d678 100%);
+    box-shadow: var(--shadow);
+  }
+  .achievement-icon { font-size: 22px; flex-shrink: 0; filter: grayscale(1); }
+  .achievement.unlocked .achievement-icon { filter: none; }
+  .achievement-body { flex: 1; min-width: 0; }
+  .achievement-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 12.5px; line-height: 1.1; }
+  .achievement-detail { font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+  .achievement-bonus { font-family: 'Fraunces', serif; font-weight: 900; font-size: 12px; color: var(--yolk-deep); }
+  
+  /* Prestige */
+  .prestige-card {
+    background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
+    color: var(--paper);
+    padding: 18px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .prestige-card::before {
+    content: '🪶';
+    position: absolute;
+    font-size: 100px;
+    opacity: 0.08;
+    right: -20px;
+    bottom: -30px;
+    transform: rotate(-20deg);
+  }
+  .prestige-title { font-family: 'Fraunces', serif; font-weight: 900; font-size: 18px; margin-bottom: 4px; }
+  .prestige-sub { font-family: 'Fraunces', serif; font-style: italic; font-size: 11px; opacity: 0.8; margin-bottom: 14px; }
+  .prestige-big {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 36px;
+    color: var(--yolk);
+    margin: 8px 0;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+  }
+  .prestige-line {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; font-size: 12px;
+    border-top: 1px dashed rgba(245, 234, 212, 0.3);
+  }
+  .prestige-line:first-of-type { border-top: none; }
+  .prestige-btn {
+    width: 100%; padding: 12px;
+    margin-top: 14px;
+    background: var(--yolk);
+    color: var(--ink);
+    border: none;
+    border-bottom: 3px solid var(--yolk-deep);
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .prestige-btn:active { transform: translateY(2px); border-bottom-width: 1px; }
+  .prestige-btn:disabled { background: var(--ink-muted); border-bottom-color: var(--ink); opacity: 0.6; cursor: not-allowed; }
+  
+  /* Stats */
+  .stat-line {
+    display: flex; justify-content: space-between;
+    padding: 9px 4px;
+    border-bottom: 1px dashed rgba(42, 24, 16, 0.15);
+    font-size: 13px;
+  }
+  .stat-line:last-of-type { border-bottom: none; }
+  .stat-label { font-family: 'Fraunces', serif; font-style: italic; color: var(--ink-muted); }
+  .stat-value { font-family: 'Fraunces', serif; font-weight: 600; }
+  .reset-btn {
+    margin-top: 16px; width: 100%; padding: 11px;
+    background: transparent;
+    border: 1.5px dashed var(--wine);
+    color: var(--wine);
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-size: 12px;
+    cursor: pointer; border-radius: 4px;
+  }
+  .reset-btn:active { background: var(--wine); color: var(--paper); }
+  
+  /* === TRIAL TIMER (top overlay) === */
+  .trial-timer {
+    position: fixed;
+    top: 56px;
+    right: 12px;
+    background: var(--ink);
+    color: var(--yolk);
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 13px;
+    z-index: 50;
+    box-shadow: var(--shadow);
+    display: none;
+    border: 1.5px solid var(--yolk);
+  }
+  .trial-timer.visible { display: flex; align-items: center; gap: 4px; }
+  .trial-timer.warning { background: var(--wine); color: var(--paper); border-color: var(--paper); animation: pulse 1s infinite; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  
+  /* === SAVE PILL === */
+  .save-pill {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--leaf);
+    color: var(--cream);
+    padding: 5px 12px;
+    border-radius: 18px;
+    font-size: 10px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .save-pill.visible { opacity: 1; }
+  
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: linear-gradient(135deg, var(--yolk) 0%, var(--yolk-deep) 100%);
+    color: var(--ink);
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    z-index: 150;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(.4,2,.6,1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+    max-width: 90%;
+  }
+  .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast-icon { font-size: 22px; }
+  .toast-title { font-weight: 900; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+  
+  /* Modals */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(42, 24, 16, 0.75);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 200; padding: 24px;
+  }
+  .modal-bg.visible { display: flex; }
+  .modal {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 24px;
+    max-width: 340px; width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    border-radius: 4px;
+  }
+  .modal h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900; font-size: 22px;
+    margin-bottom: 8px; color: var(--wine);
+  }
+  .modal-icon { font-size: 48px; margin-bottom: 8px; }
+  .modal p { font-size: 14px; margin-bottom: 18px; line-height: 1.5; color: var(--ink-muted); }
+  .modal-big-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 900; font-size: 28px;
+    color: var(--wine); margin: 8px 0;
+  }
+  .modal-buttons { display: flex; gap: 8px; }
+  .modal-btn {
+    flex: 1; padding: 12px;
+    border: 1.5px solid var(--ink);
+    font-family: 'Fraunces', serif;
+    font-weight: 600; font-size: 14px;
+    cursor: pointer; border-radius: 4px;
+  }
+  .modal-btn.primary { background: var(--leaf); color: var(--cream); border-color: var(--leaf); }
+  .modal-btn.danger { background: var(--wine); color: var(--paper); border-color: var(--wine); }
+  .modal-btn.cancel { background: var(--cream); color: var(--ink); }
+  .modal-btn.gold { background: var(--yolk); color: var(--ink); border-color: var(--yolk-deep); }
+  
+  .panel::-webkit-scrollbar { width: 6px; }
+  .panel::-webkit-scrollbar-track { background: transparent; }
+  .panel::-webkit-scrollbar-thumb { background: var(--ink-muted); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="save-pill" id="savePill">Sauvegardé</div>
+<div class="trial-timer" id="trialTimer"><span>⏱</span><span id="trialTime">10:00</span></div>
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">🏆</span>
+  <div>
+    <div class="toast-title">Trophée débloqué</div>
+    <div id="toastName"></div>
+  </div>
+</div>
+
+<header class="stats-bar">
+  <div class="stats-title">
+    <span>La Ferme du Coq Francis <span class="trial-pill" id="modePill" style="display:none">TRIAL</span></span>
+    <span class="plumes-badge" id="plumesBadge" style="display:none"><span id="plumesCount">0</span></span>
+  </div>
+  <div class="stats-row">
+    <div class="egg-count" id="eggCount">0</div>
+    <div class="eps">
+      <div><span class="eps-value" id="epsValue">0</span> œufs/sec</div>
+      <div style="font-size:10px;opacity:0.7"><span id="clickValue">1</span> par clic · ×<span id="globalMultDisplay">1</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="playfield" id="playfield">
+  <div class="scene-stack" id="sceneStack"></div>
+  
+  <div class="sprite-layer" id="spriteLayer"></div>
+  
+  <div class="egg-layer" id="eggLayer"></div>
+  
+  <div class="farm-info">
+    <div class="farm-label" id="farmLabel">— étape 1 —</div>
+    <br>
+    <div class="farm-name" id="farmName">Premier Cocorico</div>
+  </div>
+  
+  <div class="coq-area" id="coqArea">
+    <div class="coq-base"></div>
+    <button class="coq-btn" id="coqBtn" aria-label="Cliquer le coq">🐓</button>
+  </div>
+</main>
+
+<nav class="tabs">
+  <button class="tab active" data-panel="producers">Bâtiments</button>
+  <button class="tab" data-panel="upgrades">Amélio.<span class="dot"></span></button>
+  <button class="tab" data-panel="achievements">Trophées<span class="dot"></span></button>
+  <button class="tab" data-panel="prestige">Prestige<span class="dot"></span></button>
+  <button class="tab" data-panel="stats">Stats</button>
+</nav>
+
+<section class="panel" id="producersPanel"></section>
+<section class="panel hidden" id="upgradesPanel"></section>
+<section class="panel hidden" id="achievementsPanel"></section>
+<section class="panel hidden" id="prestigePanel"></section>
+<section class="panel hidden" id="statsPanel">
+  <div class="stat-line"><span class="stat-label">Œufs total (partie)</span><span class="stat-value" id="statTotal">0</span></div>
+  <div class="stat-line"><span class="stat-label">Œufs lifetime</span><span class="stat-value" id="statLifetime">0</span></div>
+  <div class="stat-line"><span class="stat-label">Clics</span><span class="stat-value" id="statClicks">0</span></div>
+  <div class="stat-line"><span class="stat-label">Production/sec</span><span class="stat-value" id="statEps">0</span></div>
+  <div class="stat-line"><span class="stat-label">Par clic</span><span class="stat-value" id="statClickVal">1</span></div>
+  <div class="stat-line"><span class="stat-label">Multiplicateur global</span><span class="stat-value" id="statGlobal">×1</span></div>
+  <div class="stat-line"><span class="stat-label">Bâtiments</span><span class="stat-value" id="statBuildings">0</span></div>
+  <div class="stat-line"><span class="stat-label">Améliorations</span><span class="stat-value" id="statUpgrades">0</span></div>
+  <div class="stat-line"><span class="stat-label">Trophées</span><span class="stat-value" id="statAchievements">0</span></div>
+  <div class="stat-line"><span class="stat-label">Prestiges</span><span class="stat-value" id="statPrestiges">0</span></div>
+  <div class="stat-line"><span class="stat-label">Plumes d'Or</span><span class="stat-value" id="statPlumes">0</span></div>
+  <div class="stat-line"><span class="stat-label">Mode</span><span class="stat-value" id="statMode">Trial</span></div>
+  <button class="reset-btn" id="resetBtn">Effacer la sauvegarde</button>
+</section>
+
+<!-- MODALS -->
+<div class="modal-bg" id="resetModal">
+  <div class="modal">
+    <h2>Tout effacer ?</h2>
+    <p>Tu perdras tout : œufs, Plumes, trophées, prestiges. Définitif.</p>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" id="cancelReset">Garder</button>
+      <button class="modal-btn danger" id="confirmReset">Effacer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="prestigeModal">
+  <div class="modal">
+    <div class="modal-icon">🪶</div>
+    <h2>Cycle de Prestige</h2>
+    <p>Tu vas convertir cette partie en <strong>Plumes d'Or</strong>. Tu repars de zéro, mais chaque Plume donne +2% de production permanente.</p>
+    <div class="modal-big-num" id="prestigeGainModal">+0 🪶</div>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" id="cancelPrestige">Annuler</button>
+      <button class="modal-btn primary" id="confirmPrestige">Prestige !</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="offlineModal">
+  <div class="modal">
+    <div class="modal-icon">😴</div>
+    <h2>Bon retour à la ferme</h2>
+    <p>Pendant ton absence (<span id="offlineDuration">0 min</span>), les pondeuses ont travaillé à 50%.</p>
+    <div class="modal-big-num" id="offlineGain">+0 🥚</div>
+    <div class="modal-buttons">
+      <button class="modal-btn primary" id="closeOffline">Récupérer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="trialEndModal">
+  <div class="modal">
+    <div class="modal-icon">🪙</div>
+    <h2>Session terminée</h2>
+    <p>Les 10 minutes de jeu gratuit sont écoulées. <strong>Connecte ton wallet $FRANC</strong> pour jouer sans limite.</p>
+    <p style="font-size:12px;color:var(--ink-muted);font-style:italic">Ta progression est sauvegardée.</p>
+    <div class="modal-buttons" style="flex-direction:column">
+      <button class="modal-btn gold" id="connectWalletBtn" style="margin-bottom:8px">🪙 Connecter mon wallet</button>
+      <button class="modal-btn cancel" id="closeTrialEnd">Retour à l'accueil</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ============ CONFIG ============
+const CONFIG = {
+  wallet_url: 'https://franclecoq.github.io/Wallet/connect-wallet.html',
+  home_url: './index.html',
+  trial_duration_sec: 600, // 10 minutes
+  backend: 'https://mubqtnqulpyehkgubhnh.supabase.co/functions/v1',
+  asset_path: 'assets/' // PNG sprites folder
+};
+
+// Mode is set via URL parameter (?mode=unlimited or ?mode=trial)
+// Defaults to trial for safety
+const urlParams = new URLSearchParams(window.location.search);
+let isUnlimited = urlParams.get('mode') === 'unlimited';
+
+// ============ DATA ============
+// Each producer has a sprite definition: position (left%, top%), size (px), and optional image filename
+const PRODUCERS = [
+  { id: 'chick',    icon: '🐤', name: 'Poussin curieux',          base: 15,             eps: 0.1,    desc: 'Pas grand chose, mais ça commence.',
+    sprite: { type: 'chicks', size: 36, png: 'chick.png' } },
+  { id: 'hen',      icon: '🐔', name: 'Poule pondeuse',            base: 100,            eps: 1,      desc: 'La base de toute ferme respectable.',
+    sprite: { type: 'single', left: 62, top: 78, size: 70, png: 'hen.png', emits_eggs: true } },
+  { id: 'coop',     icon: '🏠', name: 'Poulailler',                base: 1100,           eps: 8,      desc: 'Un toit pour les pondeuses.',
+    sprite: { type: 'single', left: 14, top: 65, size: 80, png: 'coop.png' } },
+  { id: 'farm',     icon: '🚜', name: 'Coopérative agricole',      base: 12000,          eps: 47,     desc: 'L\'union fait la force.',
+    sprite: { type: 'single', left: 84, top: 65, size: 80, png: 'farm.png' } },
+  { id: 'auto',     icon: '⚙️', name: 'Ferme automatisée',         base: 130000,         eps: 260,    desc: 'Tapis roulants et œufs partout.',
+    sprite: { type: 'single', left: 22, top: 42, size: 70, png: 'auto.png' } },
+  { id: 'factory',  icon: '🏭', name: 'Usine d\'œufs',             base: 1400000,        eps: 1400,   desc: 'L\'industrialisation de la cocotte.',
+    sprite: { type: 'single', left: 78, top: 42, size: 75, png: 'factory.png' } },
+  { id: 'lab',      icon: '🧪', name: 'Labo génétique',            base: 20000000,       eps: 7800,   desc: 'Œufs carrés, lumineux, sonores.',
+    sprite: { type: 'single', left: 12, top: 18, size: 55, png: 'lab.png' } },
+  { id: 'space',    icon: '🛰️', name: 'Station orbitale Cocorico', base: 330000000,      eps: 44000,  desc: 'Pondre dans le vide spatial.',
+    sprite: { type: 'single', left: 88, top: 18, size: 55, png: 'station.png' } },
+  { id: 'franc',    icon: '🪙', name: 'Dimension $FRANC',          base: 5100000000,     eps: 260000, desc: 'Œufs cryptés sur la chaîne.',
+    sprite: { type: 'single', left: 50, top: 10, size: 60, png: 'franc.png' } },
+  { id: 'paradox',  icon: '🌀', name: 'Paradoxe du coq',           base: 75000000000,    eps: 1600000, desc: 'L\'œuf et la poule, simultanément.',
+    sprite: { type: 'single', left: 50, top: 28, size: 65, png: 'paradox.png' } }
+];
+
+const UPGRADES = [
+  { id: 'u1', icon: '🧤', name: 'Gants de fermier',              cost: 100,           type: 'click',    mult: 2, req: { type:'clicks', n:10 } },
+  { id: 'u2', icon: '👢', name: 'Bottes en caoutchouc',          cost: 1000,          type: 'click',    mult: 2, req: { type:'producer', id:'hen', n:5 } },
+  { id: 'u3', icon: '🥢', name: 'Pince à œuf professionnelle',   cost: 50000,         type: 'click',    mult: 3, req: { type:'producer', id:'coop', n:10 } },
+  { id: 'u4', icon: '🤖', name: 'Robot ramasseur',                cost: 5000000,       type: 'click',    mult: 4, req: { type:'producer', id:'farm', n:25 } },
+  { id: 'u5', icon: '🧘', name: 'Méditation du coq',              cost: 500000000,     type: 'click',    mult: 5, req: { type:'producer', id:'factory', n:25 } },
+  { id: 'p1', icon: '🌾', name: 'Grain bio premium',              cost: 500,           type: 'producer', target:'chick',   mult: 2, req:{ type:'producer', id:'chick', n:10 } },
+  { id: 'p2', icon: '🎵', name: 'Musique apaisante',              cost: 5000,          type: 'producer', target:'hen',     mult: 2, req:{ type:'producer', id:'hen', n:10 } },
+  { id: 'p3', icon: '🪺', name: 'Nids confortables',              cost: 25000,         type: 'producer', target:'coop',    mult: 2, req:{ type:'producer', id:'coop', n:10 } },
+  { id: 'p4', icon: '📜', name: 'Charte coopérative',             cost: 250000,        type: 'producer', target:'farm',    mult: 2, req:{ type:'producer', id:'farm', n:10 } },
+  { id: 'p5', icon: '💡', name: 'IA de pondage',                  cost: 3000000,       type: 'producer', target:'auto',    mult: 2, req:{ type:'producer', id:'auto', n:10 } },
+  { id: 'p6', icon: '⛓️', name: 'Tapis ultraconducteur',          cost: 30000000,      type: 'producer', target:'factory', mult: 2, req:{ type:'producer', id:'factory', n:10 } },
+  { id: 'p7', icon: '🧬', name: 'CRISPR-Cocorico',                cost: 400000000,     type: 'producer', target:'lab',     mult: 2, req:{ type:'producer', id:'lab', n:10 } },
+  { id: 'p8', icon: '🚀', name: 'Propulseurs orbitaux',           cost: 6000000000,    type: 'producer', target:'space',   mult: 2, req:{ type:'producer', id:'space', n:10 } },
+  { id: 'p9', icon: '💎', name: 'Smart contracts dorés',          cost: 100000000000,  type: 'producer', target:'franc',   mult: 2, req:{ type:'producer', id:'franc', n:10 } },
+  { id: 'g1', icon: '☀️', name: 'Aube éternelle',                  cost: 100000,         type: 'global', mult: 1.25, req:{ type:'producer', id:'coop', n:25 } },
+  { id: 'g2', icon: '🌙', name: 'Lune des pondeuses',              cost: 10000000,       type: 'global', mult: 1.5,  req:{ type:'producer', id:'farm', n:50 } },
+  { id: 'g3', icon: '🏆', name: 'Trophée du Coq d\'Or',            cost: 1000000000,     type: 'global', mult: 2,    req:{ type:'producer', id:'auto', n:50 } }
+];
+
+const ACHIEVEMENTS = [
+  { id: 'a1',  icon: '🥚', name: 'Premier œuf',             desc: 'Lance ton premier clic',                    check: s => s.clicks >= 1 },
+  { id: 'a2',  icon: '✋', name: 'Cent fois cocorico',      desc: '100 clics',                                  check: s => s.clicks >= 100 },
+  { id: 'a3',  icon: '💪', name: 'Doigt de fer',            desc: '1 000 clics',                                check: s => s.clicks >= 1000 },
+  { id: 'a4',  icon: '🏗️', name: 'Premier bâtiment',        desc: '1 bâtiment',                                 check: s => totalBuildings(s) >= 1 },
+  { id: 'a5',  icon: '🏘️', name: 'Petit hameau',            desc: '10 bâtiments',                               check: s => totalBuildings(s) >= 10 },
+  { id: 'a6',  icon: '🌆', name: 'Empire bâtisseur',        desc: '100 bâtiments',                              check: s => totalBuildings(s) >= 100 },
+  { id: 'a7',  icon: '🌍', name: 'Mille toits',             desc: '1 000 bâtiments',                            check: s => totalBuildings(s) >= 1000 },
+  { id: 'a8',  icon: '🥬', name: 'Mille œufs',              desc: '1 000 œufs',                                 check: s => s.totalEggs >= 1000 },
+  { id: 'a9',  icon: '🌽', name: 'Million d\'œufs',         desc: '1 M œufs',                                   check: s => s.totalEggs >= 1e6 },
+  { id: 'a10', icon: '🌟', name: 'Milliard d\'œufs',        desc: '1 Md œufs',                                  check: s => s.totalEggs >= 1e9 },
+  { id: 'a11', icon: '🎯', name: 'Collectionneur',          desc: 'Posséder 1 de chaque bâtiment',              check: s => PRODUCERS.every(p => s.producers[p.id] >= 1) },
+  { id: 'a12', icon: '🛒', name: 'Améliorateur',            desc: '5 améliorations',                            check: s => s.upgrades.length >= 5 },
+  { id: 'a13', icon: '✨', name: 'Toutes les améliorations',desc: 'Toutes les améliorations',                   check: s => s.upgrades.length >= UPGRADES.length },
+  { id: 'a14', icon: '🪶', name: 'Premier Prestige',         desc: '1 prestige',                                 check: s => s.prestiges >= 1 },
+  { id: 'a15', icon: '👑', name: 'Le Coq Légendaire',       desc: '10 prestiges',                               check: s => s.prestiges >= 10 }
+];
+
+const FARM_STAGES = [
+  { eps:    0,    name: 'Premier Cocorico',       stage: 'pioneer' },
+  { eps:    10,   name: 'Petite Ferme Modeste',   stage: 'small' },
+  { eps:    100,  name: 'Hameau Avicole',          stage: 'hamlet' },
+  { eps:    1000, name: 'Domaine du Coq Francis',  stage: 'estate' },
+  { eps:   10000, name: 'Empire Pondeur',          stage: 'empire' },
+  { eps:  100000, name: 'Royaume des Œufs',        stage: 'kingdom' },
+  { eps: 1000000, name: 'Civilisation Ovipare',    stage: 'civ' },
+  { eps:    1e7,  name: 'Dimension Cocorico',      stage: 'cosmic' },
+  { eps:    1e9,  name: 'Multivers $FRANC',        stage: 'franc' }
+];
+
+// Background scenes (simplified for V3 to save space; full SVG kept from V2)
+const SCENES = {
+  pioneer: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky1)"/><circle cx="380" cy="60" r="32" fill="#e8a834" opacity="0.6"/><circle cx="380" cy="60" r="22" fill="#e8a834"/><path d="M0 250 Q120 240 240 245 T480 250 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 270 Q120 262 240 268 T480 270 L480 320 L0 320 Z" fill="#364425"/></svg>`,
+  small: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky2)"/><circle cx="80" cy="50" r="28" fill="#e8a834"/><path d="M0 240 Q120 230 240 238 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 265 Q120 258 240 263 T480 265 L480 320 L0 320 Z" fill="#364425"/></svg>`,
+  hamlet: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky3)"/><circle cx="400" cy="55" r="26" fill="#e8a834"/><g fill="#4a5d3a" opacity="0.7"><circle cx="50" cy="220" r="20"/><circle cx="100" cy="225" r="16"/><circle cx="430" cy="218" r="22"/></g><path d="M0 240 Q120 230 240 238 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 265 Q120 258 240 263 T480 265 L480 320 L0 320 Z" fill="#364425"/></svg>`,
+  estate: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky4" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e8c878"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky4)"/><circle cx="80" cy="60" r="24" fill="#e8a834"/><path d="M0 200 Q100 180 200 195 T480 200 L480 320 L0 320 Z" fill="#5a6d3a"/><path d="M0 240 Q120 225 240 235 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 270 Q120 260 240 268 T480 270 L480 320 L0 320 Z" fill="#364425"/></svg>`,
+  empire: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky5" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d8b878"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky5)"/><circle cx="420" cy="50" r="22" fill="#c8841d"/><path d="M0 215 Q100 195 200 210 T480 215 L480 320 L0 320 Z" fill="#5a6d3a"/><path d="M0 250 Q120 238 240 246 T480 250 L480 320 L0 320 Z" fill="#4a5d3a"/></svg>`,
+  kingdom: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky6" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b89868"/><stop offset="1" stop-color="#d8b878"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky6)"/><circle cx="100" cy="50" r="18" fill="#c8841d" opacity="0.7"/><path d="M0 280 L480 280 L480 320 L0 320 Z" fill="#364425"/></svg>`,
+  civ: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky7" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#6b4830"/><stop offset="0.5" stop-color="#a87848"/><stop offset="1" stop-color="#d8a868"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky7)"/><circle cx="240" cy="80" r="30" fill="#e8a834" opacity="0.8"/></svg>`,
+  cosmic: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><radialGradient id="sky8" cx="50%" cy="100%" r="80%"><stop offset="0" stop-color="#6b1a4a"/><stop offset="0.5" stop-color="#3a1830"/><stop offset="1" stop-color="#1a0820"/></radialGradient></defs><rect width="480" height="320" fill="url(#sky8)"/><g fill="#fbf3df"><circle cx="50" cy="40" r="1"/><circle cx="120" cy="60" r="1.5"/><circle cx="200" cy="30" r="1"/><circle cx="280" cy="50" r="1.2"/><circle cx="360" cy="35" r="1"/><circle cx="420" cy="55" r="1.5"/><circle cx="80" cy="90" r="1"/><circle cx="240" cy="80" r="1.3"/></g></svg>`,
+  franc: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><radialGradient id="sky9" cx="50%" cy="50%" r="80%"><stop offset="0" stop-color="#4a2860"/><stop offset="0.6" stop-color="#2a1840"/><stop offset="1" stop-color="#0a0820"/></radialGradient></defs><rect width="480" height="320" fill="url(#sky9)"/><g fill="#fbf3df"><circle cx="30" cy="30" r="0.8"/><circle cx="80" cy="50" r="1.2"/><circle cx="130" cy="20" r="1"/><circle cx="190" cy="40" r="0.8"/><circle cx="240" cy="25" r="1.4"/><circle cx="290" cy="50" r="1"/><circle cx="340" cy="30" r="1.2"/><circle cx="390" cy="55" r="0.8"/></g></svg>`
+};
+
+// Chick scatter positions (relative to coq, in % of playfield)
+const CHICK_SLOTS = [
+  { left: 35, top: 92 },
+  { left: 41, top: 96 },
+  { left: 47, top: 93 },
+  { left: 53, top: 96 },
+  { left: 58, top: 92 }
+];
+
+// ============ STATE ============
+let state = {
+  eggs: 0, totalEggs: 0, lifetimeEggs: 0,
+  clicks: 0, clickValue: 1, globalMult: 1,
+  producers: {}, producerMult: {},
+  upgrades: [], achievements: [],
+  prestiges: 0, totalPlumes: 0,
+  startTime: Date.now(),
+  lastSaveTime: Date.now(),
+  trialSecondsUsed: 0
+};
+PRODUCERS.forEach(p => { state.producers[p.id] = 0; state.producerMult[p.id] = 1; });
+
+const STORAGE_KEY = 'francEggClicker_v3';
+
+// ============ ASSET LOADING (PNG with emoji fallback) ============
+const PNG_AVAILABLE = {}; // id -> boolean
+function checkPngAvailable(filename) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = CONFIG.asset_path + filename;
+  });
+}
+
+async function preloadAssets() {
+  for (const p of PRODUCERS) {
+    if (p.sprite.png) {
+      PNG_AVAILABLE[p.id] = await checkPngAvailable(p.sprite.png);
+    }
+  }
+  PNG_AVAILABLE['coq'] = await checkPngAvailable('coq.png');
+  PNG_AVAILABLE['egg'] = await checkPngAvailable('egg.png');
+}
+
+// ============ SAVE / LOAD ============
+function save() {
+  try {
+    state.lastSaveTime = Date.now();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    flashSave();
+  } catch(e) {}
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    state = Object.assign(state, parsed);
+    PRODUCERS.forEach(p => {
+      if (!(p.id in state.producers)) state.producers[p.id] = 0;
+      if (!(p.id in state.producerMult)) state.producerMult[p.id] = 1;
+    });
+    if (!state.upgrades) state.upgrades = [];
+    if (!state.achievements) state.achievements = [];
+    if (typeof state.trialSecondsUsed !== 'number') state.trialSecondsUsed = 0;
+  } catch(e) {}
+}
+
+let saveTimer;
+function flashSave() {
+  const pill = document.getElementById('savePill');
+  pill.classList.add('visible');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => pill.classList.remove('visible'), 800);
+}
+
+// ============ MATH ============
+function fmt(n) {
+  if (n < 1000) return Math.floor(n).toLocaleString('fr-FR');
+  if (n < 1e6) return (n/1e3).toFixed(2) + ' k';
+  if (n < 1e9) return (n/1e6).toFixed(2) + ' M';
+  if (n < 1e12) return (n/1e9).toFixed(2) + ' Md';
+  if (n < 1e15) return (n/1e12).toFixed(2) + ' B';
+  return n.toExponential(2);
+}
+function fmtShort(n) {
+  if (n < 1000) return Math.floor(n).toString();
+  const units = ['', 'k', 'M', 'Md', 'B', 'aa', 'bb'];
+  const order = Math.min(Math.floor(Math.log10(Math.max(1,n)) / 3), units.length-1);
+  return (n / Math.pow(1000, order)).toFixed(1) + units[order];
+}
+function producerCost(p) { return Math.ceil(p.base * Math.pow(1.15, state.producers[p.id])); }
+function totalBuildings(s) { let n = 0; PRODUCERS.forEach(p => n += (s.producers[p.id] || 0)); return n; }
+function plumeBonus() { return 1 + state.totalPlumes * 0.02; }
+function achievementBonus() { return 1 + state.achievements.length * 0.01; }
+function totalEps() {
+  let sum = 0;
+  PRODUCERS.forEach(p => { sum += p.eps * state.producers[p.id] * state.producerMult[p.id]; });
+  return sum * state.globalMult * plumeBonus() * achievementBonus();
+}
+function effectiveClick() { return state.clickValue * plumeBonus() * achievementBonus(); }
+function checkRequirement(req) {
+  if (!req) return true;
+  if (req.type === 'clicks') return state.clicks >= req.n;
+  if (req.type === 'producer') return state.producers[req.id] >= req.n;
+  return false;
+}
+function currentStage() {
+  const eps = totalEps();
+  let stage = FARM_STAGES[0], idx = 0;
+  for (let i = 0; i < FARM_STAGES.length; i++) {
+    if (eps >= FARM_STAGES[i].eps) { stage = FARM_STAGES[i]; idx = i; }
+  }
+  return { stage, idx };
+}
+
+// ============ PRESTIGE / ACHIEVEMENTS ============
+function calculatePlumes() {
+  if (state.totalEggs < 1e9) return 0;
+  return Math.floor(Math.sqrt(state.totalEggs / 1e9));
+}
+function doPrestige() {
+  const plumes = calculatePlumes();
+  if (plumes < 1) return;
+  state.totalPlumes = (state.totalPlumes || 0) + plumes;
+  state.prestiges = (state.prestiges || 0) + 1;
+  state.lifetimeEggs = (state.lifetimeEggs || 0) + state.totalEggs;
+  state.eggs = 0; state.totalEggs = 0; state.clicks = 0;
+  state.clickValue = 1; state.globalMult = 1;
+  PRODUCERS.forEach(p => { state.producers[p.id] = 0; state.producerMult[p.id] = 1; });
+  state.upgrades = [];
+  checkAchievements();
+  renderAll();
+  save();
+}
+function checkAchievements() {
+  let newly = [];
+  ACHIEVEMENTS.forEach(a => {
+    if (!state.achievements.includes(a.id) && a.check(state)) {
+      state.achievements.push(a.id);
+      newly.push(a);
+    }
+  });
+  newly.forEach((a, i) => setTimeout(() => showToast(a), i * 2000));
+  if (newly.length > 0) save();
+}
+function showToast(a) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = a.icon;
+  document.getElementById('toastName').textContent = a.name;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 3000);
+}
+
+// ============ OFFLINE PROGRESS ============
+function applyOfflineProgress() {
+  const now = Date.now();
+  const elapsed = (now - (state.lastSaveTime || now)) / 1000;
+  if (elapsed < 30) return;
+  const CAP = 8 * 3600, RATE = 0.5;
+  const dt = Math.min(elapsed, CAP);
+  const gain = totalEps() * dt * RATE;
+  if (gain < 1) return;
+  state.eggs += gain;
+  state.totalEggs += gain;
+  document.getElementById('offlineGain').textContent = '+' + fmt(gain) + ' 🥚';
+  let durTxt;
+  if (elapsed > CAP) durTxt = `+ de 8h (plafonné)`;
+  else if (elapsed > 3600) durTxt = `${Math.floor(elapsed/3600)} h ${Math.floor((elapsed%3600)/60)} min`;
+  else if (elapsed > 60) durTxt = `${Math.floor(elapsed/60)} min`;
+  else durTxt = `${Math.floor(elapsed)} s`;
+  document.getElementById('offlineDuration').textContent = durTxt;
+  document.getElementById('offlineModal').classList.add('visible');
+}
+
+// ============ TRIAL TIMER ============
+let trialInterval = null;
+let trialStartTime = Date.now();
+function startTrialTimer() {
+  if (isUnlimited) return;
+  document.getElementById('trialTimer').classList.add('visible');
+  document.getElementById('modePill').style.display = '';
+  trialStartTime = Date.now();
+  updateTrialTimer();
+  trialInterval = setInterval(updateTrialTimer, 1000);
+}
+function updateTrialTimer() {
+  if (isUnlimited) return;
+  const sessionElapsed = (Date.now() - trialStartTime) / 1000;
+  const remaining = Math.max(0, CONFIG.trial_duration_sec - state.trialSecondsUsed - sessionElapsed);
+  const m = Math.floor(remaining / 60);
+  const s = Math.floor(remaining % 60);
+  const el = document.getElementById('trialTime');
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  const timer = document.getElementById('trialTimer');
+  if (remaining <= 60) timer.classList.add('warning');
+  if (remaining <= 0) endTrial();
+}
+function endTrial() {
+  clearInterval(trialInterval);
+  // Persist used trial seconds
+  state.trialSecondsUsed = CONFIG.trial_duration_sec;
+  save();
+  // Pause game loop by hiding playfield interactions
+  document.getElementById('coqBtn').disabled = true;
+  document.getElementById('trialEndModal').classList.add('visible');
+}
+function persistTrialTime() {
+  if (isUnlimited) return;
+  const sessionElapsed = (Date.now() - trialStartTime) / 1000;
+  state.trialSecondsUsed = Math.min(CONFIG.trial_duration_sec, state.trialSecondsUsed + sessionElapsed);
+  trialStartTime = Date.now();
+}
+
+// ============ ACTIONS ============
+function clickCoq() {
+  const gain = effectiveClick();
+  state.eggs += gain;
+  state.totalEggs += gain;
+  state.clicks++;
+  spawnPop(gain);
+  renderTop();
+  if (state.clicks <= 10 || state.clicks % 50 === 0) checkAchievements();
+}
+
+function spawnPop(n) {
+  const area = document.getElementById('coqArea');
+  const el = document.createElement('div');
+  el.className = 'pop';
+  el.textContent = fmtShort(n);
+  const offset = (Math.random() - 0.5) * 60;
+  el.style.transform = `translateX(calc(-50% + ${offset}px))`;
+  area.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function buyProducer(p) {
+  const cost = producerCost(p);
+  if (state.eggs < cost) return;
+  state.eggs -= cost;
+  state.producers[p.id]++;
+  checkAchievements();
+  renderAll();
+  save();
+}
+function buyUpgrade(u) {
+  if (state.upgrades.includes(u.id)) return;
+  if (!checkRequirement(u.req)) return;
+  if (state.eggs < u.cost) return;
+  state.eggs -= u.cost;
+  state.upgrades.push(u.id);
+  applyUpgrade(u);
+  checkAchievements();
+  renderAll();
+  save();
+}
+function applyUpgrade(u) {
+  if (u.type === 'click') state.clickValue *= u.mult;
+  else if (u.type === 'producer') state.producerMult[u.target] *= u.mult;
+  else if (u.type === 'global') state.globalMult *= u.mult;
+}
+function recomputeFromUpgrades() {
+  state.clickValue = 1;
+  state.globalMult = 1;
+  PRODUCERS.forEach(p => state.producerMult[p.id] = 1);
+  state.upgrades.forEach(uid => {
+    const u = UPGRADES.find(x => x.id === uid);
+    if (u) applyUpgrade(u);
+  });
+}
+
+// ============ SPRITE RENDERING ============
+function renderSprites() {
+  const layer = document.getElementById('spriteLayer');
+  layer.innerHTML = '';
+  
+  PRODUCERS.forEach(p => {
+    const owned = state.producers[p.id];
+    if (owned <= 0) return;
+    
+    if (p.sprite.type === 'chicks') {
+      // Scatter individual chicks up to slots, then show count badge
+      const visibleChicks = Math.min(owned, CHICK_SLOTS.length);
+      for (let i = 0; i < visibleChicks; i++) {
+        const slot = CHICK_SLOTS[i];
+        const sprite = createSprite(p, slot.left, slot.top, p.sprite.size);
+        if (i === visibleChicks - 1 && owned > CHICK_SLOTS.length) {
+          const badge = document.createElement('div');
+          badge.className = 'sprite-badge';
+          badge.textContent = '×' + owned;
+          sprite.appendChild(badge);
+        }
+        layer.appendChild(sprite);
+      }
+    } else {
+      // Single sprite with optional ×N badge
+      const sprite = createSprite(p, p.sprite.left, p.sprite.top, p.sprite.size);
+      if (owned > 1) {
+        const badge = document.createElement('div');
+        badge.className = 'sprite-badge';
+        badge.textContent = '×' + owned;
+        sprite.appendChild(badge);
+      }
+      if (p.id === 'hen') sprite.classList.add('sprite-hen');
+      layer.appendChild(sprite);
+    }
+  });
+}
+
+function createSprite(producer, leftPct, topPct, size) {
+  const div = document.createElement('div');
+  div.className = 'sprite visible';
+  div.style.left = leftPct + '%';
+  div.style.top = topPct + '%';
+  div.style.width = size + 'px';
+  div.style.height = size + 'px';
+  
+  if (PNG_AVAILABLE[producer.id]) {
+    const img = document.createElement('img');
+    img.src = CONFIG.asset_path + producer.sprite.png;
+    img.alt = producer.name;
+    div.appendChild(img);
+  } else {
+    // Fallback emoji
+    const emoji = document.createElement('div');
+    emoji.className = 'sprite-emoji';
+    emoji.style.fontSize = (size * 0.85) + 'px';
+    emoji.textContent = producer.icon;
+    div.appendChild(emoji);
+  }
+  return div;
+}
+
+// ============ FLYING EGGS ============
+let eggEmitTimer = 0;
+function updateEggEmission(dt) {
+  // Only emit if there's a hen
+  if (state.producers.hen <= 0) return;
+  
+  const eps = totalEps();
+  // Visual rate: log scale, capped at 8 eggs/sec for visual clarity
+  const visualRate = Math.min(8, 0.5 + Math.log10(Math.max(1, eps)) * 1.2);
+  const interval = 1 / visualRate;
+  
+  eggEmitTimer += dt;
+  while (eggEmitTimer >= interval) {
+    eggEmitTimer -= interval;
+    spawnFlyingEgg();
+  }
+}
+
+function spawnFlyingEgg() {
+  const layer = document.getElementById('eggLayer');
+  const playfield = document.getElementById('playfield');
+  const rect = playfield.getBoundingClientRect();
+  
+  // Hen position (matches sprite position in CSS: left 62%, top 78%)
+  const startX = rect.width * 0.62;
+  const startY = rect.height * 0.78;
+  
+  const egg = document.createElement('div');
+  egg.className = 'flying-egg';
+  if (PNG_AVAILABLE['egg']) {
+    egg.innerHTML = `<img src="${CONFIG.asset_path}egg.png" style="width:100%;height:100%" alt="">`;
+  } else {
+    egg.textContent = '🥚';
+  }
+  egg.style.left = startX + 'px';
+  egg.style.top = startY + 'px';
+  layer.appendChild(egg);
+  
+  // Random arc trajectory: launch up-right, fall offscreen
+  const angle = -20 + Math.random() * 50; // -20° to +30° from horizontal
+  const power = 0.4 + Math.random() * 0.3;
+  const vx = Math.cos(angle * Math.PI / 180) * rect.width * power;
+  const vy = -Math.sin(angle * Math.PI / 180) * rect.height * 0.4 - rect.height * 0.15;
+  const rotEnd = (Math.random() - 0.5) * 720;
+  const duration = 1200 + Math.random() * 600;
+  
+  const startTime = performance.now();
+  const gravity = rect.height * 1.5; // pixels per second squared, normalized
+  
+  function animateEgg(now) {
+    const t = (now - startTime) / 1000;
+    if (t > duration / 1000 || !egg.parentNode) {
+      egg.remove();
+      return;
+    }
+    const x = vx * t;
+    const y = vy * t + 0.5 * gravity * t * t;
+    const rot = rotEnd * (t / (duration / 1000));
+    egg.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+    if (x > rect.width || y > rect.height) {
+      egg.remove();
+      return;
+    }
+    requestAnimationFrame(animateEgg);
+  }
+  requestAnimationFrame(animateEgg);
+}
+
+// ============ RENDER ============
+let currentSceneIdx = -1;
+function renderScene() {
+  const { idx } = currentStage();
+  if (idx === currentSceneIdx) return;
+  currentSceneIdx = idx;
+  const stack = document.getElementById('sceneStack');
+  const stageId = FARM_STAGES[idx].stage;
+  let existing = stack.querySelector(`[data-stage="${stageId}"]`);
+  if (!existing) {
+    existing = document.createElement('div');
+    existing.className = 'scene';
+    existing.dataset.stage = stageId;
+    existing.innerHTML = SCENES[stageId] || '';
+    stack.appendChild(existing);
+    void existing.offsetWidth;
+  }
+  stack.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+  existing.classList.add('active');
+}
+
+function renderTop() {
+  document.getElementById('eggCount').textContent = fmt(state.eggs);
+  document.getElementById('epsValue').textContent = fmtShort(totalEps());
+  document.getElementById('clickValue').textContent = fmtShort(effectiveClick());
+  const mult = plumeBonus() * achievementBonus() * state.globalMult;
+  document.getElementById('globalMultDisplay').textContent = mult.toFixed(2);
+  const { stage, idx } = currentStage();
+  document.getElementById('farmName').textContent = stage.name;
+  document.getElementById('farmLabel').textContent = `— étape ${idx + 1} —`;
+  if (state.totalPlumes > 0) {
+    document.getElementById('plumesBadge').style.display = '';
+    document.getElementById('plumesCount').textContent = state.totalPlumes;
+  } else {
+    document.getElementById('plumesBadge').style.display = 'none';
+  }
+  renderScene();
+}
+
+function renderProducers() {
+  const panel = document.getElementById('producersPanel');
+  panel.innerHTML = '';
+  PRODUCERS.forEach((p, idx) => {
+    const ever = state.producers[p.id] > 0;
+    const prevOwned = idx === 0 ? 1 : state.producers[PRODUCERS[idx-1].id];
+    if (!ever && idx > 0 && prevOwned < 1 && state.totalEggs < p.base * 0.3 && state.lifetimeEggs < p.base) return;
+    const cost = producerCost(p);
+    const affordable = state.eggs >= cost;
+    const div = document.createElement('div');
+    div.className = 'item' + (affordable ? '' : ' locked');
+    const eachEps = p.eps * state.producerMult[p.id] * state.globalMult * plumeBonus() * achievementBonus();
+    div.innerHTML = `
+      <div class="item-icon">${p.icon}</div>
+      <div class="item-body">
+        <div class="item-name">${p.name}</div>
+        <div class="item-detail">${p.desc} · <strong>${fmtShort(eachEps)}</strong>/sec chacun</div>
+      </div>
+      <div class="item-right">
+        <div class="item-cost">${fmtShort(cost)}</div>
+        <div class="item-owned">×${state.producers[p.id]}</div>
+      </div>`;
+    div.onclick = () => buyProducer(p);
+    panel.appendChild(div);
+  });
+}
+
+function renderUpgrades() {
+  const panel = document.getElementById('upgradesPanel');
+  panel.innerHTML = '';
+  let shown = 0, hasAffordable = false;
+  UPGRADES.forEach(u => {
+    const purchased = state.upgrades.includes(u.id);
+    const reqMet = checkRequirement(u.req);
+    if (!reqMet && !purchased) return;
+    shown++;
+    const affordable = state.eggs >= u.cost;
+    if (affordable && !purchased) hasAffordable = true;
+    const div = document.createElement('div');
+    div.className = 'item' + (purchased ? ' maxed' : (affordable ? '' : ' locked'));
+    let effect = '';
+    if (u.type === 'click') effect = `Clic ×${u.mult}`;
+    else if (u.type === 'producer') {
+      const target = PRODUCERS.find(p => p.id === u.target);
+      effect = `${target.name} ×${u.mult}`;
+    } else if (u.type === 'global') effect = `Production globale ×${u.mult}`;
+    div.innerHTML = `
+      <div class="item-icon">${u.icon}</div>
+      <div class="item-body">
+        <div class="item-name">${u.name}</div>
+        <div class="item-detail">${effect}</div>
+      </div>
+      <div class="item-right">
+        <div class="item-cost">${purchased ? '✓' : fmtShort(u.cost)}</div>
+      </div>`;
+    if (!purchased) div.onclick = () => buyUpgrade(u);
+    panel.appendChild(div);
+  });
+  const tab = document.querySelector('.tab[data-panel="upgrades"]');
+  tab.classList.toggle('has-new', hasAffordable && !tab.classList.contains('active'));
+  if (shown === 0) {
+    panel.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--ink-muted);font-style:italic;font-family:\'Fraunces\',serif">Pas encore d\'améliorations.<br><br>Achète des bâtiments pour débloquer.</div>';
+  }
+}
+
+function renderAchievements() {
+  const panel = document.getElementById('achievementsPanel');
+  panel.innerHTML = '';
+  const header = document.createElement('div');
+  header.style.cssText = 'text-align:center;padding:8px 4px 16px;font-family:Fraunces,serif;font-size:13px;color:var(--ink-muted);font-style:italic';
+  header.innerHTML = `<strong style="color:var(--wine);font-style:normal">${state.achievements.length} / ${ACHIEVEMENTS.length}</strong> débloqués · chaque trophée donne <strong style="color:var(--yolk-deep);font-style:normal">+1% global permanent</strong>`;
+  panel.appendChild(header);
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = state.achievements.includes(a.id);
+    const div = document.createElement('div');
+    div.className = 'achievement' + (unlocked ? ' unlocked' : '');
+    div.innerHTML = `
+      <div class="achievement-icon">${a.icon}</div>
+      <div class="achievement-body">
+        <div class="achievement-name">${unlocked ? a.name : '???'}</div>
+        <div class="achievement-detail">${a.desc}</div>
+      </div>
+      <div class="achievement-bonus">+1%</div>`;
+    panel.appendChild(div);
+  });
+}
+
+function renderPrestige() {
+  const panel = document.getElementById('prestigePanel');
+  const plumes = calculatePlumes();
+  const eggsNeeded = Math.max(0, Math.pow(plumes + 1, 2) * 1e9 - state.totalEggs);
+  panel.innerHTML = `
+    <div class="prestige-card">
+      <div class="prestige-title">Le Cycle des Plumes</div>
+      <div class="prestige-sub">Recommence pour devenir plus fort</div>
+      <div class="prestige-big">+${plumes} 🪶</div>
+      <div class="prestige-line"><span>Plumes possédées</span><span>${state.totalPlumes}</span></div>
+      <div class="prestige-line"><span>Bonus actuel</span><span>×${plumeBonus().toFixed(2)}</span></div>
+      <div class="prestige-line"><span>Bonus après prestige</span><span>×${(1 + (state.totalPlumes + plumes) * 0.02).toFixed(2)}</span></div>
+      <div class="prestige-line"><span>Prochaine Plume dans</span><span>${fmtShort(eggsNeeded)} 🥚</span></div>
+      <button class="prestige-btn" id="prestigeBtn" ${plumes < 1 ? 'disabled' : ''}>${plumes >= 1 ? 'Prestige !' : "Atteins 1 Md d'œufs"}</button>
+    </div>
+    <div style="font-size:11.5px;color:var(--ink-muted);line-height:1.5;font-family:Fraunces,serif;font-style:italic;padding:0 8px">
+      Chaque Plume = <strong style="color:var(--yolk-deep)">+2% permanent</strong>. Tu gardes : Plumes, Trophées. Tu perds : œufs, bâtiments, améliorations.
+    </div>`;
+  const btn = document.getElementById('prestigeBtn');
+  if (btn && plumes >= 1) {
+    btn.onclick = () => {
+      document.getElementById('prestigeGainModal').textContent = '+' + plumes + ' 🪶';
+      document.getElementById('prestigeModal').classList.add('visible');
+    };
+  }
+  const tab = document.querySelector('.tab[data-panel="prestige"]');
+  tab.classList.toggle('has-new', plumes >= 1 && !tab.classList.contains('active'));
+}
+
+function renderStats() {
+  document.getElementById('statTotal').textContent = fmt(state.totalEggs);
+  document.getElementById('statLifetime').textContent = fmt((state.lifetimeEggs || 0) + state.totalEggs);
+  document.getElementById('statClicks').textContent = state.clicks.toLocaleString('fr-FR');
+  document.getElementById('statEps').textContent = fmtShort(totalEps());
+  document.getElementById('statClickVal').textContent = fmtShort(effectiveClick());
+  document.getElementById('statGlobal').textContent = '×' + (plumeBonus() * achievementBonus() * state.globalMult).toFixed(2);
+  document.getElementById('statBuildings').textContent = totalBuildings(state).toLocaleString('fr-FR');
+  document.getElementById('statUpgrades').textContent = state.upgrades.length;
+  document.getElementById('statAchievements').textContent = `${state.achievements.length} / ${ACHIEVEMENTS.length}`;
+  document.getElementById('statPrestiges').textContent = state.prestiges || 0;
+  document.getElementById('statPlumes').textContent = state.totalPlumes || 0;
+  document.getElementById('statMode').textContent = isUnlimited ? '🪙 $FRANC Holder' : 'Trial 10 min';
+}
+
+function renderAll() {
+  renderTop();
+  renderSprites();
+  renderProducers();
+  renderUpgrades();
+  renderAchievements();
+  renderPrestige();
+  renderStats();
+}
+
+// ============ TABS ============
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    tab.classList.remove('has-new');
+    document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+    document.getElementById(tab.dataset.panel + 'Panel').classList.remove('hidden');
+  };
+});
+
+document.getElementById('coqBtn').addEventListener('click', clickCoq);
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+
+// Modal controls
+document.getElementById('resetBtn').onclick = () => document.getElementById('resetModal').classList.add('visible');
+document.getElementById('cancelReset').onclick = () => document.getElementById('resetModal').classList.remove('visible');
+document.getElementById('confirmReset').onclick = () => {
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+};
+document.getElementById('cancelPrestige').onclick = () => document.getElementById('prestigeModal').classList.remove('visible');
+document.getElementById('confirmPrestige').onclick = () => {
+  document.getElementById('prestigeModal').classList.remove('visible');
+  doPrestige();
+};
+document.getElementById('closeOffline').onclick = () => {
+  document.getElementById('offlineModal').classList.remove('visible');
+  renderAll();
+};
+document.getElementById('connectWalletBtn').onclick = () => {
+  window.location.href = CONFIG.wallet_url;
+};
+document.getElementById('closeTrialEnd').onclick = () => {
+  window.location.href = CONFIG.home_url;
+};
+
+// ============ GAME LOOP ============
+let lastTick = Date.now();
+function tick() {
+  const now = Date.now();
+  const dt = (now - lastTick) / 1000;
+  lastTick = now;
+  const gain = totalEps() * dt;
+  if (gain > 0) {
+    state.eggs += gain;
+    state.totalEggs += gain;
+  }
+  updateEggEmission(dt);
+  renderTop();
+}
+
+// ============ INIT ============
+async function init() {
+  load();
+  recomputeFromUpgrades();
+  
+  // Check if trial already exhausted
+  if (!isUnlimited && state.trialSecondsUsed >= CONFIG.trial_duration_sec) {
+    document.getElementById('coqBtn').disabled = true;
+    document.getElementById('trialEndModal').classList.add('visible');
+  }
+  
+  await preloadAssets();
+  applyOfflineProgress();
+  checkAchievements();
+  renderAll();
+  
+  if (!isUnlimited) startTrialTimer();
+  
+  setInterval(tick, 100);
+  setInterval(() => { 
+    renderProducers(); renderUpgrades(); renderPrestige(); renderStats(); checkAchievements();
+    renderSprites();
+  }, 800);
+  setInterval(save, 15000);
+  
+  // Telegram init
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+}
+
+window.addEventListener('beforeunload', () => { persistTrialTime(); save(); });
+window.addEventListener('pagehide', () => { persistTrialTime(); save(); });
+document.addEventListener('visibilitychange', () => { 
+  if (document.hidden) { persistTrialTime(); save(); }
+});
+
+init();
+</script>
+</body>
+</html>
