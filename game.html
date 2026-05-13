@@ -88,6 +88,16 @@
     letter-spacing: 0.1em;
     border: 1px solid rgba(232, 168, 52, 0.4);
   }
+  .unlimited-pill {
+    background: rgba(232, 168, 52, 0.3);
+    color: var(--yolk);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    border: 1px solid var(--yolk);
+  }
   
   .stats-row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
   
@@ -121,7 +131,7 @@
     padding: 8px 0 0;
     position: relative;
     z-index: 5;
-    min-height: 340px;
+    min-height: 360px;
     overflow: hidden;
   }
   
@@ -142,10 +152,10 @@
   .sprite {
     position: absolute;
     transform: translate(-50%, -50%);
-    transition: all 0.4s cubic-bezier(.34,1.56,.64,1);
-    pointer-events: auto;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
     opacity: 0;
-    filter: drop-shadow(0 3px 0 rgba(42, 24, 16, 0.25));
+    filter: drop-shadow(0 3px 4px rgba(42, 24, 16, 0.25));
   }
   
   .sprite.visible {
@@ -164,6 +174,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
   }
   
   .sprite .sprite-emoji {
@@ -189,18 +200,41 @@
     box-shadow: 0 2px 0 rgba(0,0,0,0.2);
     min-width: 22px;
     text-align: center;
+    z-index: 1;
   }
   
-  /* === HEN ANIMATION === */
-  .sprite-hen {
-    animation: hen-bob 1.8s ease-in-out infinite;
-  }
+  /* === ANIMATIONS === */
+  .sprite-hen { animation: hen-bob 1.8s ease-in-out infinite; }
   @keyframes hen-bob {
     0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); }
     50% { transform: translate(-50%, -55%) rotate(2deg); }
   }
   
-  .sprite-coq:active { transform: translate(-50%, -50%) scale(0.92); }
+  .sprite-chick { animation: chick-hop 1.4s ease-in-out infinite; }
+  @keyframes chick-hop {
+    0%, 50%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    25% { transform: translate(-50%, -50%) translateY(-6px); }
+  }
+  
+  .sprite-paradox { animation: paradox-spin 8s linear infinite; }
+  @keyframes paradox-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+  
+  .sprite-franc { animation: franc-glow 2.5s ease-in-out infinite; }
+  @keyframes franc-glow {
+    0%, 100% { filter: drop-shadow(0 3px 4px rgba(42, 24, 16, 0.25)) drop-shadow(0 0 4px rgba(232, 168, 52, 0.4)); }
+    50% { filter: drop-shadow(0 3px 4px rgba(42, 24, 16, 0.25)) drop-shadow(0 0 14px rgba(232, 168, 52, 0.9)); }
+  }
+  
+  .sprite-factory-smoke {
+    animation: smoke 3s ease-in-out infinite;
+  }
+  @keyframes smoke {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -52%) scale(1.02); }
+  }
   
   /* === FLYING EGGS === */
   .egg-layer {
@@ -213,13 +247,13 @@
   
   .flying-egg {
     position: absolute;
-    width: 22px;
-    height: 28px;
-    font-size: 22px;
-    line-height: 1;
+    width: 28px;
+    height: 32px;
     pointer-events: none;
     will-change: transform;
   }
+  .flying-egg img { width: 100%; height: 100%; object-fit: contain; }
+  .flying-egg .egg-emoji { font-size: 26px; line-height: 1; }
   
   /* === FARM INFO === */
   .farm-info {
@@ -229,7 +263,6 @@
     transform: translateX(-50%);
     z-index: 4;
     text-align: center;
-    pointer-events: none;
     width: 100%;
   }
   
@@ -258,6 +291,8 @@
     display: inline-block;
     padding: 2px 12px;
     border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
   }
   .farm-name::before, .farm-name::after {
     content: '✦';
@@ -270,30 +305,30 @@
   /* === COQ (main button) === */
   .coq-area {
     position: relative;
-    width: 160px;
-    height: 160px;
+    width: 180px;
+    height: 180px;
     z-index: 5;
-    margin: 0 auto 8px;
+    margin: 0 auto 6px;
   }
   
   .coq-base {
     position: absolute;
-    bottom: 4px;
+    bottom: 6px;
     left: 50%;
     transform: translateX(-50%);
-    width: 150px;
+    width: 170px;
     height: 18px;
     background: radial-gradient(ellipse, rgba(42, 24, 16, 0.35), transparent 70%);
     z-index: 1;
   }
   
   .coq-btn {
-    width: 150px;
-    height: 150px;
+    width: 170px;
+    height: 170px;
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 130px;
+    font-size: 140px;
     line-height: 1;
     transition: transform 0.08s cubic-bezier(.4,2,.6,1);
     z-index: 2;
@@ -301,11 +336,16 @@
     inset: 0;
     margin: auto;
     filter: drop-shadow(0 5px 0 rgba(42, 24, 16, 0.25));
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .coq-btn:active {
     transform: scale(0.92) translateY(4px);
     filter: drop-shadow(0 2px 0 rgba(42, 24, 16, 0.3));
   }
+  .coq-btn img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
   
   @keyframes float-up {
     0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; }
@@ -397,6 +437,7 @@
   .item.locked { opacity: 0.45; cursor: not-allowed; background: var(--cream-warm); }
   .item.maxed { background: var(--leaf); color: var(--cream); cursor: default; }
   .item-icon { font-size: 28px; line-height: 1; flex-shrink: 0; width: 40px; text-align: center; }
+  .item-icon img { width: 36px; height: 36px; object-fit: contain; vertical-align: middle; }
   .item-body { flex: 1; min-width: 0; }
   .item-name {
     font-family: 'Fraunces', serif;
@@ -519,7 +560,7 @@
   }
   .reset-btn:active { background: var(--wine); color: var(--paper); }
   
-  /* === TRIAL TIMER (top overlay) === */
+  /* === TRIAL TIMER === */
   .trial-timer {
     position: fixed;
     top: 56px;
@@ -543,6 +584,45 @@
     50% { transform: scale(1.05); }
   }
   
+  /* === CHEAT TOAST === */
+  .cheat-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, var(--yolk), var(--yolk-deep));
+    color: var(--ink);
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 18px;
+    border: 2px solid var(--ink);
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+  .cheat-flash.visible {
+    animation: cheat-pop 1.5s ease-out forwards;
+  }
+  @keyframes cheat-pop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -70%) scale(0.9); opacity: 0; }
+  }
+  .cheat-flash-sub {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    font-style: italic;
+    margin-top: 4px;
+    opacity: 0.8;
+  }
+  
   /* === SAVE PILL === */
   .save-pill {
     position: fixed;
@@ -564,6 +644,7 @@
     box-shadow: var(--shadow);
   }
   .save-pill.visible { opacity: 1; }
+  .save-pill.cloud { background: var(--wine); }
   
   /* Toast */
   .toast {
@@ -644,6 +725,7 @@
 
 <div class="save-pill" id="savePill">Sauvegardé</div>
 <div class="trial-timer" id="trialTimer"><span>⏱</span><span id="trialTime">10:00</span></div>
+<div class="cheat-flash" id="cheatFlash"></div>
 <div class="toast" id="toast">
   <span class="toast-icon" id="toastIcon">🏆</span>
   <div>
@@ -668,9 +750,7 @@
 
 <main class="playfield" id="playfield">
   <div class="scene-stack" id="sceneStack"></div>
-  
   <div class="sprite-layer" id="spriteLayer"></div>
-  
   <div class="egg-layer" id="eggLayer"></div>
   
   <div class="farm-info">
@@ -754,10 +834,10 @@
   <div class="modal">
     <div class="modal-icon">🪙</div>
     <h2>Session terminée</h2>
-    <p>Les 10 minutes de jeu gratuit sont écoulées. <strong>Connecte ton wallet $FRANC</strong> pour jouer sans limite.</p>
+    <p>Les 10 minutes de jeu gratuit sont écoulées. <strong>Achète du $FRANC</strong> pour jouer sans limite.</p>
     <p style="font-size:12px;color:var(--ink-muted);font-style:italic">Ta progression est sauvegardée.</p>
     <div class="modal-buttons" style="flex-direction:column">
-      <button class="modal-btn gold" id="connectWalletBtn" style="margin-bottom:8px">🪙 Connecter mon wallet</button>
+      <button class="modal-btn gold" id="connectWalletBtn" style="margin-bottom:8px">🪙 Lier mon wallet $FRANC</button>
       <button class="modal-btn cancel" id="closeTrialEnd">Retour à l'accueil</button>
     </div>
   </div>
@@ -772,37 +852,36 @@ const CONFIG = {
   home_url: './index.html',
   trial_duration_sec: 600, // 10 minutes
   backend: 'https://mubqtnqulpyehkgubhnh.supabase.co/functions/v1',
-  asset_path: 'assets/' // PNG sprites folder
+  asset_path: 'assets/',
+  cloud_sync_interval_sec: 60
 };
 
-// Mode is set via URL parameter (?mode=unlimited or ?mode=trial)
-// Defaults to trial for safety
 const urlParams = new URLSearchParams(window.location.search);
 let isUnlimited = urlParams.get('mode') === 'unlimited';
 
-// ============ DATA ============
-// Each producer has a sprite definition: position (left%, top%), size (px), and optional image filename
+// ============ PRODUCERS (with sprite positions) ============
+// Each sprite: { left%, top%, w (display px width), h (display px height optional, defaults to w), png, door? for factory }
 const PRODUCERS = [
   { id: 'chick',    icon: '🐤', name: 'Poussin curieux',          base: 15,             eps: 0.1,    desc: 'Pas grand chose, mais ça commence.',
-    sprite: { type: 'chicks', size: 36, png: 'chick.png' } },
+    sprite: { left: 32, top: 88, w: 50, h: 50, png: 'chick.png', anim: 'sprite-chick' } },
   { id: 'hen',      icon: '🐔', name: 'Poule pondeuse',            base: 100,            eps: 1,      desc: 'La base de toute ferme respectable.',
-    sprite: { type: 'single', left: 62, top: 78, size: 70, png: 'hen.png', emits_eggs: true } },
+    sprite: { left: 68, top: 80, w: 90, h: 80, png: 'hen.png', anim: 'sprite-hen', emits_eggs: true } },
   { id: 'coop',     icon: '🏠', name: 'Poulailler',                base: 1100,           eps: 8,      desc: 'Un toit pour les pondeuses.',
-    sprite: { type: 'single', left: 14, top: 65, size: 80, png: 'coop.png' } },
+    sprite: { left: 14, top: 62, w: 90, h: 84, png: 'coop.png' } },
   { id: 'farm',     icon: '🚜', name: 'Coopérative agricole',      base: 12000,          eps: 47,     desc: 'L\'union fait la force.',
-    sprite: { type: 'single', left: 84, top: 65, size: 80, png: 'farm.png' } },
+    sprite: { left: 84, top: 60, w: 110, h: 75, png: 'farm.png' } },
   { id: 'auto',     icon: '⚙️', name: 'Ferme automatisée',         base: 130000,         eps: 260,    desc: 'Tapis roulants et œufs partout.',
-    sprite: { type: 'single', left: 22, top: 42, size: 70, png: 'auto.png' } },
+    sprite: { left: 22, top: 38, w: 100, h: 52, png: 'auto.png' } },
   { id: 'factory',  icon: '🏭', name: 'Usine d\'œufs',             base: 1400000,        eps: 1400,   desc: 'L\'industrialisation de la cocotte.',
-    sprite: { type: 'single', left: 78, top: 42, size: 75, png: 'factory.png' } },
+    sprite: { left: 78, top: 38, w: 80, h: 124, png: 'factory.png', door: { x: 0.70, y: 0.78 }, anim: 'sprite-factory-smoke' } },
   { id: 'lab',      icon: '🧪', name: 'Labo génétique',            base: 20000000,       eps: 7800,   desc: 'Œufs carrés, lumineux, sonores.',
-    sprite: { type: 'single', left: 12, top: 18, size: 55, png: 'lab.png' } },
+    sprite: { left: 12, top: 16, w: 75, h: 75, png: 'lab.png' } },
   { id: 'space',    icon: '🛰️', name: 'Station orbitale Cocorico', base: 330000000,      eps: 44000,  desc: 'Pondre dans le vide spatial.',
-    sprite: { type: 'single', left: 88, top: 18, size: 55, png: 'station.png' } },
+    sprite: { left: 88, top: 16, w: 90, h: 70, png: 'station.png' } },
   { id: 'franc',    icon: '🪙', name: 'Dimension $FRANC',          base: 5100000000,     eps: 260000, desc: 'Œufs cryptés sur la chaîne.',
-    sprite: { type: 'single', left: 50, top: 10, size: 60, png: 'franc.png' } },
+    sprite: { left: 50, top: 9, w: 70, h: 70, png: 'franc.png', anim: 'sprite-franc' } },
   { id: 'paradox',  icon: '🌀', name: 'Paradoxe du coq',           base: 75000000000,    eps: 1600000, desc: 'L\'œuf et la poule, simultanément.',
-    sprite: { type: 'single', left: 50, top: 28, size: 65, png: 'paradox.png' } }
+    sprite: { left: 50, top: 26, w: 75, h: 90, png: 'paradox.png', anim: 'sprite-paradox' } }
 ];
 
 const UPGRADES = [
@@ -855,11 +934,10 @@ const FARM_STAGES = [
   { eps:    1e9,  name: 'Multivers $FRANC',        stage: 'franc' }
 ];
 
-// Background scenes (simplified for V3 to save space; full SVG kept from V2)
 const SCENES = {
   pioneer: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky1)"/><circle cx="380" cy="60" r="32" fill="#e8a834" opacity="0.6"/><circle cx="380" cy="60" r="22" fill="#e8a834"/><path d="M0 250 Q120 240 240 245 T480 250 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 270 Q120 262 240 268 T480 270 L480 320 L0 320 Z" fill="#364425"/></svg>`,
   small: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky2)"/><circle cx="80" cy="50" r="28" fill="#e8a834"/><path d="M0 240 Q120 230 240 238 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 265 Q120 258 240 263 T480 265 L480 320 L0 320 Z" fill="#364425"/></svg>`,
-  hamlet: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky3)"/><circle cx="400" cy="55" r="26" fill="#e8a834"/><g fill="#4a5d3a" opacity="0.7"><circle cx="50" cy="220" r="20"/><circle cx="100" cy="225" r="16"/><circle cx="430" cy="218" r="22"/></g><path d="M0 240 Q120 230 240 238 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 265 Q120 258 240 263 T480 265 L480 320 L0 320 Z" fill="#364425"/></svg>`,
+  hamlet: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky3)"/><circle cx="400" cy="55" r="26" fill="#e8a834"/><g fill="#4a5d3a" opacity="0.5"><circle cx="50" cy="220" r="20"/><circle cx="100" cy="225" r="16"/><circle cx="430" cy="218" r="22"/></g><path d="M0 240 Q120 230 240 238 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 265 Q120 258 240 263 T480 265 L480 320 L0 320 Z" fill="#364425"/></svg>`,
   estate: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky4" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e8c878"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky4)"/><circle cx="80" cy="60" r="24" fill="#e8a834"/><path d="M0 200 Q100 180 200 195 T480 200 L480 320 L0 320 Z" fill="#5a6d3a"/><path d="M0 240 Q120 225 240 235 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 270 Q120 260 240 268 T480 270 L480 320 L0 320 Z" fill="#364425"/></svg>`,
   empire: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky5" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d8b878"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky5)"/><circle cx="420" cy="50" r="22" fill="#c8841d"/><path d="M0 215 Q100 195 200 210 T480 215 L480 320 L0 320 Z" fill="#5a6d3a"/><path d="M0 250 Q120 238 240 246 T480 250 L480 320 L0 320 Z" fill="#4a5d3a"/></svg>`,
   kingdom: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky6" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b89868"/><stop offset="1" stop-color="#d8b878"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky6)"/><circle cx="100" cy="50" r="18" fill="#c8841d" opacity="0.7"/><path d="M0 280 L480 280 L480 320 L0 320 Z" fill="#364425"/></svg>`,
@@ -867,15 +945,6 @@ const SCENES = {
   cosmic: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><radialGradient id="sky8" cx="50%" cy="100%" r="80%"><stop offset="0" stop-color="#6b1a4a"/><stop offset="0.5" stop-color="#3a1830"/><stop offset="1" stop-color="#1a0820"/></radialGradient></defs><rect width="480" height="320" fill="url(#sky8)"/><g fill="#fbf3df"><circle cx="50" cy="40" r="1"/><circle cx="120" cy="60" r="1.5"/><circle cx="200" cy="30" r="1"/><circle cx="280" cy="50" r="1.2"/><circle cx="360" cy="35" r="1"/><circle cx="420" cy="55" r="1.5"/><circle cx="80" cy="90" r="1"/><circle cx="240" cy="80" r="1.3"/></g></svg>`,
   franc: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><radialGradient id="sky9" cx="50%" cy="50%" r="80%"><stop offset="0" stop-color="#4a2860"/><stop offset="0.6" stop-color="#2a1840"/><stop offset="1" stop-color="#0a0820"/></radialGradient></defs><rect width="480" height="320" fill="url(#sky9)"/><g fill="#fbf3df"><circle cx="30" cy="30" r="0.8"/><circle cx="80" cy="50" r="1.2"/><circle cx="130" cy="20" r="1"/><circle cx="190" cy="40" r="0.8"/><circle cx="240" cy="25" r="1.4"/><circle cx="290" cy="50" r="1"/><circle cx="340" cy="30" r="1.2"/><circle cx="390" cy="55" r="0.8"/></g></svg>`
 };
-
-// Chick scatter positions (relative to coq, in % of playfield)
-const CHICK_SLOTS = [
-  { left: 35, top: 92 },
-  { left: 41, top: 96 },
-  { left: 47, top: 93 },
-  { left: 53, top: 96 },
-  { left: 58, top: 92 }
-];
 
 // ============ STATE ============
 let state = {
@@ -890,10 +959,10 @@ let state = {
 };
 PRODUCERS.forEach(p => { state.producers[p.id] = 0; state.producerMult[p.id] = 1; });
 
-const STORAGE_KEY = 'francEggClicker_v3';
+const STORAGE_KEY = 'francEggClicker_v4';
 
-// ============ ASSET LOADING (PNG with emoji fallback) ============
-const PNG_AVAILABLE = {}; // id -> boolean
+// ============ ASSET LOADING ============
+const PNG_AVAILABLE = {};
 function checkPngAvailable(filename) {
   return new Promise(resolve => {
     const img = new Image();
@@ -902,15 +971,14 @@ function checkPngAvailable(filename) {
     img.src = CONFIG.asset_path + filename;
   });
 }
-
 async function preloadAssets() {
+  const checks = [];
   for (const p of PRODUCERS) {
-    if (p.sprite.png) {
-      PNG_AVAILABLE[p.id] = await checkPngAvailable(p.sprite.png);
-    }
+    if (p.sprite.png) checks.push(checkPngAvailable(p.sprite.png).then(ok => PNG_AVAILABLE[p.id] = ok));
   }
-  PNG_AVAILABLE['coq'] = await checkPngAvailable('coq.png');
-  PNG_AVAILABLE['egg'] = await checkPngAvailable('egg.png');
+  checks.push(checkPngAvailable('coq.png').then(ok => PNG_AVAILABLE['coq'] = ok));
+  checks.push(checkPngAvailable('egg.png').then(ok => PNG_AVAILABLE['egg'] = ok));
+  await Promise.all(checks);
 }
 
 // ============ SAVE / LOAD ============
@@ -918,10 +986,9 @@ function save() {
   try {
     state.lastSaveTime = Date.now();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    flashSave();
+    flashSave('local');
   } catch(e) {}
 }
-
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -939,11 +1006,83 @@ function load() {
 }
 
 let saveTimer;
-function flashSave() {
+function flashSave(kind) {
   const pill = document.getElementById('savePill');
+  pill.textContent = kind === 'cloud' ? '☁ Cloud sync' : 'Sauvegardé';
+  pill.classList.toggle('cloud', kind === 'cloud');
   pill.classList.add('visible');
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => pill.classList.remove('visible'), 800);
+  saveTimer = setTimeout(() => pill.classList.remove('visible'), 1000);
+}
+
+// ============ CLOUD SAVE (Supabase) ============
+// Endpoints expected on backend:
+//   POST /game-save  body: { initData, state } → { ok: true }
+//   POST /game-load  body: { initData } → { ok: true, state?: {...}, lastSaved?: timestamp }
+// If endpoints are not yet deployed, calls will fail silently and game keeps working with localStorage only.
+
+const tg = window.Telegram?.WebApp;
+
+async function cloudLoad() {
+  if (!isUnlimited || !tg?.initData) return null;
+  try {
+    const res = await fetch(CONFIG.backend + '/game-load', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ initData: tg.initData })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.ok && data.state) {
+      return { state: data.state, lastSaved: data.lastSaved || 0 };
+    }
+  } catch(e) {
+    console.warn('Cloud load failed:', e.message);
+  }
+  return null;
+}
+
+async function cloudSave(useBeacon = false) {
+  if (!isUnlimited || !tg?.initData) return;
+  state.lastSaveTime = Date.now();
+  const payload = JSON.stringify({ initData: tg.initData, state });
+  try {
+    if (useBeacon && navigator.sendBeacon) {
+      // Use beacon for unload/visibilitychange — guaranteed delivery
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon(CONFIG.backend + '/game-save', blob);
+    } else {
+      const res = await fetch(CONFIG.backend + '/game-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      });
+      if (res.ok) flashSave('cloud');
+    }
+  } catch(e) {
+    console.warn('Cloud save failed:', e.message);
+  }
+}
+
+async function initCloudSync() {
+  if (!isUnlimited) return;
+  const remote = await cloudLoad();
+  if (remote && remote.state) {
+    // Conflict resolution: use the most recently saved version
+    const localTime = state.lastSaveTime || 0;
+    const remoteTime = remote.lastSaved || 0;
+    if (remoteTime > localTime) {
+      // Remote is newer → use it
+      state = Object.assign(state, remote.state);
+      PRODUCERS.forEach(p => {
+        if (!(p.id in state.producers)) state.producers[p.id] = 0;
+        if (!(p.id in state.producerMult)) state.producerMult[p.id] = 1;
+      });
+      if (!state.upgrades) state.upgrades = [];
+      if (!state.achievements) state.achievements = [];
+      flashSave('cloud');
+    }
+  }
 }
 
 // ============ MATH ============
@@ -1004,6 +1143,7 @@ function doPrestige() {
   checkAchievements();
   renderAll();
   save();
+  cloudSave();
 }
 function checkAchievements() {
   let newly = [];
@@ -1014,7 +1154,7 @@ function checkAchievements() {
     }
   });
   newly.forEach((a, i) => setTimeout(() => showToast(a), i * 2000));
-  if (newly.length > 0) save();
+  if (newly.length > 0) { save(); cloudSave(); }
 }
 function showToast(a) {
   const t = document.getElementById('toast');
@@ -1070,10 +1210,8 @@ function updateTrialTimer() {
 }
 function endTrial() {
   clearInterval(trialInterval);
-  // Persist used trial seconds
   state.trialSecondsUsed = CONFIG.trial_duration_sec;
   save();
-  // Pause game loop by hiding playfield interactions
   document.getElementById('coqBtn').disabled = true;
   document.getElementById('trialEndModal').classList.add('visible');
 }
@@ -1083,6 +1221,85 @@ function persistTrialTime() {
   state.trialSecondsUsed = Math.min(CONFIG.trial_duration_sec, state.trialSecondsUsed + sessionElapsed);
   trialStartTime = Date.now();
 }
+
+// ============ CHEAT MODE ============
+// Type "FRANC" anywhere (desktop) OR long-press the farm name (mobile/desktop) to boost score for testing.
+let cheatBuffer = '';
+function activateCheat() {
+  // Tier the cheat by how many times it's been used in this session
+  if (!window._cheatTier) window._cheatTier = 0;
+  window._cheatTier++;
+  
+  const tier = window._cheatTier;
+  let msg, sub;
+  
+  if (tier === 1) {
+    state.eggs += 1e9;
+    state.totalEggs += 1e9;
+    msg = '🐔 CHEAT × 1';
+    sub = '+1 milliard d\'œufs';
+  } else if (tier === 2) {
+    state.eggs += 1e12;
+    state.totalEggs += 1e12;
+    msg = '🐓 CHEAT × 2';
+    sub = '+1 billion d\'œufs';
+  } else if (tier === 3) {
+    state.eggs += 1e15;
+    state.totalEggs += 1e15;
+    // Give some buildings to test sprites
+    PRODUCERS.forEach(p => { if (state.producers[p.id] < 5) state.producers[p.id] = 5; });
+    msg = '🪙 CHEAT MAX';
+    sub = '+1 billiard + 5 de chaque bâtiment';
+  } else {
+    state.eggs *= 10;
+    msg = '✨ CHEAT';
+    sub = `×10 (tier ${tier})`;
+  }
+  
+  showCheatFlash(msg, sub);
+  checkAchievements();
+  renderAll();
+  save();
+}
+
+function showCheatFlash(title, sub) {
+  const el = document.getElementById('cheatFlash');
+  el.innerHTML = title + '<span class="cheat-flash-sub">' + sub + '</span>';
+  el.classList.remove('visible');
+  void el.offsetWidth; // restart animation
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 1500);
+}
+
+// Keyboard cheat: type FRANC
+document.addEventListener('keydown', (e) => {
+  cheatBuffer = (cheatBuffer + e.key.toUpperCase()).slice(-5);
+  if (cheatBuffer === 'FRANC') {
+    activateCheat();
+    cheatBuffer = '';
+  }
+});
+
+// Long-press on farm name: 1.5s
+let pressTimer = null;
+function attachLongPress() {
+  const farmName = document.getElementById('farmName');
+  ['touchstart', 'mousedown'].forEach(evt => {
+    farmName.addEventListener(evt, (e) => {
+      e.preventDefault();
+      pressTimer = setTimeout(() => {
+        activateCheat();
+        if (navigator.vibrate) navigator.vibrate(50);
+      }, 1500);
+    });
+  });
+  ['touchend', 'touchcancel', 'mouseup', 'mouseleave'].forEach(evt => {
+    farmName.addEventListener(evt, () => { if (pressTimer) clearTimeout(pressTimer); });
+  });
+}
+
+// Also expose to window for DevTools
+window.cheat = activateCheat;
 
 // ============ ACTIONS ============
 function clickCoq() {
@@ -1114,6 +1331,7 @@ function buyProducer(p) {
   checkAchievements();
   renderAll();
   save();
+  cloudSave();
 }
 function buyUpgrade(u) {
   if (state.upgrades.includes(u.id)) return;
@@ -1125,6 +1343,7 @@ function buyUpgrade(u) {
   checkAchievements();
   renderAll();
   save();
+  cloudSave();
 }
 function applyUpgrade(u) {
   if (u.type === 'click') state.clickValue *= u.mult;
@@ -1141,7 +1360,7 @@ function recomputeFromUpgrades() {
   });
 }
 
-// ============ SPRITE RENDERING ============
+// ============ SPRITE RENDERING (single sprite per type + ×N badge) ============
 function renderSprites() {
   const layer = document.getElementById('spriteLayer');
   layer.innerHTML = '';
@@ -1149,71 +1368,78 @@ function renderSprites() {
   PRODUCERS.forEach(p => {
     const owned = state.producers[p.id];
     if (owned <= 0) return;
-    
-    if (p.sprite.type === 'chicks') {
-      // Scatter individual chicks up to slots, then show count badge
-      const visibleChicks = Math.min(owned, CHICK_SLOTS.length);
-      for (let i = 0; i < visibleChicks; i++) {
-        const slot = CHICK_SLOTS[i];
-        const sprite = createSprite(p, slot.left, slot.top, p.sprite.size);
-        if (i === visibleChicks - 1 && owned > CHICK_SLOTS.length) {
-          const badge = document.createElement('div');
-          badge.className = 'sprite-badge';
-          badge.textContent = '×' + owned;
-          sprite.appendChild(badge);
-        }
-        layer.appendChild(sprite);
-      }
-    } else {
-      // Single sprite with optional ×N badge
-      const sprite = createSprite(p, p.sprite.left, p.sprite.top, p.sprite.size);
-      if (owned > 1) {
-        const badge = document.createElement('div');
-        badge.className = 'sprite-badge';
-        badge.textContent = '×' + owned;
-        sprite.appendChild(badge);
-      }
-      if (p.id === 'hen') sprite.classList.add('sprite-hen');
-      layer.appendChild(sprite);
+    const sprite = createSprite(p);
+    if (owned > 1) {
+      const badge = document.createElement('div');
+      badge.className = 'sprite-badge';
+      badge.textContent = '×' + owned;
+      sprite.appendChild(badge);
     }
+    if (p.sprite.anim) sprite.classList.add(p.sprite.anim);
+    layer.appendChild(sprite);
   });
 }
 
-function createSprite(producer, leftPct, topPct, size) {
+function createSprite(producer) {
+  const s = producer.sprite;
+  const w = s.w;
+  const h = s.h || s.w;
   const div = document.createElement('div');
   div.className = 'sprite visible';
-  div.style.left = leftPct + '%';
-  div.style.top = topPct + '%';
-  div.style.width = size + 'px';
-  div.style.height = size + 'px';
+  div.dataset.id = producer.id;
+  div.style.left = s.left + '%';
+  div.style.top = s.top + '%';
+  div.style.width = w + 'px';
+  div.style.height = h + 'px';
   
   if (PNG_AVAILABLE[producer.id]) {
     const img = document.createElement('img');
-    img.src = CONFIG.asset_path + producer.sprite.png;
+    img.src = CONFIG.asset_path + s.png;
     img.alt = producer.name;
     div.appendChild(img);
   } else {
-    // Fallback emoji
     const emoji = document.createElement('div');
     emoji.className = 'sprite-emoji';
-    emoji.style.fontSize = (size * 0.85) + 'px';
+    emoji.style.fontSize = Math.min(w, h) * 0.85 + 'px';
     emoji.textContent = producer.icon;
     div.appendChild(emoji);
   }
   return div;
 }
 
+// Get position (px) where eggs should be emitted from (hen) and where they go (factory door or off-screen)
+function getHenPosition() {
+  const playfield = document.getElementById('playfield').getBoundingClientRect();
+  const hen = PRODUCERS.find(p => p.id === 'hen').sprite;
+  return {
+    x: playfield.width * hen.left / 100,
+    y: playfield.height * hen.top / 100,
+    pfw: playfield.width,
+    pfh: playfield.height
+  };
+}
+
+function getFactoryDoorPosition() {
+  const factory = PRODUCERS.find(p => p.id === 'factory').sprite;
+  const playfield = document.getElementById('playfield').getBoundingClientRect();
+  // door.x and door.y are relative offsets within the sprite (0..1)
+  const centerX = playfield.width * factory.left / 100;
+  const centerY = playfield.height * factory.top / 100;
+  const w = factory.w;
+  const h = factory.h || factory.w;
+  return {
+    x: centerX + w * (factory.door.x - 0.5),
+    y: centerY + h * (factory.door.y - 0.5)
+  };
+}
+
 // ============ FLYING EGGS ============
 let eggEmitTimer = 0;
 function updateEggEmission(dt) {
-  // Only emit if there's a hen
   if (state.producers.hen <= 0) return;
-  
   const eps = totalEps();
-  // Visual rate: log scale, capped at 8 eggs/sec for visual clarity
   const visualRate = Math.min(8, 0.5 + Math.log10(Math.max(1, eps)) * 1.2);
   const interval = 1 / visualRate;
-  
   eggEmitTimer += dt;
   while (eggEmitTimer >= interval) {
     eggEmitTimer -= interval;
@@ -1223,52 +1449,82 @@ function updateEggEmission(dt) {
 
 function spawnFlyingEgg() {
   const layer = document.getElementById('eggLayer');
-  const playfield = document.getElementById('playfield');
-  const rect = playfield.getBoundingClientRect();
-  
-  // Hen position (matches sprite position in CSS: left 62%, top 78%)
-  const startX = rect.width * 0.62;
-  const startY = rect.height * 0.78;
+  const start = getHenPosition();
+  const hasFactory = state.producers.factory > 0;
+  // If factory exists, 65% chance to route the egg there
+  const goToFactory = hasFactory && Math.random() < 0.65;
   
   const egg = document.createElement('div');
   egg.className = 'flying-egg';
   if (PNG_AVAILABLE['egg']) {
-    egg.innerHTML = `<img src="${CONFIG.asset_path}egg.png" style="width:100%;height:100%" alt="">`;
+    egg.innerHTML = `<img src="${CONFIG.asset_path}egg.png" alt="">`;
   } else {
-    egg.textContent = '🥚';
+    egg.innerHTML = `<span class="egg-emoji">🥚</span>`;
   }
+  // Egg starts just below the hen (where she sits)
+  const startX = start.x + (Math.random() - 0.5) * 20;
+  const startY = start.y - 10;
   egg.style.left = startX + 'px';
   egg.style.top = startY + 'px';
   layer.appendChild(egg);
   
-  // Random arc trajectory: launch up-right, fall offscreen
-  const angle = -20 + Math.random() * 50; // -20° to +30° from horizontal
-  const power = 0.4 + Math.random() * 0.3;
-  const vx = Math.cos(angle * Math.PI / 180) * rect.width * power;
-  const vy = -Math.sin(angle * Math.PI / 180) * rect.height * 0.4 - rect.height * 0.15;
   const rotEnd = (Math.random() - 0.5) * 720;
-  const duration = 1200 + Math.random() * 600;
   
-  const startTime = performance.now();
-  const gravity = rect.height * 1.5; // pixels per second squared, normalized
-  
-  function animateEgg(now) {
-    const t = (now - startTime) / 1000;
-    if (t > duration / 1000 || !egg.parentNode) {
-      egg.remove();
-      return;
-    }
-    const x = vx * t;
-    const y = vy * t + 0.5 * gravity * t * t;
-    const rot = rotEnd * (t / (duration / 1000));
-    egg.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
-    if (x > rect.width || y > rect.height) {
-      egg.remove();
-      return;
-    }
-    requestAnimationFrame(animateEgg);
+  if (goToFactory) {
+    animateToFactory(egg, startX, startY, getFactoryDoorPosition(), rotEnd);
+  } else {
+    animateOffScreen(egg, startX, startY, start.pfw, start.pfh, rotEnd);
   }
-  requestAnimationFrame(animateEgg);
+}
+
+// Animate egg with parabolic arc to factory door, then shrink (absorbed)
+function animateToFactory(egg, startX, startY, target, rotEnd) {
+  const duration = 900 + Math.random() * 300;
+  const startTime = performance.now();
+  // Control point for arc: midpoint with negative y offset (arc upward)
+  const midX = (startX + target.x) / 2;
+  const midY = Math.min(startY, target.y) - 60 - Math.random() * 40;
+  
+  function step(now) {
+    const t = Math.min(1, (now - startTime) / duration);
+    // Quadratic bezier
+    const u = 1 - t;
+    const x = u * u * startX + 2 * u * t * midX + t * t * target.x;
+    const y = u * u * startY + 2 * u * t * midY + t * t * target.y;
+    // Shrink during last 20%
+    const scale = t < 0.8 ? 1 : 1 - (t - 0.8) * 5;
+    const rot = rotEnd * t;
+    egg.style.transform = `translate(${x - startX}px, ${y - startY}px) rotate(${rot}deg) scale(${scale})`;
+    if (t >= 1) {
+      egg.remove();
+      return;
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Animate egg arcing toward the right edge and off-screen
+function animateOffScreen(egg, startX, startY, pfw, pfh, rotEnd) {
+  const duration = 1400 + Math.random() * 500;
+  const startTime = performance.now();
+  // Launch right-up
+  const vx = (pfw * 0.7 + Math.random() * pfw * 0.4); // total horizontal travel
+  const vy_initial = -(80 + Math.random() * 40); // initial upward velocity
+  const gravity = 250 + Math.random() * 100; // downward acceleration
+  
+  function step(now) {
+    const t = (now - startTime) / 1000;
+    if (t * 1000 > duration) { egg.remove(); return; }
+    const x = vx * t;
+    const y = vy_initial * t + 0.5 * gravity * t * t;
+    const rot = rotEnd * (t * 1000 / duration);
+    egg.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+    // Stop if off-screen
+    if (startX + x > pfw + 50 || startY + y > pfh + 50) { egg.remove(); return; }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 // ============ RENDER ============
@@ -1322,8 +1578,11 @@ function renderProducers() {
     const div = document.createElement('div');
     div.className = 'item' + (affordable ? '' : ' locked');
     const eachEps = p.eps * state.producerMult[p.id] * state.globalMult * plumeBonus() * achievementBonus();
+    const iconHtml = PNG_AVAILABLE[p.id] 
+      ? `<img src="${CONFIG.asset_path}${p.sprite.png}" alt="">`
+      : p.icon;
     div.innerHTML = `
-      <div class="item-icon">${p.icon}</div>
+      <div class="item-icon">${iconHtml}</div>
       <div class="item-body">
         <div class="item-name">${p.name}</div>
         <div class="item-detail">${p.desc} · <strong>${fmtShort(eachEps)}</strong>/sec chacun</div>
@@ -1438,7 +1697,16 @@ function renderStats() {
   document.getElementById('statAchievements').textContent = `${state.achievements.length} / ${ACHIEVEMENTS.length}`;
   document.getElementById('statPrestiges').textContent = state.prestiges || 0;
   document.getElementById('statPlumes').textContent = state.totalPlumes || 0;
-  document.getElementById('statMode').textContent = isUnlimited ? '🪙 $FRANC Holder' : 'Trial 10 min';
+  document.getElementById('statMode').textContent = isUnlimited ? '🪙 $FRANC Holder (cloud)' : 'Trial 10 min';
+}
+
+function renderCoqButton() {
+  const btn = document.getElementById('coqBtn');
+  if (PNG_AVAILABLE['coq']) {
+    btn.innerHTML = `<img src="${CONFIG.asset_path}coq.png" alt="Coq Francis">`;
+  } else {
+    btn.textContent = '🐓';
+  }
 }
 
 function renderAll() {
@@ -1514,15 +1782,21 @@ async function init() {
   load();
   recomputeFromUpgrades();
   
-  // Check if trial already exhausted
+  await preloadAssets();
+  renderCoqButton();
+  
+  // For holders: try to merge with cloud save
+  await initCloudSync();
+  
+  // Check trial status
   if (!isUnlimited && state.trialSecondsUsed >= CONFIG.trial_duration_sec) {
     document.getElementById('coqBtn').disabled = true;
     document.getElementById('trialEndModal').classList.add('visible');
   }
   
-  await preloadAssets();
   applyOfflineProgress();
   checkAchievements();
+  attachLongPress();
   renderAll();
   
   if (!isUnlimited) startTrialTimer();
@@ -1534,15 +1808,18 @@ async function init() {
   }, 800);
   setInterval(save, 15000);
   
-  // Telegram init
-  const tg = window.Telegram?.WebApp;
+  // Cloud sync every minute for holders
+  if (isUnlimited) {
+    setInterval(() => cloudSave(false), CONFIG.cloud_sync_interval_sec * 1000);
+  }
+  
   if (tg) { tg.ready(); tg.expand(); }
 }
 
-window.addEventListener('beforeunload', () => { persistTrialTime(); save(); });
-window.addEventListener('pagehide', () => { persistTrialTime(); save(); });
+window.addEventListener('beforeunload', () => { persistTrialTime(); save(); if (isUnlimited) cloudSave(true); });
+window.addEventListener('pagehide', () => { persistTrialTime(); save(); if (isUnlimited) cloudSave(true); });
 document.addEventListener('visibilitychange', () => { 
-  if (document.hidden) { persistTrialTime(); save(); }
+  if (document.hidden) { persistTrialTime(); save(); if (isUnlimited) cloudSave(true); }
 });
 
 init();
