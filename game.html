@@ -40,39 +40,40 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 #moonEl{width:58px;height:58px;}
 
 /* Clouds */
-.cloud{position:absolute;pointer-events:none;z-index:3;transition:opacity 3s ease;}
-.cloud img{width:100%;height:100%;object-fit:contain;}
+.cloud{position:absolute;pointer-events:none;z-index:3;opacity:0;transition:opacity 4s ease;}
+.cloud img{width:100%;height:100%;object-fit:contain;display:block;}
+@keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
 #groundLayer{position:absolute;bottom:0;left:0;right:0;height:35%;z-index:4;background:linear-gradient(to bottom,#4a5d3a 0%,#3d4f30 40%,#2e3d22 100%);border-radius:50% 50% 0 0 / 20% 20% 0 0;}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
-#fogOverlay{position:absolute;inset:0;background:rgba(210,220,230,.0);backdrop-filter:blur(0px);transition:background 20s ease, backdrop-filter 20s ease;}
-#rainCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 8s ease;}
+#fogOverlay{position:absolute;inset:0;background:rgba(220,230,245,0);transition:background 15s ease;border-radius:0;}
+#rainCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;}
 
 /* SPRITE LAYER */
 #spriteLayer{position:absolute;inset:0;z-index:6;pointer-events:none;}
-.spr{position:absolute;transform:translate(-50%,-50%);pointer-events:none;opacity:0;filter:drop-shadow(0 3px 4px rgba(42,24,16,.3));}
-.spr.vis{opacity:1;animation:spawn .5s cubic-bezier(.34,1.56,.64,1);}
-@keyframes spawn{0%{transform:translate(-50%,-50%) scale(0);}60%{transform:translate(-50%,-50%) scale(1.15);}100%{transform:translate(-50%,-50%) scale(1);}}
+.spr{position:absolute;transform:translate(-50%,0);pointer-events:none;opacity:0;filter:drop-shadow(0 3px 4px rgba(42,24,16,.3));}
+.spr.vis{opacity:1;animation:spawnB .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes spawnB{0%{transform:translate(-50%,0) scale(0);}60%{transform:translate(-50%,0) scale(1.15);}100%{transform:translate(-50%,0) scale(1);}}
 .spr img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:-webkit-optimize-contrast;}
 .spr-em{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:1;}
 .sbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(107,26,26,.88);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:12px;padding:3px 8px;border-radius:10px;border:2px solid rgba(245,234,212,.9);box-shadow:0 2px 8px rgba(0,0,0,.5);min-width:26px;text-align:center;pointer-events:none;}
 
 /* Sprite animations */
 .anim-hen{animation:henb 2s ease-in-out infinite;}
-@keyframes henb{0%,100%{transform:translate(-50%,-50%) rotate(-2deg);}50%{transform:translate(-50%,-52%) rotate(2deg);}}
+@keyframes henb{0%,100%{transform:translate(-50%,0) rotate(-2deg);}50%{transform:translate(-50%,-3%) rotate(2deg);}}
 .anim-chick{animation:chkh 1.5s ease-in-out infinite;}
-@keyframes chkh{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-55%) scale(1.05);}}
+@keyframes chkh{0%,100%{transform:translate(-50%,0) scale(1);}50%{transform:translate(-50%,-5%) scale(1.05);}}
 .anim-franc{animation:frglow 2.5s ease-in-out infinite;}
-@keyframes frglow{0%,100%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 6px rgba(232,168,52,.5));}50%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 16px rgba(232,168,52,.9));}}
+@keyframes frglow{0%,100%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 6px rgba(232,168,52,.5));transform:translate(-50%,0);}50%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 16px rgba(232,168,52,.9));transform:translate(-50%,0);}}
 .anim-paradox{animation:parspin 6s linear infinite;}
-@keyframes parspin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+@keyframes parspin{0%{transform:translate(-50%,0) rotate(0);}100%{transform:translate(-50%,0) rotate(360deg);}}
 .anim-plume{animation:plumesway 3s ease-in-out infinite;}
-@keyframes plumesway{0%,100%{transform:translate(-50%,-50%) rotate(-5deg);}50%{transform:translate(-50%,-50%) rotate(5deg);}}
+@keyframes plumesway{0%,100%{transform:translate(-50%,0) rotate(-5deg);}50%{transform:translate(-50%,0) rotate(5deg);}}
 .anim-gants{animation:gantswob .8s ease-in-out infinite alternate;}
-@keyframes gantswob{0%{transform:translate(-50%,-50%) scale(1);}100%{transform:translate(-50%,-50%) scale(1.04);}}
+@keyframes gantswob{0%{transform:translate(-50%,0) scale(1);}100%{transform:translate(-50%,0) scale(1.04);}}
 
 /* EGG LAYER */
 #eggLayer{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden;}
@@ -198,7 +199,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .panel::-webkit-scrollbar-thumb{background:var(--muted);border-radius:3px;}
 /* FLOATING UPGRADE SYSTEM */
 #besaceEl{position:absolute;z-index:8;pointer-events:auto;cursor:pointer;transition:transform .2s;}
-#besaceEl:active{transform:translate(-50%,-50%) scale(.9);}
+#besaceEl:active{transform:translate(-50%,0) scale(.9);}
 #floatUpg{position:absolute;z-index:9;pointer-events:auto;cursor:pointer;animation:floatBob 2s ease-in-out infinite;}
 @keyframes floatBob{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.06) translateY(-4px);}}
 .upg-fly{position:absolute;pointer-events:none;z-index:20;will-change:transform,opacity;}
@@ -243,14 +244,15 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
     <div>
       <div class="ecnt" id="ecnt">0</div>
       <div style="display:flex;gap:5px;margin-top:3px;align-items:center;flex-wrap:wrap;">
-        <span class="tpill" id="modePill" style="display:none">TRIAL 10MIN</span>
-        <span class="hpill" id="holderPill" style="display:none">🪙 HOLDER</span>
+        <span class="tpill" id="modePill" style="display:none">TRIAL</span>
         <span class="plbadge" id="plbadge" style="display:none">🪶 <span id="plcount">0</span></span>
       </div>
-      <div id="stageBar" style="margin-top:4px;font-family:'Fraunces',serif;font-size:12px;color:rgba(245,234,212,.8);letter-spacing:.04em;"></div>
     </div>
-    <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
-      <div id="clockEl" style="font-family:'Fraunces',serif;font-size:11px;font-weight:600;color:rgba(245,234,212,.65);">06:00</div>
+    <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="hpill" id="holderPill" style="display:none">🪙 HOLDER</span>
+        <div id="clockEl" style="font-family:'Fraunces',serif;font-size:11px;font-weight:600;color:rgba(245,234,212,.65);">06:00</div>
+      </div>
       <div class="eps"><div><span class="epsv" id="epsv">0</span> œufs/sec</div><div style="font-size:10px;opacity:.7"><span id="clkv">1</span>/clic · ×<span id="gmult">1</span></div></div>
     </div>
   </div>
@@ -335,25 +337,25 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:14,top:80,w:50,h:50,png:'chick.png',anim:'chick'}},
+   sp:{left:40,bot:12,w:50,h:50,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:84,top:79,w:75,h:66,png:'hen.png',anim:'hen',emits:true}},
+   sp:{left:82,bot:20,w:75,h:66,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:13,top:72,w:85,h:78,png:'coop.png'}},
+   sp:{left:14,bot:32,w:85,h:78,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:19,top:58,w:95,h:64,png:'farm.png'}},
+   sp:{left:22,bot:38,w:95,h:64,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:58,top:56,w:90,h:48,png:'auto.png'}},
+   sp:{left:57,bot:50,w:90,h:48,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:87,top:42,w:75,h:116,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:83,bot:44,w:75,h:116,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:30,top:50,w:70,h:70,png:'lab.png'}},
+   sp:{left:28,bot:48,w:70,h:70,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
    sp:{left:10, top:15,w:85,h:65,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
    sp:{left:50,top:9, w:65,h:65,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:48,top:26,w:70,h:84,png:'paradox.png',anim:'paradox'}}
+   sp:{left:48,bot:72,w:70,h:84,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -625,9 +627,12 @@ function buyProd(p){
   checkAch();renderAll();save();
 }
 function buyUpg(u){
-  if(ST.up.includes(u.id))return;
-  if(!reqOK(u.req))return;
-  if(ST.eggs<u.cost)return;
+  if(ST.up.includes(u.id)){showToast({ico:'✅',ttl:'Déjà acheté',name:u.name});return;}
+  if(!reqOK(u.req)){
+    const cond=u.req?(u.req.t==='clicks'?`${u.req.n} clics requis`:`${u.req.n} ${u.req.id||''} requis`):'Pas encore disponible';
+    showToast({ico:'🔒',ttl:'Condition non remplie',name:cond});return;
+  }
+  if(ST.eggs<u.cost){showToast({ico:'🥚',ttl:"Pas assez d'œufs",name:`Il faut ${fS(u.cost)} 🥚`});return;}
   ST.eggs-=u.cost;ST.up.push(u.id);
   applyUpg(u);_prodDirty=true;
   // Coq méditation swap
@@ -637,7 +642,8 @@ function buyUpg(u){
   }
   // Music apaisante swap
   if(u.id==='p2')switchMusic('ferme apaisante.mp3');
-  checkAch();renderAll();save();
+  checkAch();renderAll();renderBesaceAndFloatUpg();save();
+  showToast({ico:'✅',ttl:'Amélioration achetée !',name:u.name});
 }
 function applyUpg(u){
   if(u.type==='click')ST.cv*=u.mult;
@@ -859,51 +865,65 @@ function updateCelestials(h){
 
 // Clouds
 const _clouds=[];
-let _cloudTimer=0;
-let _activeCloud=-1; // -1=none, 0=nuage1, 1=nuage2
-let _cloudX=0,_cloudY=0,_cloudDir=1;
+let _cloudTimer=0; // kept for compat
 function buildClouds(){
   const sky=document.getElementById('skyLayer');
   ['nuage1','nuage2'].forEach((k,i)=>{
     const div=document.createElement('div');
-    div.className='cloud';div.style.cssText='opacity:0;position:absolute;pointer-events:none;z-index:3;';
+    div.className='cloud';
+    div.style.cssText='opacity:0;position:absolute;pointer-events:none;z-index:3;left:-200px;';
+    div.style.width=(i===0?'90px':'80px');
+    div.style.height=(i===0?'35px':'60px');
     if(PNG[k]){
-      const img=new Image();img.src=CFG.ap+k+'.png';
-      div.style.width=(i===0?'90px':'80px');div.style.height=(i===0?'35px':'60px');
+      const img=new Image();img.src=CFG.ap+k+'.png';img.style.cssText='width:100%;height:100%;display:block;';
       div.appendChild(img);
     }
     sky.appendChild(div);_clouds.push(div);
   });
 }
+function scheduleClouds(){
+  function launchCloud(){
+    const h=gameHour();
+    const quiet=(h>=20||h<6)||(h>=15&&h<16)||(h>=8&&h<9);
+    if(!quiet&&_clouds.length>0){
+      const idx=Math.floor(Math.random()*_clouds.length);
+      const c=_clouds[idx];
+      if(!c._animating){
+        c._animating=true;
+        const dur=55+Math.random()*45; // 55-100s to cross
+        const topPct=10+Math.random()*22;
+        c.style.top=topPct+'%';
+        c.style.opacity='0.85';
+        c.style.transition='none';
+        c.style.animation=`cloudFloat ${dur}s linear forwards`;
+        c.addEventListener('animationend',()=>{
+          c.style.animation='none';c.style.opacity='0';c._animating=false;
+        },{once:true});
+      }
+    }
+    const next=(20+Math.random()*55)*1000;
+    setTimeout(launchCloud,next);
+  }
+  setTimeout(launchCloud,4000);
+}
 let _cloudInterval=null;
 function updateClouds(h){
-  const isNight=h>=20||h<6;
+  // Only override during rain/fog; otherwise CSS animation handles it
   const isRain=h>=15&&h<16;
   const isFog=h>=8&&h<9;
   if(isRain||isFog){
-    // All clouds visible, overlapping
-    _clouds.forEach((c,i)=>{c.style.opacity='0.78';c.style.left=(i*35-10)+'%';c.style.top='20%';});
-    return;
+    _clouds.forEach((c,i)=>{
+      c.style.animation='none';
+      c.style.opacity='0.75';
+      c.style.left=(5+i*45)+'%';
+      c.style.top='12%';
+      c.style.width=(i===0?'120px':'100px');
+      c.style.height=(i===0?'46px':'75px');
+    });
   }
-  if(isNight){_clouds.forEach(c=>c.style.opacity='0');return;}
-  // Drift one cloud at a time
-  _cloudTimer++;
-  if(_cloudTimer%2!==0)return;
-  if(_activeCloud<0){
-    // Randomly decide to show a cloud (1 in 300 ticks = ~every 30s)
-    if(Math.random()<0.003){
-      _activeCloud=Math.random()<0.5?0:1;
-      _cloudX=-150;_cloudY=18+Math.random()*22;
-      _cloudDir=1;
-    }
-  } else {
-    _clouds.forEach((c,i)=>{c.style.opacity=i===_activeCloud?'0.85':'0';});
-    _cloudX+=0.15;
-    const pf=document.getElementById('playfield').getBoundingClientRect();
-    const pw=pf.width||320;
-    _clouds[_activeCloud].style.left=_cloudX+'px';
-    _clouds[_activeCloud].style.top=_cloudY+'%';
-    if(_cloudX>pw+150){_activeCloud=-1;_clouds.forEach(c=>c.style.opacity='0');}
+  // Night: hide clouds that are animating
+  if(h>=20||h<6){
+    _clouds.forEach(c=>{if(c.style.opacity!=='0'&&!c._animating){c.style.opacity='0';}});
   }
 }
 
@@ -915,23 +935,32 @@ let _rainTarget=0;
 function buildRain(){
   const canvas=document.getElementById('rainCanvas');
   _rainCtx=canvas.getContext('2d');
-  const pf=document.getElementById('playfield').getBoundingClientRect();
-  canvas.width=pf.width||320;canvas.height=pf.height||400;
-  for(let i=0;i<60;i++)_rainDrops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,speed:3+Math.random()*4,len:12+Math.random()*15});
+  function sizeCanvas(){
+    const pf=document.getElementById('playfield');
+    canvas.width=pf.offsetWidth||320;canvas.height=pf.offsetHeight||400;
+    _rainDrops=[];
+    for(let i=0;i<80;i++)_rainDrops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,speed:2+Math.random()*3.5,len:10+Math.random()*18});
+  }
+  sizeCanvas();
+  window.addEventListener('resize',sizeCanvas);
 }
 function drawRain(){
   if(!_rainCtx)return;
   const c=document.getElementById('rainCanvas');
+  if(!c.width)return;
   _rainCtx.clearRect(0,0,c.width,c.height);
-  if(_rainOpacity<=0.01)return;
-  _rainCtx.strokeStyle=`rgba(150,190,230,${_rainOpacity*0.6})`;
-  _rainCtx.lineWidth=1.2;
+  // Smoothly change opacity
+  _rainOpacity+=(_rainTarget-_rainOpacity)*0.04;
+  c.style.opacity=_rainOpacity.toFixed(3);
+  if(_rainOpacity<0.01){c.style.opacity='0';return;}
+  _rainCtx.strokeStyle=`rgba(140,185,230,0.7)`;
+  _rainCtx.lineWidth=1.3;
   _rainDrops.forEach(d=>{
     _rainCtx.beginPath();
     _rainCtx.moveTo(d.x,d.y);
-    _rainCtx.lineTo(d.x+d.len*0.15,d.y+d.len);
+    _rainCtx.lineTo(d.x+d.len*0.18,d.y+d.len);
     _rainCtx.stroke();
-    d.y+=d.speed;
+    d.y+=d.speed;d.x+=0.5; // slight wind
     if(d.y>c.height){d.y=-20;d.x=Math.random()*c.width;}
   });
 }
@@ -939,15 +968,18 @@ function updateWeather(h){
   // Rain 15-16h
   const isRain=h>=15&&h<16;
   const rainProg=isRain?(h-15):0;
-  if(isRain)_rainTarget=Math.min(1,rainProg*6+(1-Math.abs(rainProg-.5)*2)*0.4+0.2);
+  if(isRain){
+    const phase=rainProg; // 0→1 over the hour
+    // Gentle start, peak at 30min, gentle end
+    _rainTarget=Math.min(0.95,Math.sin(phase*Math.PI)*0.85+0.15);
+  }
   else _rainTarget=0;
   _rainOpacity+=((_rainTarget-_rainOpacity)*.02);
   // Fog 8-9h
   const isFog=h>=8&&h<9;
   const fogProg=isFog?Math.sin((h-8)*Math.PI):0;
   const fo=document.getElementById('fogOverlay');
-  fo.style.background=`rgba(210,220,230,${fogProg*0.28})`;
-  fo.style.backdropFilter=fogProg>0.1?`blur(${fogProg*2.5}px)`:'none';
+  fo.style.background=`rgba(210,228,245,${(fogProg*0.38).toFixed(3)})`;
 }
 
 // ============ SPRITES ============
@@ -982,7 +1014,7 @@ function makeSpr(p){
   const sp=p.sp;
   const div=document.createElement('div');
   div.className='spr vis';div.dataset.id=p.id;
-  div.style.left=sp.left+'%';div.style.top=sp.top+'%';
+  div.style.left=sp.left+'%';div.style.bottom=(sp.bot||sp.bottom||0)+'%';
   div.style.width=sp.w+'px';div.style.height=sp.h+'px';
   if(sp.anim)div.classList.add('anim-'+sp.anim);
   if(PNG[p.id]){
@@ -1003,26 +1035,32 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u3');
     const key=isGold?'gants_or':'gants_caoutchouc';
     const file=isGold?'gants_or.png':'gants_caoutchouc.png';
-    addDecor(layer,file,key,34,89,50,46,'anim-gants');
+    addDecorB(layer,file,key,34,16,50,46,'anim-gants');
   }
   // Bottes: appear when u2 purchased, upgrade to gold when u4 purchased
   if(ST.up.includes('u2')){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecor(layer,file,key,63,91,44,52);
+    addDecorB(layer,file,key,63,16,44,52);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
-    addDecor(layer,'plume_or.png','plume_or',50,95,100,38,'anim-plume');
+    addDecorB(layer,'plume_or.png','plume_or',50,3,100,38,'anim-plume');
   }
 }
 
 function addDecor(layer,file,key,left,top,w,h,anim){
+  // left-top version (for gants/bottes which use bottom now too but keep compat)
+  addDecorB(layer,file,key,left,top,w,h,anim,true);
+}
+function addDecorB(layer,file,key,left,bot,w,h,anim,useTop=false){
   const div=document.createElement('div');
   div.className='spr vis';
-  div.style.left=left+'%';div.style.top=top+'%';
+  div.style.left=left+'%';
+  if(useTop)div.style.top=bot+'%'; else div.style.bottom=bot+'%';
   div.style.width=w+'px';div.style.height=h+'px';
+  div.style.transform='translate(-50%,0)';
   div.style.filter='drop-shadow(0 2px 3px rgba(42,24,16,.3))';
   if(anim)div.classList.add(anim);
   if(PNG[key]){
@@ -1170,7 +1208,7 @@ function renderBesaceAndFloatUpg(){
   if(ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='besaceEl';
-    el.style.cssText=`left:36%;top:84%;width:56px;height:56px;transform:translate(-50%,-50%);`;
+    el.style.cssText=`left:33%;bottom:16%;width:56px;height:56px;transform:translate(-50%,0);`;
     if(PNG['besace']){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
@@ -1183,7 +1221,7 @@ function renderBesaceAndFloatUpg(){
   if(nextUpg&&ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='floatUpg';
-    el.style.cssText=`left:48%;top:68%;width:44px;height:44px;transform:translate(-50%,-50%);cursor:pointer;`;
+    el.style.cssText=`left:51%;bottom:16%;width:44px;height:44px;transform:translate(-50%,0);cursor:pointer;`;
     const canAfford=ST.eggs>=nextUpg.cost;
     const icoFile=nextUpg.ico.endsWith('.png')?nextUpg.ico:null;
     if(icoFile&&PNG[icoFile.replace('.png','')]){
@@ -1238,7 +1276,7 @@ function renderTop(){
   const idx=stageIdx();
   document.getElementById('fname').textContent=STAGES[idx].name;
   document.getElementById('flabel').textContent=`étape ${idx+1}`;
-  const sb=document.getElementById('stageBar');if(sb)sb.textContent=`étape ${idx+1} · ${STAGES[idx].name}`;
+
   if(ST.pl>0){document.getElementById('plbadge').style.display='';document.getElementById('plcount').textContent=ST.pl;}
   else document.getElementById('plbadge').style.display='none';
 }
@@ -1295,7 +1333,7 @@ function renderUpg(){
       icoH=done?'✓':'?';
     }
     div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}</div></div><div class="irt"><div class="icst">${done?'✓':fS(u.cost)}</div></div>`;
-    if(!done)div.onclick=()=>buyUpg(u);
+    div.onclick=()=>buyUpg(u);
     panel.appendChild(div);
   });
   // PRESTIGE section at bottom
@@ -1429,7 +1467,7 @@ async function init(){
     btn.dataset.coqDefault='coq.png';
     btn.dataset.coqMed='coq_meditation.png';
   }
-  buildCelestials();buildClouds();buildRain();
+  buildCelestials();buildClouds();buildRain();scheduleClouds();
   if(checkFoxAttack()){showFoxAlarm();}else{applyOffline();}
   checkAch();renderAll();
   if(!isUnlimited)startTrial();
