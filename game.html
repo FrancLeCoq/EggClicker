@@ -27,7 +27,8 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .epsv{font-weight:600;font-style:normal;}
 
 /* PLAYFIELD */
-.pf{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;z-index:5;min-height:340px;overflow:hidden;}
+.pf{flex:1;position:relative;z-index:5;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
+#pfCanvas{width:360px;height:380px;position:relative;flex-shrink:0;transform-origin:bottom center;overflow:hidden;}
 
 /* SKY LAYER */
 #skyLayer{position:absolute;inset:0;z-index:1;transition:background 10s ease;}
@@ -45,7 +46,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
-#groundLayer{position:absolute;bottom:0;left:0;right:0;height:32%;z-index:4;background:linear-gradient(to bottom,#5a6d42 0%,#4a5d32 35%,#3a4d28 70%,#2e3d22 100%);border-radius:48% 48% 0 0/18% 18% 0 0;}
+#groundLayer{position:absolute;bottom:0;left:0;right:0;height:122px;z-index:4;background:linear-gradient(to bottom,#5a6d42 0%,#4a5d32 35%,#3a4d28 70%,#2e3d22 100%);border-radius:48% 48% 0 0/22% 22% 0 0;}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
@@ -63,9 +64,9 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 
 /* Sprite animations */
 .anim-hen{animation:henb 2s ease-in-out infinite;}
-@keyframes henb{0%,100%{transform:translate(-50%,0) rotate(-2deg);}50%{transform:translate(-50%,-3%) rotate(2deg);}}
+@keyframes henb{0%,100%{transform:translate(-50%,0) rotate(-2deg);}50%{transform:translate(-50%,-5px) rotate(2deg);}}
 .anim-chick{animation:chkh 1.5s ease-in-out infinite;}
-@keyframes chkh{0%,100%{transform:translate(-50%,0) scale(1);}50%{transform:translate(-50%,-5%) scale(1.05);}}
+@keyframes chkh{0%,100%{transform:translate(-50%,0) scale(1);}50%{transform:translate(-50%,-6px) scale(1.05);}}
 .anim-franc{animation:frglow 2.5s ease-in-out infinite;}
 @keyframes frglow{0%,100%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 6px rgba(232,168,52,.5));transform:translate(-50%,0);}50%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 16px rgba(232,168,52,.9));transform:translate(-50%,0);}}
 .anim-paradox{animation:parspin 6s linear infinite;}
@@ -81,14 +82,14 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .fegg img{width:100%;height:100%;object-fit:contain;}
 
 /* FARM INFO */
-.finfo{position:absolute;top:8px;left:0;right:0;z-index:10;display:flex;align-items:center;gap:6px;padding:0 8px;pointer-events:none;}
+.finfo{position:absolute;top:8px;left:0;width:360px;z-index:10;display:flex;align-items:center;gap:6px;padding:0 8px;pointer-events:none;}
 .finfo>*{pointer-events:auto;}
-.flabel{font-family:'Fraunces',serif;font-style:italic;font-size:10px;color:var(--wine);background:rgba(245,234,212,.88);display:inline-block;padding:3px 9px;border-radius:12px;white-space:nowrap;flex-shrink:0;font-weight:700;border:1px solid rgba(107,26,26,.25);}
+.flabel{font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--wine);background:rgba(245,234,212,.9);display:inline-block;padding:3px 9px;border-radius:12px;white-space:nowrap;flex-shrink:0;font-weight:700;border:1px solid rgba(107,26,26,.25);}
 .fname{font-family:'Fraunces',serif;font-weight:900;font-size:15px;color:var(--wine);background:rgba(245,234,212,.88);display:block;padding:3px 10px;border-radius:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(107,26,26,.25);flex:1;}
 .fname::before,.fname::after{content:'✦';color:var(--yolk-d);margin:0 4px;font-size:9px;vertical-align:middle;}
 
 /* COQ */
-.coqarea{position:relative;width:160px;height:160px;z-index:9;margin:0 auto 0;}
+.coqarea{position:absolute;width:160px;height:160px;z-index:9;left:50%;transform:translateX(-50%);bottom:0;}
 .coqbase{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:150px;height:18px;background:radial-gradient(ellipse,rgba(42,24,16,.35),transparent 70%);z-index:1;}
 .coqbtn{width:152px;height:152px;border:none;background:transparent;cursor:pointer;font-size:140px;line-height:1;transition:transform .08s cubic-bezier(.4,2,.6,1);z-index:2;position:absolute;inset:0;margin:auto;filter:drop-shadow(0 5px 0 rgba(42,24,16,.25));padding:0;touch-action:manipulation;}
 .coqbtn:active{transform:scale(.92) translateY(4px);filter:drop-shadow(0 2px 0 rgba(42,24,16,.3));}
@@ -259,18 +260,19 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 </header>
 
 <main class="pf" id="playfield">
-  <div id="skyLayer"></div>
-  <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
-  <div id="groundLayer"></div>
-  <div id="spriteLayer"></div>
-  <div id="eggLayer"></div>
-  <div class="finfo">
-    <div class="flabel" id="flabel">étape 1</div>
-    <div class="fname" id="fname">Premier Cocorico</div>
-  </div>
-  <div class="coqarea" id="coqArea">
-    <div class="coqbase"></div>
-    <button class="coqbtn" id="coqBtn" aria-label="Cliquer">🐓</button>
+  <div id="pfCanvas">
+    <div id="skyLayer"></div>
+    <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
+    <div id="groundLayer"></div>
+    <div id="spriteLayer"></div>
+    <div id="eggLayer"></div>
+    <div class="finfo">
+      <div class="flabel" id="flabel">étape 1</div>
+      <div class="fname" id="fname">Premier Cocorico</div>
+    </div>
+    <div class="coqarea" id="coqArea">
+      <button class="coqbtn" id="coqBtn" aria-label="Cliquer">🐓</button>
+    </div>
   </div>
 </main>
 
@@ -337,25 +339,25 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:58,bot:12,w:45,h:47,z:3,z:3,png:'chick.png',anim:'chick'}},
+   sp:{left:210,bot:44,w:52,h:54,z:6,px:1}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:78,bot:12,w:76,h:64,z:3,z:3,png:'hen.png',anim:'hen',emits:true}},
+   sp:{left:272,bot:40,w:82,h:70,z:6,px:1}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:12,bot:12,w:66,h:59,z:3,z:3,png:'coop.png'}},
+   sp:{left:8,bot:60,w:72,h:65,z:3,px:1}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:17,bot:32,w:75,h:50,z:2,z:2,png:'farm.png'}},
+   sp:{left:5,bot:118,w:90,h:60,z:5,px:1}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:33,bot:32,w:64,h:35,z:2,z:2,png:'auto.png'}},
+   sp:{left:86,bot:122,w:72,h:40,z:5,px:1}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:88,bot:32,w:61,h:104,z:2,z:2,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:290,bot:115,w:65,h:108,z:5,px:1}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:57,bot:32,w:73,h:76,z:2,z:2,png:'lab.png'}},
+   sp:{left:178,bot:118,w:80,h:84,z:5,px:1}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:15,top:3,w:64,h:50,z:1,z:1,png:'station.png'}},
+   sp:{left:15,top:6,w:68,h:52,z:1,px:1}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:7,w:50,h:50,z:1,z:1,png:'franc.png',anim:'franc'}},
+   sp:{left:152,top:6,w:52,h:52,z:1,px:1}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:43,bot:62,w:50,h:62,z:1,z:1,z:1,z:1,png:'paradox.png',anim:'paradox'}}
+   sp:{left:140,top:50,w:55,h:68,z:2,px:1}}
 ];
 
 // ============ UPGRADES ============
@@ -846,12 +848,11 @@ function buildCelestials(){
 function updateCelestials(h){
   if(!_sunEl)return;
   const isDay=h>=6&&h<20;
-  const pf=document.getElementById('playfield');
-  const pw=pf.offsetWidth||320, ph=pf.offsetHeight||400;
-  // Position: top-right of playfield (matches Disposition screenshot)
+  // Fixed pixel positions in 360px canvas
   const bob=Math.sin(Date.now()/4000)*3;
-  const cx=pw*0.74; // ~74% from left (matches Théorie)
-  const cy=ph*0.06+bob; // ~6% from top
+  // Sun/Moon: top-right area, left=265px (74% of 360), top=8px
+  const cx=265;
+  const cy=8+bob;
   if(isDay){
     _sunEl.style.left=(cx-35)+'px';
     _sunEl.style.top=cy+'px';
@@ -938,8 +939,7 @@ function buildRain(){
   const canvas=document.getElementById('rainCanvas');
   _rainCtx=canvas.getContext('2d');
   function sizeCanvas(){
-    const pf=document.getElementById('playfield');
-    canvas.width=pf.offsetWidth||320;canvas.height=pf.offsetHeight||400;
+    canvas.width=360;canvas.height=380; // fixed canvas dimensions
     _rainDrops=[];
     for(let i=0;i<80;i++)_rainDrops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,speed:2+Math.random()*3.5,len:10+Math.random()*18});
   }
@@ -1016,12 +1016,24 @@ function makeSpr(p){
   const sp=p.sp;
   const div=document.createElement('div');
   div.className='spr vis';div.dataset.id=p.id;
-  div.style.left=sp.left+'%';
-  if(sp.top!==undefined){
-    div.style.top=sp.top+'%';
-    div.style.transform='translate(-50%,0)';  
+  // sp.px=1 means use pixel values directly; otherwise legacy % mode
+  if(sp.px){
+    div.style.left=sp.left+'px';
+    if(sp.top!==undefined){
+      div.style.top=sp.top+'px';
+      div.style.transform='translate(-50%,0)';
+    } else {
+      div.style.bottom=(sp.bot||0)+'px';
+      div.style.transform='translate(-50%,0)';
+    }
   } else {
-    div.style.bottom=(sp.bot||0)+'%';
+    div.style.left=sp.left+'%';
+    if(sp.top!==undefined){
+      div.style.top=sp.top+'%';
+      div.style.transform='translate(-50%,0)';
+    } else {
+      div.style.bottom=(sp.bot||0)+'%';
+    }
   }
   div.style.width=sp.w+'px';div.style.height=sp.h+'px';
   div.style.zIndex=sp.z||2;
@@ -1029,7 +1041,7 @@ function makeSpr(p){
   if(PNG[p.id]){
     const img=document.createElement('img');
     img.src=CFG.ap+sp.png;img.alt=p.name;img.draggable=false;
-    img.style.cssText='width:100%;height:100%;object-fit:contain;display:block;';
+    img.style.cssText='width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;';
     div.appendChild(img);
   }else{
     const e=document.createElement('div');e.className='spr-em';
@@ -1045,21 +1057,32 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u3');
     const key=isGold?'gants_or':'gants_caoutchouc';
     const file=isGold?'gants_or.png':'gants_caoutchouc.png';
-    addDecorB(layer,file,key,28,9,46,42,'anim-gants');
+    addDecorPx(layer,file,key,100,42,46,42,'anim-gants');
   }
   // Bottes: appear when u2 purchased, upgrade to gold when u4 purchased
   if(ST.up.includes('u2')){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,66,8,42,50);
+    addDecorPx(layer,file,key,228,36,42,50);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
-    addDecorB(layer,'plume_or.png','plume_or',43,2,85,32,'anim-plume');
+    addDecorPx(layer,'plume_or.png','plume_or',148,38,85,32,'anim-plume');
   }
 }
 
+function addDecorPx(layer,file,key,left_px,bot_px,w,h,anim){
+  const div=document.createElement('div');
+  div.className='spr vis';
+  div.style.left=left_px+'px';div.style.bottom=bot_px+'px';
+  div.style.width=w+'px';div.style.height=h+'px';
+  div.style.transform='translate(-50%,0)';div.style.zIndex=6;
+  div.style.filter='drop-shadow(0 2px 3px rgba(42,24,16,.3))';
+  if(anim)div.classList.add(anim);
+  if(PNG[key]){const img=document.createElement('img');img.src=CFG.ap+file;img.draggable=false;img.style.cssText='width:100%;height:100%;object-fit:contain;';div.appendChild(img);}
+  layer.appendChild(div);
+}
 function addDecor(layer,file,key,left,top,w,h,anim){
   // left-top version (for gants/bottes which use bottom now too but keep compat)
   addDecorB(layer,file,key,left,top,w,h,anim,true);
@@ -1082,14 +1105,22 @@ function addDecorB(layer,file,key,left,bot,w,h,anim,useTop=false){
 // ============ EGGS — multiple emitters ============
 // Emitters: {prodId, leftPct, topPct} — egg rolls to nearest edge
 const EGG_EMITTERS=[
-  {id:'hen',   cond:()=>ST.pr.hen>0,   lFn:()=>84,  tFn:()=>79},
-  {id:'coop',  cond:()=>ST.pr.coop>0,  lFn:()=>13,  tFn:()=>72},
-  {id:'factory',cond:()=>ST.pr.factory>0,lFn:()=>87,tFn:()=>42},
-  {id:'farm',  cond:()=>ST.pr.farm>0,  lFn:()=>19,  tFn:()=>58},
-  // celestial: only emit if visible (day/night)
-  {id:'soleil',cond:()=>ST.pr.franc>0&&gameHour()>=6&&gameHour()<20,lFn:()=>82,tFn:()=>8},
-  {id:'lune',  cond:()=>ST.pr.franc>0&&(gameHour()>=20||gameHour()<6),lFn:()=>82,tFn:()=>8},
-  {id:'space', cond:()=>ST.pr.space>0, lFn:()=>10,  tFn:()=>15},
+  // All positions in canvas pixels (360×380px canvas)
+  // lFn=left px (center), tFn=top px (from canvas top, for egg spawn)
+  {id:'hen',    cond:()=>ST.pr.hen>0,
+   lFn:()=>272+41, tFn:()=>380-40-35},      // hen center+offset
+  {id:'coop',   cond:()=>ST.pr.coop>0,
+   lFn:()=>8+36,   tFn:()=>380-60-30},      // coop
+  {id:'factory',cond:()=>ST.pr.factory>0,
+   lFn:()=>290+32, tFn:()=>380-115-50},     // factory
+  {id:'farm',   cond:()=>ST.pr.farm>0,
+   lFn:()=>5+45,   tFn:()=>380-118-30},     // farm
+  {id:'soleil', cond:()=>ST.pr.franc>0&&gameHour()>=6&&gameHour()<20,
+   lFn:()=>265,    tFn:()=>30},
+  {id:'lune',   cond:()=>ST.pr.franc>0&&(gameHour()>=20||gameHour()<6),
+   lFn:()=>265,    tFn:()=>30},
+  {id:'space',  cond:()=>ST.pr.space>0,
+   lFn:()=>15+34,  tFn:()=>6+26},
 ];
 let _eggTimers={};
 function updateEggs(dt){
@@ -1107,11 +1138,12 @@ function updateEggs(dt){
   });
 }
 
-function spawnEggFrom(leftPct,topPct,toFactory){
+function spawnEggFrom(leftPx,topPx,toFactory){
   const layer=document.getElementById('eggLayer');
-  const pf=document.getElementById('playfield').getBoundingClientRect();
-  const startX=pf.width*leftPct/100;
-  const startY=pf.height*topPct/100;
+  // Positions are already in canvas px (360×380)
+  const startX=leftPx;
+  const startY=topPx;
+  const pf={width:360,height:380};
   const egg=document.createElement('div');
   egg.className='fegg';
   egg.style.cssText=`width:20px;height:26px;left:${startX}px;top:${startY}px;transform:translate(-50%,-50%);`;
@@ -1146,7 +1178,7 @@ function rollToNearestEdge(egg,sx,sy,pf){
     const rot=t*200*tilt;
     egg.style.left=x+'px';egg.style.top=y+'px';
     egg.style.transform=`translate(-50%,-50%) rotate(${rot}deg)`;
-    if(x<-30||x>pf.width+30||y<-30||y>pf.height+30){egg.remove();return;}
+    if(x<-30||x>390||y<-30||y>410){egg.remove();return;}
     requestAnimationFrame(anim);
   }
   requestAnimationFrame(anim);
@@ -1154,11 +1186,14 @@ function rollToNearestEdge(egg,sx,sy,pf){
 
 function getFactoryDoor(){
   const fd=PROD.find(p=>p.id==='factory');
-  const pf=document.getElementById('playfield').getBoundingClientRect();
-  const cx=pf.width*fd.sp.left/100;
-  const cy=pf.height*fd.sp.top/100;
-  const door=fd.sp.door;
-  return{x:cx+fd.sp.w*(door.x-.5),y:cy+fd.sp.h*(door.y-.5),pfw:pf.width,pfh:pf.height};
+  const sp=fd.sp;
+  // Canvas: 360×380, factory: left:290, bot:115, w:65, h:108
+  const cx=sp.left; // center of factory (already in px from CSS transform)
+  const canvasH=380;
+  const cy=canvasH - (sp.bot||0) - sp.h/2; // center from top
+  const door=sp.door;
+  if(!door)return null;
+  return{x:cx+sp.w*(door.x-.5), y:cy+sp.h*(door.y-.5), pfw:360, pfh:380};
 }
 
 function rollToFactory(egg,sx,sy,pf){
@@ -1180,7 +1215,7 @@ function rollToFactory(egg,sx,sy,pf){
       setTimeout(()=>{
         egg.remove();
         // Spawn from factory right side (conveyor belt output)
-        spawnConveyorEgg(door.x+40,door.y,door.pfw,door.pfh);
+        spawnConveyorEgg(door.x+40,door.y,360,380);
       },200);
       return;
     }
@@ -1202,7 +1237,7 @@ function spawnConveyorEgg(sx,sy,pw,ph){
   if(PNG['egg']){const i=new Image();i.src=CFG.ap+'egg.png';egg.appendChild(i);}
   else egg.textContent='🥚';
   layer.appendChild(egg);
-  rollOffScreen(egg,sx,sy,{width:pw,height:ph});
+  rollToNearestEdge(egg,sx,sy,{width:360,height:380});
 }
 
 
@@ -1218,7 +1253,7 @@ function renderBesaceAndFloatUpg(){
   if(ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='besaceEl';
-    el.style.cssText=`left:32%;bottom:9%;width:50px;height:56px;transform:translate(-50%,0);z-index:4;`;
+    el.style.cssText=`left:110px;bottom:42px;width:50px;height:56px;transform:translate(-50%,0);z-index:4;`;
     if(PNG['besace']){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
@@ -1231,7 +1266,7 @@ function renderBesaceAndFloatUpg(){
   if(nextUpg&&ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='floatUpg';
-    el.style.cssText=`left:36%;bottom:30%;width:44px;height:44px;transform:translate(-50%,0);cursor:pointer;z-index:4;`;
+    el.style.cssText=`left:125px;bottom:105px;width:44px;height:44px;transform:translate(-50%,0);cursor:pointer;z-index:4;`;
     const canAfford=ST.eggs>=nextUpg.cost;
     const icoFile=nextUpg.ico.endsWith('.png')?nextUpg.ico:null;
     if(icoFile&&PNG[icoFile.replace('.png','')]){
@@ -1487,6 +1522,18 @@ async function init(){
   setInterval(()=>cloudSave(false),60000);
   if(tg){tg.ready();tg.expand();}
   initMusic();
+  // Scale fixed canvas to screen width
+  function scalePfCanvas(){
+    const c=document.getElementById('pfCanvas');
+    if(!c)return;
+    const scale=Math.min(window.innerWidth/360, window.innerHeight*0.62/380);
+    c.style.transform=`scale(${scale.toFixed(4)})`;
+    // Adjust parent height so it takes up scaled space
+    const pf=document.getElementById('playfield');
+    if(pf)pf.style.height=(380*scale)+'px';
+  }
+  scalePfCanvas();
+  window.addEventListener('resize', scalePfCanvas);
 }
 
 window.addEventListener('beforeunload',()=>{persistTrial();save();cloudSave(true);setFoxChance();});
