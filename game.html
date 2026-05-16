@@ -272,10 +272,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
   <div id="groundLayer"></div>
   <div id="spriteLayer"></div>
   <div id="eggLayer"></div>
-  <div class="finfo">
-    <div class="flabel" id="flabel">étape 1</div>
-    <div class="fname" id="fname">Premier Cocorico</div>
-  </div>
+
   <div class="coqarea" id="coqArea">
     <div class="coqbase"></div>
     <button class="coqbtn" id="coqBtn" aria-label="Cliquer">🐓</button>
@@ -345,25 +342,25 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:60,botpx:45,w:52,h:54,z:6,px:1}},
+   sp:{left:60,botpx:45,w:52,h:54,z:6,px:1,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:78,botpx:42,w:80,h:68,z:6,px:1}},
+   sp:{left:78,botpx:42,w:80,h:68,z:6,px:1,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:11,botpx:55,w:72,h:65,z:3,px:1}},
+   sp:{left:11,botpx:55,w:72,h:65,z:3,px:1,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:12,botpx:120,w:85,h:58,z:5,px:1}},
+   sp:{left:12,botpx:120,w:85,h:58,z:5,px:1,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:30,botpx:120,w:72,h:40,z:5,px:1}},
+   sp:{left:30,botpx:120,w:72,h:40,z:5,px:1,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:84,botpx:112,w:64,h:108,z:5,px:1}},
+   sp:{left:84,botpx:112,w:64,h:108,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:56,botpx:115,w:78,h:82,z:5,px:1}},
+   sp:{left:56,botpx:115,w:78,h:82,z:5,px:1,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:8,top:5,w:64,h:50,z:1,px:0}},
+   sp:{left:8,top:5,w:64,h:50,z:1,px:0,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:7,w:52,h:52,z:1,px:0}},
+   sp:{left:50,top:7,w:52,h:52,z:1,px:0,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:43,top:14,w:55,h:68,z:2,px:0}}
+   sp:{left:43,top:14,w:55,h:68,z:2,px:0,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
