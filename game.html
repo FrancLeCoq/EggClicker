@@ -1279,8 +1279,7 @@ function renderTop(){
   document.getElementById('clkv').textContent=fS(eClick());
   document.getElementById('gmult').textContent=(plBonus()*achBonus()*ST.gm).toFixed(2);
   const idx=stageIdx();
-  document.getElementById('fname').textContent=STAGES[idx].name;
-  document.getElementById('flabel').textContent=`étape ${idx+1}`;
+  // fname/flabel elements removed - stageInfo is the only stage display now
   const si=document.getElementById('stageInfo');if(si)si.textContent=`étape ${idx+1} · ${STAGES[idx].name}`;
 
   if(ST.pl>0){document.getElementById('plbadge').style.display='';document.getElementById('plcount').textContent=ST.pl;}
