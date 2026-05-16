@@ -337,25 +337,25 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:58,bot:16,w:60,h:60,z:3,z:3,png:'chick.png',anim:'chick'}},
+   sp:{left:58,bot:12,w:45,h:47,z:3,z:3,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:76,bot:13,w:98,h:82,z:3,z:3,png:'hen.png',anim:'hen',emits:true}},
+   sp:{left:78,bot:12,w:76,h:64,z:3,z:3,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:11,bot:15,w:88,h:80,z:3,z:3,png:'coop.png'}},
+   sp:{left:12,bot:12,w:66,h:59,z:3,z:3,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:14,bot:36,w:82,h:55,z:2,z:2,png:'farm.png'}},
+   sp:{left:17,bot:32,w:75,h:50,z:2,z:2,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:30,bot:38,w:75,h:41,z:2,z:2,png:'auto.png'}},
+   sp:{left:33,bot:32,w:64,h:35,z:2,z:2,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:85,bot:36,w:79,h:122,z:2,z:2,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:88,bot:32,w:61,h:104,z:2,z:2,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:60,bot:36,w:86,h:88,z:2,z:2,png:'lab.png'}},
+   sp:{left:57,bot:32,w:73,h:76,z:2,z:2,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:8,top:5,w:82,h:62,z:1,z:1,png:'station.png'}},
+   sp:{left:15,top:3,w:64,h:50,z:1,z:1,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:8,w:55,h:55,z:1,z:1,png:'franc.png',anim:'franc'}},
+   sp:{left:50,top:7,w:50,h:50,z:1,z:1,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:47,bot:54,w:68,h:85,z:1,z:1,z:1,z:1,png:'paradox.png',anim:'paradox'}}
+   sp:{left:43,bot:62,w:50,h:62,z:1,z:1,z:1,z:1,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -850,7 +850,7 @@ function updateCelestials(h){
   const pw=pf.offsetWidth||320, ph=pf.offsetHeight||400;
   // Position: top-right of playfield (matches Disposition screenshot)
   const bob=Math.sin(Date.now()/4000)*3;
-  const cx=pw*0.77; // ~77% from left
+  const cx=pw*0.74; // ~74% from left (matches Théorie)
   const cy=ph*0.06+bob; // ~6% from top
   if(isDay){
     _sunEl.style.left=(cx-35)+'px';
@@ -1045,18 +1045,18 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u3');
     const key=isGold?'gants_or':'gants_caoutchouc';
     const file=isGold?'gants_or.png':'gants_caoutchouc.png';
-    addDecorB(layer,file,key,34,14,48,44,'anim-gants');
+    addDecorB(layer,file,key,28,9,46,42,'anim-gants');
   }
   // Bottes: appear when u2 purchased, upgrade to gold when u4 purchased
   if(ST.up.includes('u2')){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,64,10,44,52);
+    addDecorB(layer,file,key,66,8,42,50);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
-    addDecorB(layer,'plume_or.png','plume_or',42,2,88,33,'anim-plume');
+    addDecorB(layer,'plume_or.png','plume_or',43,2,85,32,'anim-plume');
   }
 }
 
@@ -1218,7 +1218,7 @@ function renderBesaceAndFloatUpg(){
   if(ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='besaceEl';
-    el.style.cssText=`left:29%;bottom:14%;width:54px;height:60px;transform:translate(-50%,0);z-index:4;`;
+    el.style.cssText=`left:32%;bottom:9%;width:50px;height:56px;transform:translate(-50%,0);z-index:4;`;
     if(PNG['besace']){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
