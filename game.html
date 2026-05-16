@@ -57,7 +57,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .spr{position:absolute;transform:translate(-50%,0);pointer-events:none;opacity:0;filter:drop-shadow(0 3px 4px rgba(42,24,16,.3));}
 .spr.vis{opacity:1;animation:spawnB .5s cubic-bezier(.34,1.56,.64,1);}
 @keyframes spawnB{0%{transform:translate(-50%,0) scale(0);}60%{transform:translate(-50%,0) scale(1.15);}100%{transform:translate(-50%,0) scale(1);}}
-.spr img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:-webkit-optimize-contrast;}
+.spr img{display:block;width:100%;height:100%;object-fit:contain;}
 .spr-em{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:1;}
 .sbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(107,26,26,.88);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:12px;padding:3px 8px;border-radius:10px;border:2px solid rgba(245,234,212,.9);box-shadow:0 2px 8px rgba(0,0,0,.5);min-width:26px;text-align:center;pointer-events:none;}
 
@@ -78,10 +78,10 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 /* EGG LAYER */
 #eggLayer{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden;}
 .fegg{position:absolute;pointer-events:none;will-change:transform;}
-.fegg img{width:100%;height:100%;object-fit:contain;image-rendering:-webkit-optimize-contrast;}
+.fegg img{width:100%;height:100%;object-fit:contain;}
 
 /* FARM INFO */
-.finfo{position:absolute;top:8px;left:0;right:0;z-index:8;display:flex;align-items:center;gap:6px;padding:0 10px;pointer-events:none;}
+.finfo{position:absolute;top:8px;left:0;right:0;z-index:10;display:flex;align-items:center;gap:6px;padding:0 8px;pointer-events:none;}
 .finfo>*{pointer-events:auto;}
 .flabel{font-family:'Fraunces',serif;font-style:italic;font-size:10px;color:var(--wine);background:rgba(245,234,212,.88);display:inline-block;padding:3px 9px;border-radius:12px;white-space:nowrap;flex-shrink:0;font-weight:700;border:1px solid rgba(107,26,26,.25);}
 .fname{font-family:'Fraunces',serif;font-weight:900;font-size:15px;color:var(--wine);background:rgba(245,234,212,.88);display:block;padding:3px 10px;border-radius:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(107,26,26,.25);flex:1;}
@@ -219,7 +219,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 #foxSubtitle{font-family:'Fraunces',serif;font-size:13px;color:#ffaaaa;animation:blink2 .8s infinite;margin-bottom:12px;letter-spacing:.08em;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
 @keyframes blink2{0%,100%{color:#ffaaaa;}50%{color:#2060ff;}}
-#foxImg{width:300px;max-width:90%;margin:10px auto;display:block;image-rendering:-webkit-optimize-contrast;}
+#foxImg{width:300px;max-width:90%;margin:10px auto;display:block;}
 #foxMsg{font-family:'DM Sans',sans-serif;font-size:13px;color:#eee;margin:12px 0;line-height:1.5;}
 .fox-btn{width:100%;padding:13px;border:none;border-radius:10px;font-family:'Fraunces',serif;font-weight:900;font-size:15px;cursor:pointer;margin-top:8px;letter-spacing:.05em;}
 .fox-btn.hunt{background:linear-gradient(135deg,#e8a834,#c8841d);color:#1a0800;border-bottom:3px solid #a06010;}
@@ -337,25 +337,25 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:40,bot:12,w:50,h:50,png:'chick.png',anim:'chick'}},
+   sp:{left:58,bot:16,w:65,h:65,z:3,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:82,bot:20,w:75,h:66,png:'hen.png',anim:'hen',emits:true}},
+   sp:{left:77,bot:14,w:108,h:96,z:3,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:14,bot:32,w:85,h:78,png:'coop.png'}},
+   sp:{left:11,bot:16,w:105,h:96,z:3,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:22,bot:38,w:95,h:64,png:'farm.png'}},
+   sp:{left:17,bot:42,w:145,h:98,z:2,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:57,bot:50,w:90,h:48,png:'auto.png'}},
+   sp:{left:32,bot:46,w:108,h:58,z:2,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:83,bot:44,w:75,h:116,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:85,bot:42,w:98,h:152,z:2,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:28,bot:48,w:70,h:70,png:'lab.png'}},
+   sp:{left:62,bot:42,w:130,h:135,z:2,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:10, top:15,w:85,h:65,png:'station.png'}},
+   sp:{left:8,top:5,w:95,h:72,z:1,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:9, w:65,h:65,png:'franc.png',anim:'franc'}},
+   sp:{left:50,top:8,w:60,h:60,z:1,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:48,bot:72,w:70,h:84,png:'paradox.png',anim:'paradox'}}
+   sp:{left:47,bot:54,w:80,h:100,z:1,z:1,z:1,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -846,19 +846,21 @@ function buildCelestials(){
 function updateCelestials(h){
   if(!_sunEl)return;
   const isDay=h>=6&&h<20;
-  const pf=document.getElementById('playfield').getBoundingClientRect();
-  const pw=pf.width||320,ph=pf.height||340;
-  // Sun: fixed top-right area, gentle bob
-  const bob=Math.sin(Date.now()/4000)*4;
+  const pf=document.getElementById('playfield');
+  const pw=pf.offsetWidth||320, ph=pf.offsetHeight||400;
+  // Position: top-right of playfield (matches Disposition screenshot)
+  const bob=Math.sin(Date.now()/4000)*3;
+  const cx=pw*0.77; // ~77% from left
+  const cy=ph*0.06+bob; // ~6% from top
   if(isDay){
-    _sunEl.style.left=(pw*0.82-35)+'px';
-    _sunEl.style.top=(ph*0.08+bob)+'px';
-    _sunEl.style.opacity=h<7||h>19?'0.5':'1';
+    _sunEl.style.left=(cx-35)+'px';
+    _sunEl.style.top=cy+'px';
+    _sunEl.style.opacity=(h<7||h>19)?'0.5':'1';
     _moonEl.style.opacity='0';
   }else{
     _sunEl.style.opacity='0';
-    _moonEl.style.left=(pw*0.82-29)+'px';
-    _moonEl.style.top=(ph*0.08+bob)+'px';
+    _moonEl.style.left=(cx-29)+'px';
+    _moonEl.style.top=cy+'px';
     _moonEl.style.opacity='0.9';
   }
 }
@@ -1014,12 +1016,20 @@ function makeSpr(p){
   const sp=p.sp;
   const div=document.createElement('div');
   div.className='spr vis';div.dataset.id=p.id;
-  div.style.left=sp.left+'%';div.style.bottom=(sp.bot||sp.bottom||0)+'%';
+  div.style.left=sp.left+'%';
+  if(sp.top!==undefined){
+    div.style.top=sp.top+'%';
+    div.style.transform='translate(-50%,0)';  
+  } else {
+    div.style.bottom=(sp.bot||0)+'%';
+  }
   div.style.width=sp.w+'px';div.style.height=sp.h+'px';
+  div.style.zIndex=sp.z||2;
   if(sp.anim)div.classList.add('anim-'+sp.anim);
   if(PNG[p.id]){
     const img=document.createElement('img');
     img.src=CFG.ap+sp.png;img.alt=p.name;img.draggable=false;
+    img.style.cssText='width:100%;height:100%;object-fit:contain;display:block;';
     div.appendChild(img);
   }else{
     const e=document.createElement('div');e.className='spr-em';
@@ -1035,18 +1045,18 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u3');
     const key=isGold?'gants_or':'gants_caoutchouc';
     const file=isGold?'gants_or.png':'gants_caoutchouc.png';
-    addDecorB(layer,file,key,34,16,50,46,'anim-gants');
+    addDecorB(layer,file,key,32,14,52,48,'anim-gants');
   }
   // Bottes: appear when u2 purchased, upgrade to gold when u4 purchased
   if(ST.up.includes('u2')){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,63,16,44,52);
+    addDecorB(layer,file,key,65,10,46,54);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
-    addDecorB(layer,'plume_or.png','plume_or',50,3,100,38,'anim-plume');
+    addDecorB(layer,'plume_or.png','plume_or',42,3,95,36,'anim-plume');
   }
 }
 
@@ -1208,7 +1218,7 @@ function renderBesaceAndFloatUpg(){
   if(ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='besaceEl';
-    el.style.cssText=`left:33%;bottom:16%;width:56px;height:56px;transform:translate(-50%,0);`;
+    el.style.cssText=`left:28%;bottom:14%;width:58px;height:64px;transform:translate(-50%,0);z-index:4;`;
     if(PNG['besace']){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
@@ -1221,7 +1231,7 @@ function renderBesaceAndFloatUpg(){
   if(nextUpg&&ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='floatUpg';
-    el.style.cssText=`left:51%;bottom:16%;width:44px;height:44px;transform:translate(-50%,0);cursor:pointer;`;
+    el.style.cssText=`left:38%;bottom:28%;width:46px;height:46px;transform:translate(-50%,0);cursor:pointer;z-index:4;`;
     const canAfford=ST.eggs>=nextUpg.cost;
     const icoFile=nextUpg.ico.endsWith('.png')?nextUpg.ico:null;
     if(icoFile&&PNG[icoFile.replace('.png','')]){
