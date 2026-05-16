@@ -51,6 +51,9 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
 #fogOverlay{position:absolute;inset:0;background:rgba(220,230,245,0);transition:background 15s ease;border-radius:0;}
 #rainCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;}
+#rainLayer{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 8s ease;}
+.rdrop{position:absolute;background:linear-gradient(180deg,rgba(180,210,255,0),rgba(180,215,255,.7));border-radius:0 0 2px 2px;animation:rainFall linear infinite;}
+@keyframes rainFall{0%{transform:translateY(-100%) rotate(15deg);}100%{transform:translateY(110vh) rotate(15deg);}}
 
 /* SPRITE LAYER */
 #spriteLayer{position:absolute;inset:0;z-index:6;pointer-events:none;}
@@ -62,10 +65,10 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .sbadge{position:absolute;bottom:2px;right:-6px;background:rgba(107,26,26,.92);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:11px;padding:2px 6px;border-radius:8px;border:1.5px solid rgba(245,234,212,.9);box-shadow:0 2px 6px rgba(0,0,0,.5);min-width:22px;text-align:center;pointer-events:none;}
 
 /* Sprite animations */
-.anim-hen{animation:henb 2s ease-in-out infinite;}
-@keyframes henb{0%,100%{transform:translate(-50%,0) rotate(-2deg);}50%{transform:translate(-50%,-3%) rotate(2deg);}}
-.anim-chick{animation:chkh 1.5s ease-in-out infinite;}
-@keyframes chkh{0%,100%{transform:translate(-50%,0) scale(1);}50%{transform:translate(-50%,-5%) scale(1.05);}}
+.anim-hen{animation:henBreath 2.8s ease-in-out infinite;}
+@keyframes henBreath{0%,100%{transform:translate(-50%,0) scale(1);}35%{transform:translate(-50%,-3px) scale(1.03,0.97);}65%{transform:translate(-50%,-4px) scale(0.98,1.03);}}
+.anim-chick{animation:chickBreath 2.2s ease-in-out infinite;}
+@keyframes chickBreath{0%,100%{transform:translate(-50%,0) scale(1);}40%{transform:translate(-50%,-4px) scale(1.04,0.97);}70%{transform:translate(-50%,-2px) scale(0.97,1.04);}}50%{transform:translate(-50%,-5%) scale(1.05);}}
 .anim-franc{animation:frglow 2.5s ease-in-out infinite;}
 @keyframes frglow{0%,100%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 6px rgba(232,168,52,.5));transform:translate(-50%,0);}50%{filter:drop-shadow(0 3px 4px rgba(42,24,16,.25)) drop-shadow(0 0 16px rgba(232,168,52,.9));transform:translate(-50%,0);}}
 .anim-paradox{animation:parspin 6s linear infinite;}
@@ -91,6 +94,9 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .coqarea{position:absolute;width:160px;height:160px;z-index:9;left:50%;transform:translateX(-50%);bottom:10px;}
 .coqbase{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:150px;height:18px;background:radial-gradient(ellipse,rgba(42,24,16,.35),transparent 70%);z-index:1;}
 .coqbtn{width:152px;height:152px;border:none;background:transparent;cursor:pointer;font-size:140px;line-height:1;transition:transform .08s cubic-bezier(.4,2,.6,1);z-index:2;position:absolute;inset:0;margin:auto;filter:drop-shadow(0 5px 0 rgba(42,24,16,.25));padding:0;touch-action:manipulation;}
+.coqbtn:active{transform:scale(.88) translateY(6px);filter:drop-shadow(0 1px 0 rgba(42,24,16,.35));}
+@keyframes coqBounce{0%{transform:scale(1);}20%{transform:scale(.88) translateY(6px);}50%{transform:scale(1.06) translateY(-3px);}75%{transform:scale(.97) translateY(1px);}100%{transform:scale(1);}}
+.coq-clicked{animation:coqBounce .35s cubic-bezier(.34,1.56,.64,1);}
 .coqbtn:active{transform:scale(.92) translateY(4px);filter:drop-shadow(0 2px 0 rgba(42,24,16,.3));}
 .coqbtn img{width:100%;height:100%;object-fit:contain;pointer-events:none;}
 @keyframes floatup{0%{transform:translate(-50%,0) scale(.5);opacity:0;}20%{opacity:1;transform:translate(-50%,-10px) scale(1.1);}100%{transform:translate(-50%,-120px) scale(.9);opacity:0;}}
@@ -247,6 +253,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
         <span class="tpill" id="modePill" style="display:none">TRIAL</span>
         <span class="plbadge" id="plbadge" style="display:none">🪶 <span id="plcount">0</span></span>
       </div>
+      <div id="stageInfo" style="font-family:'Fraunces',serif;font-size:11px;color:rgba(245,234,212,.7);margin-top:2px;letter-spacing:.03em;"></div>
     </div>
     <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
       <div style="display:flex;align-items:center;gap:6px;">
@@ -261,6 +268,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 <main class="pf" id="playfield">
   <div id="skyLayer"></div>
   <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
+  <div id="rainLayer"></div>
   <div id="groundLayer"></div>
   <div id="spriteLayer"></div>
   <div id="eggLayer"></div>
@@ -602,6 +610,12 @@ function persistTrial(){
 // ============ ACTIONS ============
 function clickCoq(){
   const g=eClick();ST.eggs+=g;ST.te+=g;ST.cl++;
+  // Bounce animation
+  const btn=document.getElementById('coqBtn');
+  btn.classList.remove('coq-clicked');
+  void btn.offsetWidth; // reflow
+  btn.classList.add('coq-clicked');
+  setTimeout(()=>btn.classList.remove('coq-clicked'),400);
   spawnPop(g);renderTop();checkAch();
 }
 
@@ -935,46 +949,38 @@ let _rainDrops=[];
 let _rainOpacity=0;
 let _rainTarget=0;
 function buildRain(){
-  const canvas=document.getElementById('rainCanvas');
-  _rainCtx=canvas.getContext('2d');
-  function sizeCanvas(){
-    const pf=document.getElementById('playfield');
-    canvas.width=pf.offsetWidth||320;canvas.height=pf.offsetHeight||400;
-    _rainDrops=[];
-    for(let i=0;i<80;i++)_rainDrops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,speed:2+Math.random()*3.5,len:10+Math.random()*18});
+  // CSS-based rain drops (no canvas needed)
+  const layer=document.getElementById('rainLayer');
+  if(!layer)return;
+  layer.innerHTML='';
+  for(let i=0;i<40;i++){
+    const d=document.createElement('div');
+    d.className='rdrop';
+    const w=1+Math.random()*1.5;
+    const h=10+Math.random()*20;
+    const dur=0.5+Math.random()*0.5;
+    const delay=Math.random()*2;
+    d.style.cssText=`left:${Math.random()*110-5}%;top:0;width:${w}px;height:${h}px;animation-duration:${dur}s;animation-delay:-${delay}s;opacity:${0.4+Math.random()*.4};`;
+    layer.appendChild(d);
   }
-  sizeCanvas();
-  window.addEventListener('resize',sizeCanvas);
+  _rainCtx=null; // no canvas
 }
+function drawRain(){ /* CSS handles it */ }
 function drawRain(){
-  if(!_rainCtx)return;
-  const c=document.getElementById('rainCanvas');
-  if(!c.width)return;
-  _rainCtx.clearRect(0,0,c.width,c.height);
-  // Smoothly change opacity
+  // CSS rain - just update opacity smoothly
   _rainOpacity+=(_rainTarget-_rainOpacity)*0.04;
-  c.style.opacity=_rainOpacity.toFixed(3);
-  if(_rainOpacity<0.01){c.style.opacity='0';return;}
-  _rainCtx.strokeStyle=`rgba(140,185,230,0.7)`;
-  _rainCtx.lineWidth=1.3;
-  _rainDrops.forEach(d=>{
-    _rainCtx.beginPath();
-    _rainCtx.moveTo(d.x,d.y);
-    _rainCtx.lineTo(d.x+d.len*0.18,d.y+d.len);
-    _rainCtx.stroke();
-    d.y+=d.speed;d.x+=0.5; // slight wind
-    if(d.y>c.height){d.y=-20;d.x=Math.random()*c.width;}
-  });
 }
 function updateWeather(h){
   // Rain 15-16h
   const isRain=h>=15&&h<16;
   const rainProg=isRain?(h-15):0;
   if(isRain){
-    const phase=rainProg; // 0→1 over the hour
-    // Gentle start, peak at 30min, gentle end
-    _rainTarget=Math.min(0.95,Math.sin(phase*Math.PI)*0.85+0.15);
+    const phase=rainProg;
+    _rainTarget=Math.min(0.92,Math.sin(phase*Math.PI)*0.88+0.12);
   }
+  // CSS rain layer
+  const rl=document.getElementById('rainLayer');
+  if(rl)rl.style.opacity=(_rainTarget>0.05)?_rainTarget.toFixed(2):'0';
   else _rainTarget=0;
   _rainOpacity+=((_rainTarget-_rainOpacity)*.02);
   // Fog 8-9h
@@ -1061,7 +1067,7 @@ function renderDecorations(layer){
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
-    addDecorB(layer,'plume_or.png','plume_or',43,40,85,32,'anim-plume');
+    addDecorB(layer,'plume_or.png','plume_or',43,40,85,32,'anim-plume','prestige');
   }
 }
 
@@ -1069,11 +1075,13 @@ function addDecor(layer,file,key,left,top,w,h,anim){
   // left-top version (for gants/bottes which use bottom now too but keep compat)
   addDecorB(layer,file,key,left,top,w,h,anim,true);
 }
-function addDecorB(layer,file,key,left_pct,bot_px,w,h,anim){
+function addDecorB(layer,file,key,left_pct,bot_px,w,h,anim,extraClass){
   const div=document.createElement('div');
   div.className='spr vis';
+  if(extraClass)div.classList.add(extraClass);
   div.style.left=left_pct+'%';
   div.style.bottom=bot_px+'px';
+  div.style.pointerEvents='none';
   div.style.width=w+'px';div.style.height=h+'px';
   div.style.transform='translate(-50%,0)';div.style.zIndex=6;
   div.style.filter='drop-shadow(0 2px 3px rgba(42,24,16,.3))';
@@ -1276,6 +1284,7 @@ function renderTop(){
   const idx=stageIdx();
   document.getElementById('fname').textContent=STAGES[idx].name;
   document.getElementById('flabel').textContent=`étape ${idx+1}`;
+  const si=document.getElementById('stageInfo');if(si)si.textContent=`étape ${idx+1} · ${STAGES[idx].name}`;
 
   if(ST.pl>0){document.getElementById('plbadge').style.display='';document.getElementById('plcount').textContent=ST.pl;}
   else document.getElementById('plbadge').style.display='none';
@@ -1301,7 +1310,7 @@ function renderProd(){
     const div=document.createElement('div');
     div.className='item'+(aff?'':' locked');
     const eps=p.eps*ST.pm[p.id]*ST.gm*plBonus()*achBonus();
-    let icoH=PNG[p.id]?`<img src="${CFG.ap}${p.sp.png}" alt="">`:(p.ico);
+    let icoH=PNG[p.id]?`<img src="${CFG.ap}${p.sp.png}" alt="">`:(p.icon||p.ico||'?');
     div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec chacun</div></div><div class="irt"><div class="icst">${fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
     div.onclick=()=>buyProd(p);panel.appendChild(div);
   });
@@ -1315,6 +1324,16 @@ function renderUpg(){
   UPG.forEach(u=>{
     const done=ST.up.includes(u.id);
     const req=reqOK(u.req);
+    // Hide if req not met AND far from being met
+    if(!req&&!done){
+      const r=u.req;
+      let pct=0;
+      if(r){
+        if(r.t==='clicks')pct=ST.cl/r.n;
+        else if(r.t==='prod')pct=(ST.pr[r.id]||0)/r.n;
+      }
+      if(pct<0.5)return; // hide when less than 50% of req met
+    }
     const aff=ST.eggs>=u.cost;if(aff&&!done)hasAff=true;
     const div=document.createElement('div');
     div.className='item'+(done?' maxed':(aff?'':' locked'));
