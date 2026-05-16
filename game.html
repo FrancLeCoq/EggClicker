@@ -45,7 +45,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
-#groundLayer{position:absolute;bottom:0;left:0;right:0;height:35%;z-index:4;background:linear-gradient(to bottom,#4a5d3a 0%,#3d4f30 40%,#2e3d22 100%);border-radius:50% 50% 0 0 / 20% 20% 0 0;}
+#groundLayer{position:absolute;bottom:0;left:0;right:0;height:32%;z-index:4;background:linear-gradient(to bottom,#5a6d42 0%,#4a5d32 35%,#3a4d28 70%,#2e3d22 100%);border-radius:48% 48% 0 0/18% 18% 0 0;}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
@@ -57,9 +57,9 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .spr{position:absolute;transform:translate(-50%,0);pointer-events:none;opacity:0;filter:drop-shadow(0 3px 4px rgba(42,24,16,.3));}
 .spr.vis{opacity:1;animation:spawnB .5s cubic-bezier(.34,1.56,.64,1);}
 @keyframes spawnB{0%{transform:translate(-50%,0) scale(0);}60%{transform:translate(-50%,0) scale(1.15);}100%{transform:translate(-50%,0) scale(1);}}
-.spr img{display:block;width:100%;height:100%;object-fit:contain;}
+.spr img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
 .spr-em{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:1;}
-.sbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(107,26,26,.88);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:12px;padding:3px 8px;border-radius:10px;border:2px solid rgba(245,234,212,.9);box-shadow:0 2px 8px rgba(0,0,0,.5);min-width:26px;text-align:center;pointer-events:none;}
+.sbadge{position:absolute;bottom:2px;right:-6px;background:rgba(107,26,26,.92);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:11px;padding:2px 6px;border-radius:8px;border:1.5px solid rgba(245,234,212,.9);box-shadow:0 2px 6px rgba(0,0,0,.5);min-width:22px;text-align:center;pointer-events:none;}
 
 /* Sprite animations */
 .anim-hen{animation:henb 2s ease-in-out infinite;}
@@ -88,9 +88,9 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .fname::before,.fname::after{content:'✦';color:var(--yolk-d);margin:0 4px;font-size:9px;vertical-align:middle;}
 
 /* COQ */
-.coqarea{position:relative;width:170px;height:170px;z-index:9;margin:0 auto 8px;}
+.coqarea{position:relative;width:160px;height:160px;z-index:9;margin:0 auto 0;}
 .coqbase{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:150px;height:18px;background:radial-gradient(ellipse,rgba(42,24,16,.35),transparent 70%);z-index:1;}
-.coqbtn{width:160px;height:160px;border:none;background:transparent;cursor:pointer;font-size:140px;line-height:1;transition:transform .08s cubic-bezier(.4,2,.6,1);z-index:2;position:absolute;inset:0;margin:auto;filter:drop-shadow(0 5px 0 rgba(42,24,16,.25));padding:0;touch-action:manipulation;}
+.coqbtn{width:152px;height:152px;border:none;background:transparent;cursor:pointer;font-size:140px;line-height:1;transition:transform .08s cubic-bezier(.4,2,.6,1);z-index:2;position:absolute;inset:0;margin:auto;filter:drop-shadow(0 5px 0 rgba(42,24,16,.25));padding:0;touch-action:manipulation;}
 .coqbtn:active{transform:scale(.92) translateY(4px);filter:drop-shadow(0 2px 0 rgba(42,24,16,.3));}
 .coqbtn img{width:100%;height:100%;object-fit:contain;pointer-events:none;}
 @keyframes floatup{0%{transform:translate(-50%,0) scale(.5);opacity:0;}20%{opacity:1;transform:translate(-50%,-10px) scale(1.1);}100%{transform:translate(-50%,-120px) scale(.9);opacity:0;}}
@@ -337,25 +337,25 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:58,bot:16,w:65,h:65,z:3,png:'chick.png',anim:'chick'}},
+   sp:{left:58,bot:16,w:60,h:60,z:3,z:3,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:77,bot:14,w:108,h:96,z:3,png:'hen.png',anim:'hen',emits:true}},
+   sp:{left:76,bot:13,w:98,h:82,z:3,z:3,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:11,bot:16,w:105,h:96,z:3,png:'coop.png'}},
+   sp:{left:11,bot:15,w:88,h:80,z:3,z:3,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:17,bot:42,w:145,h:98,z:2,png:'farm.png'}},
+   sp:{left:14,bot:36,w:82,h:55,z:2,z:2,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:32,bot:46,w:108,h:58,z:2,png:'auto.png'}},
+   sp:{left:30,bot:38,w:75,h:41,z:2,z:2,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:85,bot:42,w:98,h:152,z:2,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:85,bot:36,w:79,h:122,z:2,z:2,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:62,bot:42,w:130,h:135,z:2,png:'lab.png'}},
+   sp:{left:60,bot:36,w:86,h:88,z:2,z:2,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:8,top:5,w:95,h:72,z:1,png:'station.png'}},
+   sp:{left:8,top:5,w:82,h:62,z:1,z:1,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:8,w:60,h:60,z:1,png:'franc.png',anim:'franc'}},
+   sp:{left:50,top:8,w:55,h:55,z:1,z:1,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:47,bot:54,w:80,h:100,z:1,z:1,z:1,png:'paradox.png',anim:'paradox'}}
+   sp:{left:47,bot:54,w:68,h:85,z:1,z:1,z:1,z:1,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -1045,18 +1045,18 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u3');
     const key=isGold?'gants_or':'gants_caoutchouc';
     const file=isGold?'gants_or.png':'gants_caoutchouc.png';
-    addDecorB(layer,file,key,32,14,52,48,'anim-gants');
+    addDecorB(layer,file,key,34,14,48,44,'anim-gants');
   }
   // Bottes: appear when u2 purchased, upgrade to gold when u4 purchased
   if(ST.up.includes('u2')){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,65,10,46,54);
+    addDecorB(layer,file,key,64,10,44,52);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
-    addDecorB(layer,'plume_or.png','plume_or',42,3,95,36,'anim-plume');
+    addDecorB(layer,'plume_or.png','plume_or',42,2,88,33,'anim-plume');
   }
 }
 
@@ -1218,7 +1218,7 @@ function renderBesaceAndFloatUpg(){
   if(ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='besaceEl';
-    el.style.cssText=`left:28%;bottom:14%;width:58px;height:64px;transform:translate(-50%,0);z-index:4;`;
+    el.style.cssText=`left:29%;bottom:14%;width:54px;height:60px;transform:translate(-50%,0);z-index:4;`;
     if(PNG['besace']){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
@@ -1231,7 +1231,7 @@ function renderBesaceAndFloatUpg(){
   if(nextUpg&&ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='floatUpg';
-    el.style.cssText=`left:38%;bottom:28%;width:46px;height:46px;transform:translate(-50%,0);cursor:pointer;z-index:4;`;
+    el.style.cssText=`left:36%;bottom:30%;width:44px;height:44px;transform:translate(-50%,0);cursor:pointer;z-index:4;`;
     const canAfford=ST.eggs>=nextUpg.cost;
     const icoFile=nextUpg.ico.endsWith('.png')?nextUpg.ico:null;
     if(icoFile&&PNG[icoFile.replace('.png','')]){
