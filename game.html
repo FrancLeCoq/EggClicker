@@ -347,7 +347,7 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:65,botpx:45,w:54,h:56,z:6,px:1,png:'chick.png',anim:'chick'}},
+   sp:{left:72,botpx:45,w:54,h:56,z:6,px:1,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
    sp:{left:87,botpx:0,w:71,h:68,z:6,px:1,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
@@ -355,11 +355,11 @@ const PROD=[
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
    sp:{left:13,botpx:95,w:95,h:65,z:5,px:1,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:35,botpx:95,w:76,h:55,z:5,px:1,png:'auto.png'}},
+   sp:{left:40,botpx:100,w:76,h:55,z:5,px:1,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:87,botpx:95,w:94,h:105,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:87,botpx:85,w:94,h:105,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:60,botpx:118,w:90,h:85,z:5,px:1,png:'lab.png'}},
+   sp:{left:65,botpx:110,w:90,h:85,z:5,px:1,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
    sp:{left:20,top:21,w:90,h:52,z:1,px:0,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
@@ -922,7 +922,7 @@ function scheduleClouds(){
       if(!c._animating){
         c._animating=true;
         const dur=55+Math.random()*45; // 55-100s to cross
-        const topPct=10+Math.random()*22;
+        const topPct=Math.random()*21;
         c.style.top=topPct+'%';
         c.style.opacity='0.85';
         c.style.transition='none';
@@ -932,7 +932,7 @@ function scheduleClouds(){
         },{once:true});
       }
     }
-    const next=(20+Math.random()*55)*1000;
+    const next=(8+Math.random()*12)*1000;
     setTimeout(launchCloud,next);
   }
   setTimeout(launchCloud,4000);
@@ -1078,7 +1078,7 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,68,2,42,48);
+    addDecorB(layer,file,key,30,5,42,48);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
