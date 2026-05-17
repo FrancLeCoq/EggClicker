@@ -361,7 +361,7 @@ const PROD=[
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
    sp:{left:68,botpx:113,w:90,h:85,z:5,px:1,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:20,top:21,w:180,h:104,z:1,px:0,png:'station.png'}},
+   sp:{left:20,top:3,w:180,h:104,z:1,px:0,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
    sp:{left:50,top:7,w:50,h:50,z:1,px:0,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
@@ -899,47 +899,74 @@ const _clouds=[];
 let _cloudTimer=0; // kept for compat
 function buildClouds(){
   const sky=document.getElementById('skyLayer');
-  ['nuage1','nuage2'].forEach((k,i)=>{
+  _clouds=[];
+  const configs=[
+    {key:'nuage1',file:'nuage1.png',w:120,h:48},
+    {key:'nuage2',file:'nuage2.png',w:100,h:75},
+  ];
+  configs.forEach((cfg,i)=>{
     const div=document.createElement('div');
     div.className='cloud';
-    div.style.cssText='opacity:0;position:absolute;pointer-events:none;z-index:3;left:-200px;';
-    div.style.width=(i===0?'90px':'80px');
-    div.style.height=(i===0?'35px':'60px');
-    if(PNG[k]){
-      const img=new Image();img.src=CFG.ap+k+'.png';img.style.cssText='width:100%;height:100%;display:block;';
+    div.style.cssText=`opacity:0;position:absolute;pointer-events:none;z-index:3;left:-200px;top:0;width:${cfg.w}px;height:${cfg.h}px;`;
+    // Try PNG first, fallback to CSS cloud
+    const img=new Image();
+    img.onload=()=>{
+      img.style.cssText='width:100%;height:100%;display:block;';
       div.appendChild(img);
-    }
-    sky.appendChild(div);_clouds.push(div);
+    };
+    img.onerror=()=>{
+      // CSS fallback: white fluffy cloud shape
+      div.style.background='radial-gradient(ellipse at 50% 60%,rgba(255,255,255,.9) 60%,rgba(255,255,255,.0) 100%)';
+      div.style.borderRadius='50% 50% 40% 40%/60% 60% 40% 40%';
+      div.style.filter='drop-shadow(0 4px 8px rgba(0,0,0,.15))';
+    };
+    img.src=CFG.ap+cfg.file;
+    sky.appendChild(div);
+    _clouds.push(div);
   });
 }
+
 function scheduleClouds(){
-  function launchCloud(){
+  let cloudIdx=0;
+  function launch(){
+    if(!_clouds||_clouds.length===0){setTimeout(launch,2000);return;}
     const h=gameHour();
-    const isRain=(h>=15&&h<16);
-    const isFog=(h>=8&&h<9);
     const isNight=(h>=20||h<6);
-    if(isNight||_clouds.length===0){setTimeout(launchCloud,3000);return;}
-    // Pick cloud not already animating
-    const avail=_clouds.filter(c=>!c._animating);
-    if(avail.length>0){
-      const c=avail[Math.floor(Math.random()*avail.length)];
+    const c=_clouds[cloudIdx%_clouds.length];
+    cloudIdx++;
+    if(!c._animating){
       c._animating=true;
-      const dur=45+Math.random()*30; // 45-75s to cross screen
-      const topPct=Math.random()*18; // 0-18% from top = sky level with sun/moon
+      const dur=40+Math.random()*25; // 40-65s
+      const topPct=Math.random()*16; // 0-16% from top (sky level)
       c.style.top=topPct+'%';
-      c.style.opacity=(isRain||isFog)?'0.85':'0.75';
-      c.style.animation=`cloudFloat ${dur}s linear forwards`;
-      c.addEventListener('animationend',()=>{
-        c.style.animation='none';
-        c.style.opacity='0';
-        c._animating=false;
-      },{once:true});
+      c.style.opacity=isNight?'0':'0.82';
+      // Reset position
+      c.style.transition='none';
+      c.style.left='-200px';
+      // Force reflow then animate with JS
+      void c.offsetWidth;
+      const startTime=Date.now();
+      const pf=document.getElementById('playfield');
+      const pw=pf?pf.offsetWidth+200:575;
+      function animCloud(){
+        if(!c._animating)return;
+        const t=(Date.now()-startTime)/1000;
+        const x=-200+(pw/dur)*t;
+        c.style.left=x+'px';
+        if(x>pw+10){
+          c.style.left='-200px';
+          c.style.opacity='0';
+          c._animating=false;
+        }else{
+          requestAnimationFrame(animCloud);
+        }
+      }
+      requestAnimationFrame(animCloud);
     }
-    // Next cloud in 8-18s
-    setTimeout(launchCloud,(8+Math.random()*10)*1000);
+    // Next cloud in 10-20s
+    setTimeout(launch,(10+Math.random()*10)*1000);
   }
-  // Start first cloud after 2s
-  setTimeout(launchCloud,2000);
+  setTimeout(launch,1500);
 }
 
 function updateClouds(h){
@@ -1111,16 +1138,22 @@ function addDecorB(layer,file,key,left_pct,bot_px,w,h,anim,extraClass){
 
 
 let _eggTimers={}; // per-emitter timers
-// EGG_EMITTERS: producers that emit eggs visually
-// Position values: lFn returns left in %, tFn returns top in % (for spawn point)
+// EGG_EMITTERS: 4 sources only
+// Eggs come from: factory door, farm door, coop door, hen tail
+// Positions in % (left=center%, top=spawn point % from pf top)
 const EGG_EMITTERS=[
-  {id:'hen',     cond:()=>ST.pr.hen>0,     lFn:()=>78, tFn:()=>88},
-  {id:'coop',    cond:()=>ST.pr.coop>0,    lFn:()=>11, tFn:()=>80},
-  {id:'farm',    cond:()=>ST.pr.farm>0,    lFn:()=>12, tFn:()=>65},
-  {id:'factory', cond:()=>ST.pr.factory>0, lFn:()=>84, tFn:()=>55},
-  {id:'lab',     cond:()=>ST.pr.lab>0,     lFn:()=>56, tFn:()=>65},
-  {id:'space',   cond:()=>ST.pr.space>0,   lFn:()=>10, tFn:()=>20},
-  {id:'franc',   cond:()=>ST.pr.franc>0,   lFn:()=>50, tFn:()=>15},
+  // hen tail: right side of hen, near mid-body
+  {id:'hen',    cond:()=>ST.pr.hen>0,
+   lFn:()=>87+4, tFn:()=>100-0-34}, // right of hen body (tail area)
+  // coop door: front of coop, ground level
+  {id:'coop',   cond:()=>ST.pr.coop>0,
+   lFn:()=>10+3, tFn:()=>100-0-30},
+  // farm door: front of farm barn
+  {id:'farm',   cond:()=>ST.pr.farm>0,
+   lFn:()=>13+5, tFn:()=>100-95-30},
+  // factory door: right side conveyor exit
+  {id:'factory',cond:()=>ST.pr.factory>0,
+   lFn:()=>90+4, tFn:()=>100-80-55},
 ];
 
 function updateEggs(dt){
@@ -1140,20 +1173,18 @@ function updateEggs(dt){
 
 function spawnEggFrom(leftPct,topPct,toFactory){
   const layer=document.getElementById('eggLayer');
-  const pf=document.getElementById('playfield').getBoundingClientRect();
-  const startX=pf.width*leftPct/100;
-  const startY=pf.height*topPct/100;
+  const pf=document.getElementById('playfield');
+  const pw=pf.offsetWidth||375;
+  const ph=pf.offsetHeight||380;
+  const startX=pw*leftPct/100;
+  const startY=ph*topPct/100;
   const egg=document.createElement('div');
   egg.className='fegg';
-  egg.style.cssText=`width:20px;height:26px;left:${startX}px;top:${startY}px;transform:translate(-50%,-50%);`;
-  if(PNG['egg']){const i=new Image();i.src=CFG.ap+'egg.png';egg.appendChild(i);}
+  egg.style.cssText=`width:18px;height:22px;left:${startX}px;top:${startY}px;transform:translate(-50%,-50%);`;
+  if(PNG['egg']){const i=new Image();i.src=CFG.ap+'egg.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';egg.appendChild(i);}
   else egg.textContent='🥚';
   layer.appendChild(egg);
-  if(toFactory&&ST.pr.factory>0&&Math.random()<0.5){
-    rollToFactory(egg,startX,startY,pf);
-  }else{
-    rollToNearestEdge(egg,startX,startY,pf);
-  }
+  rollToNearestEdge(egg,startX,startY,{width:pw,height:ph});
 }
 
 function rollToNearestEdge(egg,sx,sy,pf){
