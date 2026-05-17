@@ -347,25 +347,25 @@ let isUnlimited=urlP.get('mode')==='unlimited';
 // ============ PRODUCERS ============
 const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
-   sp:{left:60,botpx:45,w:52,h:54,z:6,px:1,png:'chick.png',anim:'chick'}},
+   sp:{left:58,botpx:45,w:54,h:56,z:6,px:1,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:78,botpx:42,w:80,h:68,z:6,px:1,png:'hen.png',anim:'hen'}},
+   sp:{left:73,botpx:42,w:71,h:68,z:6,px:1,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:11,botpx:62,w:72,h:65,z:3,px:1,png:'coop.png'}},
+   sp:{left:10,botpx:58,w:68,h:65,z:3,px:1,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:12,botpx:120,w:80,h:54,z:5,px:1,png:'farm.png'}},
+   sp:{left:16,botpx:120,w:95,h:65,z:5,px:1,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:30,botpx:120,w:68,h:38,z:5,px:1,png:'auto.png'}},
+   sp:{left:31,botpx:120,w:76,h:55,z:5,px:1,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:85,botpx:112,w:60,h:102,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:80,botpx:115,w:94,h:105,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:55,botpx:120,w:72,h:75,z:5,px:1,png:'lab.png'}},
+   sp:{left:50,botpx:118,w:90,h:85,z:5,px:1,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:8,top:6,w:62,h:48,z:1,px:0,png:'station.png'}},
+   sp:{left:15,top:6,w:90,h:52,z:1,px:0,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:8,w:50,h:50,z:1,px:0,png:'franc.png',anim:'franc'}},
+   sp:{left:50,top:7,w:50,h:50,z:1,px:0,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:45,top:11,w:52,h:65,z:1,px:0,png:'paradox.png',anim:'paradox'}}
+   sp:{left:37,top:8,w:68,h:65,z:1,px:0,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -879,7 +879,7 @@ function updateCelestials(h){
   const pw=pf.offsetWidth||320, ph=pf.offsetHeight||400;
   // Position: top-right of playfield (matches Disposition screenshot)
   const bob=Math.sin(Date.now()/4000)*3;
-  const cx=pw*0.77; // sun/moon: top-right area
+  const cx=pw*0.78; // sun/moon: top-right 78% of width
   const cy=ph*0.06+bob; // ~6% from top
   if(isDay){
     _sunEl.style.left=(cx-35)+'px';
@@ -1071,14 +1071,14 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u3');
     const key=isGold?'gants_or':'gants_caoutchouc';
     const file=isGold?'gants_or.png':'gants_caoutchouc.png';
-    addDecorB(layer,file,key,34,48,46,42,'anim-gants');
+    addDecorB(layer,file,key,30,44,46,42,'anim-gants');
   }
   // Bottes: appear when u2 purchased, upgrade to gold when u4 purchased
   if(ST.up.includes('u2')){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,65,42,42,50);
+    addDecorB(layer,file,key,55,40,42,48);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
@@ -1245,7 +1245,7 @@ function renderBesaceAndFloatUpg(){
   if(ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='besaceEl';
-    el.style.cssText=`left:30%;bottom:42px;width:50px;height:56px;transform:translate(-50%,0);z-index:6;`;
+    el.style.cssText=`left:26%;bottom:40px;width:48px;height:55px;transform:translate(-50%,0);z-index:6;`;
     if(PNG['besace']){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
