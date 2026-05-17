@@ -42,7 +42,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 /* Clouds */
 .cloud{position:absolute;pointer-events:none;z-index:3;opacity:0;transition:opacity 4s ease;}
 .cloud img{width:100%;height:100%;object-fit:contain;display:block;}
-@keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
+@keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:0.8;}95%{opacity:0.8;}100%{left:calc(100% + 200px);opacity:0;}}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
 #groundLayer{position:absolute;bottom:0;left:0;right:0;height:120px;z-index:4;background:linear-gradient(to bottom,#5a6d42 0%,#4a5d32 35%,#3a4d28 70%,#2e3d22 100%);border-radius:50% 50% 0 0/22% 22% 0 0;}
@@ -62,7 +62,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes spawnB{0%{transform:translate(-50%,0) scale(0);}60%{transform:translate(-50%,0) scale(1.15);}100%{transform:translate(-50%,0) scale(1);}}
 .spr img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
 .spr-em{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:1;}
-.sbadge{position:absolute;bottom:2px;right:-6px;background:rgba(107,26,26,.92);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:11px;padding:2px 6px;border-radius:8px;border:1.5px solid rgba(245,234,212,.9);box-shadow:0 2px 6px rgba(0,0,0,.5);min-width:22px;text-align:center;pointer-events:none;}
+.sbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(107,26,26,.92);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:11px;padding:2px 6px;border-radius:8px;border:1.5px solid rgba(245,234,212,.9);box-shadow:0 2px 6px rgba(0,0,0,.5);min-width:22px;text-align:center;pointer-events:none;z-index:10;}
 
 /* Sprite animations */
 .anim-hen{animation:henBreath 2.8s ease-in-out infinite;}
@@ -355,13 +355,13 @@ const PROD=[
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
    sp:{left:13,botpx:95,w:95,h:65,z:5,px:1,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:40,botpx:100,w:76,h:55,z:5,px:1,png:'auto.png'}},
+   sp:{left:35,botpx:112,w:76,h:55,z:5,px:1,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:87,botpx:85,w:94,h:105,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:90,botpx:80,w:94,h:105,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:65,botpx:110,w:90,h:85,z:5,px:1,png:'lab.png'}},
+   sp:{left:68,botpx:113,w:90,h:85,z:5,px:1,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:20,top:21,w:90,h:52,z:1,px:0,png:'station.png'}},
+   sp:{left:20,top:21,w:180,h:104,z:1,px:0,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
    sp:{left:50,top:7,w:50,h:50,z:1,px:0,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
@@ -915,29 +915,33 @@ function buildClouds(){
 function scheduleClouds(){
   function launchCloud(){
     const h=gameHour();
-    const quiet=(h>=20||h<6)||(h>=15&&h<16)||(h>=8&&h<9);
-    if(!quiet&&_clouds.length>0){
-      const idx=Math.floor(Math.random()*_clouds.length);
-      const c=_clouds[idx];
-      if(!c._animating){
-        c._animating=true;
-        const dur=55+Math.random()*45; // 55-100s to cross
-        const topPct=Math.random()*21;
-        c.style.top=topPct+'%';
-        c.style.opacity='0.85';
-        c.style.transition='none';
-        c.style.animation=`cloudFloat ${dur}s linear forwards`;
-        c.addEventListener('animationend',()=>{
-          c.style.animation='none';c.style.opacity='0';c._animating=false;
-        },{once:true});
-      }
+    const isRain=(h>=15&&h<16);
+    const isFog=(h>=8&&h<9);
+    const isNight=(h>=20||h<6);
+    if(isNight||_clouds.length===0){setTimeout(launchCloud,3000);return;}
+    // Pick cloud not already animating
+    const avail=_clouds.filter(c=>!c._animating);
+    if(avail.length>0){
+      const c=avail[Math.floor(Math.random()*avail.length)];
+      c._animating=true;
+      const dur=45+Math.random()*30; // 45-75s to cross screen
+      const topPct=Math.random()*18; // 0-18% from top = sky level with sun/moon
+      c.style.top=topPct+'%';
+      c.style.opacity=(isRain||isFog)?'0.85':'0.75';
+      c.style.animation=`cloudFloat ${dur}s linear forwards`;
+      c.addEventListener('animationend',()=>{
+        c.style.animation='none';
+        c.style.opacity='0';
+        c._animating=false;
+      },{once:true});
     }
-    const next=(8+Math.random()*12)*1000;
-    setTimeout(launchCloud,next);
+    // Next cloud in 8-18s
+    setTimeout(launchCloud,(8+Math.random()*10)*1000);
   }
-  setTimeout(launchCloud,4000);
+  // Start first cloud after 2s
+  setTimeout(launchCloud,2000);
 }
-let _cloudInterval=null;
+
 function updateClouds(h){
   // Only override during rain/fog; otherwise CSS animation handles it
   const isRain=h>=15&&h<16;
@@ -1078,7 +1082,7 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,30,5,42,48);
+    addDecorB(layer,file,key,30,50,42,48);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
