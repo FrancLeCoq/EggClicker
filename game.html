@@ -27,7 +27,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .epsv{font-weight:600;font-style:normal;}
 
 /* PLAYFIELD */
-.pf{height:380px;flex-shrink:0;position:relative;z-index:5;overflow:hidden;background:#1a0820;}
+.pf{height:380px;max-height:calc(100vh - 180px);flex-shrink:0;position:relative;z-index:5;overflow:hidden;background:#1a0820;}
 
 /* SKY LAYER */
 #skyLayer{position:absolute;inset:0;z-index:1;transition:background 10s ease;overflow:hidden;}
@@ -851,21 +851,27 @@ function updateSky(){
 let _sunEl=null,_moonEl=null;
 function buildCelestials(){
   const sky=document.getElementById('skyLayer');
-  // Sun
+  function makeImg(el,w,h,file,fileAlt,fallbackHTML){
+    el.style.cssText=`width:${w}px;height:${h}px;`;
+    function tryLoad(src,onFail){
+      const i=new Image();
+      i.style.cssText='width:100%;height:100%;object-fit:contain;';
+      i.onload=()=>{el.innerHTML='';el.appendChild(i);};
+      i.onerror=onFail;
+      i.src=src;
+    }
+    tryLoad(CFG.ap+file,()=>tryLoad(CFG.ap+fileAlt,()=>{el.innerHTML=fallbackHTML;}));
+  }
   _sunEl=document.createElement('div');
   _sunEl.id='sunEl';_sunEl.className='celestial';
-  _sunEl.style.cssText='width:70px;height:64px;';
-  if(PNG['soleil']){const i=new Image();i.src=CFG.ap+'soleil.png';_sunEl.appendChild(i);}
-  else{_sunEl.style.fontSize='52px';_sunEl.textContent='☀️';}
+  makeImg(_sunEl,70,64,'soleil.png','Soleil.png','<div style="width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 38% 33%,#fff8a0,#ffd700 40%,#ff9000);box-shadow:0 0 22px 8px rgba(255,195,0,.6);"></div>');
   sky.appendChild(_sunEl);
-  // Moon
   _moonEl=document.createElement('div');
   _moonEl.id='moonEl';_moonEl.className='celestial';
-  _moonEl.style.cssText='width:58px;height:58px;';
-  if(PNG['lune']){const i=new Image();i.src=CFG.ap+'lune.png';_moonEl.appendChild(i);}
-  else{_moonEl.style.fontSize='44px';_moonEl.textContent='🌙';}
+  makeImg(_moonEl,58,58,'lune.png','Lune.png','<div style="width:52px;height:52px;border-radius:50% 0 50% 50%;background:radial-gradient(circle at 38% 33%,#fffbe0,#f5d020 50%,#e8a800);box-shadow:0 0 15px 5px rgba(240,200,0,.4);transform:rotate(-45deg);"></div>');
   sky.appendChild(_moonEl);
 }
+
 function updateCelestials(h){
   if(!_sunEl)return;
   const isDay=h>=6&&h<20;
