@@ -30,7 +30,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .pf{height:380px;max-height:calc(100vh - 180px);flex-shrink:0;position:relative;z-index:5;overflow:hidden;}
 
 /* SKY LAYER */
-#skyLayer{position:absolute;inset:0;z-index:1;transition:background 10s ease;overflow:hidden;}
+#skyLayer{position:absolute;top:0;left:0;right:0;bottom:140px;z-index:1;transition:background 10s ease;overflow:hidden;}
 #skyLayer canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
 
 /* Sun/Moon */
@@ -898,28 +898,25 @@ function updateCelestials(h){
 let _clouds=[];
 let _cloudTimer=0; // kept for compat
 function buildClouds(){
-  // Clouds go directly in playfield (not skyLayer) so they stack above sprites
   const container=document.getElementById('playfield');
   _clouds=[];
-  const configs=[
-    {key:'nuage1',file:'nuage1.png',w:130,h:52},
-    {key:'nuage2',file:'nuage2.png',w:110,h:82},
-  ];
-  configs.forEach((cfg)=>{
+  const sizes=[[140,55],[110,80]];
+  sizes.forEach(([w,h],i)=>{
     const div=document.createElement('div');
     div.className='cloud';
-    div.style.cssText=`opacity:0;position:absolute;pointer-events:none;z-index:8;left:-200px;top:5%;width:${cfg.w}px;height:${cfg.h}px;`;
+    // CSS cloud background as immediate fallback
+    const style=i===0
+      ?'background:radial-gradient(ellipse 60% 50% at 50% 60%,rgba(255,255,255,.95) 60%,rgba(255,255,255,0));'
+      :'background:radial-gradient(ellipse 55% 55% at 40% 55%,rgba(240,245,255,.95) 65%,rgba(255,255,255,0));';
+    div.style.cssText=`position:absolute;pointer-events:none;z-index:8;opacity:0;left:-250px;top:5%;width:${w}px;height:${h}px;${style}`;
+    // Try to load PNG on top
     const img=new Image();
     img.onload=()=>{
-      img.style.cssText='width:100%;height:100%;display:block;';
+      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;';
       div.appendChild(img);
+      div.style.background='none'; // let PNG show
     };
-    img.onerror=()=>{
-      // CSS fallback cloud
-      div.style.background='radial-gradient(ellipse at 50% 55%,rgba(255,255,255,.92) 55%,rgba(240,245,255,.0) 100%)';
-      div.style.filter='drop-shadow(0 3px 6px rgba(0,0,0,.12))';
-    };
-    img.src=CFG.ap+cfg.file;
+    img.src=CFG.ap+(i===0?'nuage1.png':'nuage2.png');
     container.appendChild(div);
     _clouds.push(div);
   });
