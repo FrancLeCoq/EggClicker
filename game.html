@@ -27,7 +27,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .epsv{font-weight:600;font-style:normal;}
 
 /* PLAYFIELD */
-.pf{height:380px;max-height:calc(100vh - 180px);flex-shrink:0;position:relative;z-index:5;overflow:hidden;background:#1a0820;}
+.pf{height:380px;max-height:calc(100vh - 180px);flex-shrink:0;position:relative;z-index:5;overflow:hidden;}
 
 /* SKY LAYER */
 #skyLayer{position:absolute;inset:0;z-index:1;transition:background 10s ease;overflow:hidden;}
@@ -45,7 +45,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:0.8;}95%{opacity:0.8;}100%{left:calc(100% + 200px);opacity:0;}}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
-#groundLayer{position:absolute;bottom:0;left:0;right:0;height:120px;z-index:4;background:linear-gradient(to bottom,#5a6d42 0%,#4a5d32 35%,#3a4d28 70%,#2e3d22 100%);border-radius:50% 50% 0 0/22% 22% 0 0;}
+#groundLayer{position:absolute;bottom:0;left:0;right:0;height:150px;z-index:4;background:linear-gradient(to bottom,#6a8848 0%,#5a7838 35%,#4a6028 70%,#3a5020 100%);border-radius:50% 50% 0 0/20% 20% 0 0;}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
@@ -927,73 +927,58 @@ function buildClouds(){
 }
 
 function scheduleClouds(){
-  let cloudIdx=0;
+  let _rainClouds=[];
   function launch(){
     if(!_clouds||_clouds.length===0){setTimeout(launch,2000);return;}
     const h=gameHour();
     const isNight=(h>=20||h<6);
-    const c=_clouds[cloudIdx%_clouds.length];
-    cloudIdx++;
-    if(!c._animating){
+    const isRain=(h>=15&&h<16);
+    const isFog=(h>=8&&h<9);
+    if(isNight){setTimeout(launch,3000);return;}
+    // Pick cloud not already animating
+    const avail=_clouds.filter(c=>!c._animating);
+    if(avail.length>0){
+      const c=avail[0];
       c._animating=true;
-      const dur=40+Math.random()*25; // 40-65s
-      const topPct=Math.random()*16; // 0-16% from top (sky level)
+      const dur=isRain||isFog?(15+Math.random()*10):(40+Math.random()*25);
+      const topPct=Math.random()*18;
       c.style.top=topPct+'%';
-      c.style.opacity=isNight?'0':'0.82';
-      // Reset position
-      c.style.transition='none';
+      c.style.opacity=(isRain||isFog)?'0.9':'0.78';
       c.style.left='-200px';
-      // Force reflow then animate with JS
       void c.offsetWidth;
-      const startTime=Date.now();
       const pf=document.getElementById('playfield');
-      const pw=pf?pf.offsetWidth+200:575;
+      const pw=(pf?pf.offsetWidth:375)+200;
+      const startTime=Date.now();
       function animCloud(){
         if(!c._animating)return;
         const t=(Date.now()-startTime)/1000;
         const x=-200+(pw/dur)*t;
         c.style.left=x+'px';
-        if(x>pw+10){
-          c.style.left='-200px';
-          c.style.opacity='0';
-          c._animating=false;
-        }else{
-          requestAnimationFrame(animCloud);
-        }
+        if(x>pw){c.style.left='-200px';c.style.opacity='0';c._animating=false;}
+        else requestAnimationFrame(animCloud);
       }
       requestAnimationFrame(animCloud);
     }
-    // Next cloud in 10-20s
-    setTimeout(launch,(10+Math.random()*10)*1000);
+    // Next cloud: faster during rain/fog
+    const next=isRain||isFog
+      ?(2+Math.random()*4)*1000   // rain/fog: cloud every 2-6s = lots of clouds
+      :(5+Math.random()*18)*1000; // normal: 5-23s
+    setTimeout(launch,next);
   }
   setTimeout(launch,1500);
 }
 
 function updateClouds(h){
-  // Only override during rain/fog; otherwise CSS animation handles it
   const isRain=h>=15&&h<16;
   const isFog=h>=8&&h<9;
-  if(isRain||isFog){
-    _clouds.forEach((c,i)=>{
-      c.style.animation='none';
-      c.style.opacity='0.75';
-      c.style.left=(5+i*45)+'%';
-      c.style.top='12%';
-      c.style.width=(i===0?'120px':'100px');
-      c.style.height=(i===0?'46px':'75px');
-    });
+  const isNight=h>=20||h<6;
+  if(isNight){
+    _clouds.forEach(c=>{if(!c._animating){c.style.opacity='0';}});
   }
-  // Night: hide clouds that are animating
-  if(h>=20||h<6){
-    _clouds.forEach(c=>{if(c.style.opacity!=='0'&&!c._animating){c.style.opacity='0';}});
-  }
+  // Rain/fog handled by scheduleClouds checking those conditions
+  // No static override needed - let animation run naturally with more clouds
 }
 
-// Rain canvas
-let _rainCtx=null;
-let _rainDrops=[];
-let _rainOpacity=0;
-let _rainTarget=0;
 function buildRain(){
   // CSS-based rain drops (no canvas needed)
   const layer=document.getElementById('rainLayer');
@@ -1109,7 +1094,7 @@ function renderDecorations(layer){
     const isGold=ST.up.includes('u4');
     const key=isGold?'botte_or':'botte_caoutchouc';
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
-    addDecorB(layer,file,key,30,50,42,48);
+    addDecorB(layer,file,key,30,60,42,48);
   }
   // Plume d'Or: appear under coq when prestige is available
   if(calcPlumes()>=1){
@@ -1142,20 +1127,25 @@ let _eggTimers={}; // per-emitter timers
 // Eggs come from: factory door, farm door, coop door, hen tail
 // Positions in % (left=center%, top=spawn point % from pf top)
 const EGG_EMITTERS=[
-  // hen tail: right side of hen, near mid-body
+  // hen tail: right side, near bottom of playfield
+  // hen: left:87%, botpx:0, h:68px → bottom edge at 0px, center at 34px from bottom
+  // As % of 380px pf: Y from top = (380-34)/380*100 = 91%
   {id:'hen',    cond:()=>ST.pr.hen>0,
-   lFn:()=>87+4, tFn:()=>100-0-34}, // right of hen body (tail area)
-  // coop door: front of coop, ground level
+   lFn:()=>89, tFn:()=>90},
+  // coop door: front, at ground level
+  // coop: left:10%, botpx:0, so door at bottom → Y from top ≈ 95%
   {id:'coop',   cond:()=>ST.pr.coop>0,
-   lFn:()=>10+3, tFn:()=>100-0-30},
-  // farm door: front of farm barn
+   lFn:()=>13, tFn:()=>90},
+  // farm door: left side of farm
+  // farm: left:13%, botpx:95px → bottom at 95px from pf_bottom
+  // Y from top = (380-95)/380*100 = 75% → door at bottom of farm = 75%+
   {id:'farm',   cond:()=>ST.pr.farm>0,
-   lFn:()=>13+5, tFn:()=>100-95-30},
-  // factory door: right side conveyor exit
+   lFn:()=>15, tFn:()=>80},
+  // factory: right side exit
+  // factory: left:90%, botpx:80px, h:85px → center at (380-80-42)/380*100=67%
   {id:'factory',cond:()=>ST.pr.factory>0,
-   lFn:()=>90+4, tFn:()=>100-80-55},
+   lFn:()=>93, tFn:()=>72},
 ];
-
 function updateEggs(dt){
   const eps=tEps();
   const baseRate=Math.min(1.5,.25+Math.log10(Math.max(1,eps))*.25);
