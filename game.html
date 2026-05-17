@@ -349,7 +349,7 @@ const PROD=[
   {id:'chick', icon:'🐤', name:'Poussin curieux',       base:15,          eps:.1,   desc:'Pas grand chose, mais ça commence.',
    sp:{left:60,botpx:45,w:52,h:54,z:6,px:1,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
-   sp:{left:78,botpx:42,w:80,h:68,z:6,px:1,png:'hen.png',anim:'hen',emits:true}},
+   sp:{left:78,botpx:42,w:80,h:68,z:6,px:1,png:'hen.png',anim:'hen'}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
    sp:{left:11,botpx:62,w:72,h:65,z:3,px:1,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
@@ -361,11 +361,11 @@ const PROD=[
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
    sp:{left:55,botpx:120,w:72,h:75,z:5,px:1,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:8,top:4,w:62,h:48,z:1,px:0,png:'station.png'}},
+   sp:{left:8,top:6,w:62,h:48,z:1,px:0,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:6,w:50,h:50,z:1,px:0,png:'franc.png',anim:'franc'}},
+   sp:{left:50,top:8,w:50,h:50,z:1,px:0,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:45,top:10,w:52,h:65,z:1,px:0,png:'paradox.png',anim:'paradox'}}
+   sp:{left:45,top:11,w:52,h:65,z:1,px:0,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -443,7 +443,7 @@ async function preload(){
   checks.push(checkP('plume_or','plume_or.png'));
   checks.push(checkP('coq_meditation','coq_meditation.png'));
   checks.push(checkP('renards','renards.png'));
-  checks.push(checkP('besace','besace.png'));
+  checks.push(checkP('besace','besace.png'),checkP('besaceB','Besace.png'));
   checks.push(checkP('gants_caoutchouc','gants_caoutchouc.png'), checkP('gants_or','gants_or.png'));
   checks.push(checkP('botte_caoutchouc','botte_caoutchouc.png'), checkP('botte_or','botte_or.png'));
   // Also check upgrade PNGs
@@ -873,7 +873,7 @@ function updateCelestials(h){
   const pw=pf.offsetWidth||320, ph=pf.offsetHeight||400;
   // Position: top-right of playfield (matches Disposition screenshot)
   const bob=Math.sin(Date.now()/4000)*3;
-  const cx=pw*0.74; // ~74% from left (matches Théorie)
+  const cx=pw*0.77; // sun/moon: top-right area
   const cy=ph*0.06+bob; // ~6% from top
   if(isDay){
     _sunEl.style.left=(cx-35)+'px';
