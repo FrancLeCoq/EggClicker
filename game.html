@@ -447,7 +447,7 @@ async function preload(){
   });
   await Promise.all(checks);
 }
-function checkP(k,f){return new Promise(r=>{const i=new Image();i.onload=()=>{PNG[k]=true;r();};i.onerror=()=>r();i.src=CFG.ap+f;});}
+function checkP(k,f){return new Promise(r=>{const i=new Image();let done=false;const finish=()=>{if(done)return;done=true;r();};i.onload=()=>{PNG[k]=true;finish();};i.onerror=finish;setTimeout(finish,3000);i.src=CFG.ap+f;});}
 
 // ============ MATH ============
 function fmt(n){
@@ -1474,17 +1474,22 @@ async function init(){
     document.getElementById('coqBtn').disabled=true;
     document.getElementById('trialEndModal').classList.add('vis');
   }
-  await preload();
-  if(PNG['coq']){
-    const btn=document.getElementById('coqBtn');
-    const coqImg=ST.up.includes('u5')&&PNG['coq_meditation']?'coq_meditation.png':'coq.png';
-    btn.innerHTML=`<img src="${CFG.ap}${coqImg}" alt="Coq">`;
-    btn.dataset.coqDefault='coq.png';
-    btn.dataset.coqMed='coq_meditation.png';
-  }
+  // First render with fallback emojis so UI shows immediately
   buildCelestials();buildClouds();buildRain();scheduleClouds();
   if(checkFoxAttack()){showFoxAlarm();}else{applyOffline();}
   checkAch();renderAll();
+  // Then preload PNGs in background; once done, re-render with images
+  preload().then(()=>{
+    if(PNG['coq']){
+      const btn=document.getElementById('coqBtn');
+      const coqImg=ST.up.includes('u5')&&PNG['coq_meditation']?'coq_meditation.png':'coq.png';
+      btn.innerHTML=`<img src="${CFG.ap}${coqImg}" alt="Coq">`;
+      btn.dataset.coqDefault='coq.png';
+      btn.dataset.coqMed='coq_meditation.png';
+    }
+    _prodDirty=true;_lastProdKey='';
+    renderAll();
+  });
   if(!isUnlimited)startTrial();
   setInterval(tick,100);
   setInterval(slowLoop,800);
