@@ -242,19 +242,10 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 </head>
 <body>
 <div class="spill" id="spill">Sauvegardé</div>
-<div id="errDbg" style="position:fixed;top:0;left:0;right:0;background:#400;color:#fff;font:11px monospace;padding:6px;z-index:9999;white-space:pre-wrap;max-height:120px;overflow:auto;display:none;"></div>
+
 <script>
-window.onerror=function(msg,src,ln,col,err){
-  var el=document.getElementById("errDbg");if(!el)return;
-  el.style.display="block";
-  el.textContent+="ERR: "+msg+" @ ln "+ln+" col "+col+"\n";
-  return false;
-};
-window.addEventListener("unhandledrejection",function(e){
-  var el=document.getElementById("errDbg");if(!el)return;
-  el.style.display="block";
-  el.textContent+="REJ: "+(e.reason&&e.reason.message||e.reason||"unknown")+"\n";
-});
+window.onerror=function(msg,src,ln,col,err){console.error('ERR L'+ln+': '+msg);return false;};
+window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e.reason&&e.reason.message)||e.reason||'?');});
 </script>
 <div class="ttimer" id="ttimer"><span>⏱</span><span id="ttime">10:00</span></div>
 <div class="toast" id="toast"><span class="tico" id="tico">🏆</span><div><div class="ttl" id="ttl">Trophée</div><div id="tname"></div></div></div>
@@ -360,21 +351,21 @@ const PROD=[
   {id:'hen',   icon:'🐔', name:'Poule pondeuse',         base:100,         eps:1,    desc:'La base de toute ferme respectable.',
    sp:{left:78,botpx:42,w:80,h:68,z:6,px:1,png:'hen.png',anim:'hen',emits:true}},
   {id:'coop',  icon:'🏠', name:'Poulailler',             base:1100,        eps:8,    desc:'Un toit pour les pondeuses.',
-   sp:{left:11,botpx:55,w:72,h:65,z:3,px:1,png:'coop.png'}},
+   sp:{left:11,botpx:62,w:72,h:65,z:3,px:1,png:'coop.png'}},
   {id:'farm',  icon:'🚜', name:'Coopérative agricole',   base:12000,       eps:47,   desc:"L'union fait la force.",
-   sp:{left:12,botpx:120,w:85,h:58,z:5,px:1,png:'farm.png'}},
+   sp:{left:12,botpx:120,w:80,h:54,z:5,px:1,png:'farm.png'}},
   {id:'auto',  icon:'⚙️', name:'Ferme automatisée',      base:130000,      eps:260,  desc:'Tapis roulants et œufs partout.',
-   sp:{left:30,botpx:120,w:72,h:40,z:5,px:1,png:'auto.png'}},
+   sp:{left:30,botpx:120,w:68,h:38,z:5,px:1,png:'auto.png'}},
   {id:'factory',icon:'🏭',name:"Usine d'œufs",          base:1400000,     eps:1400, desc:"L'industrialisation de la cocotte.",
-   sp:{left:84,botpx:112,w:64,h:108,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
+   sp:{left:85,botpx:112,w:60,h:102,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
   {id:'lab',   icon:'🧪', name:'Labo génétique',         base:20000000,    eps:7800, desc:'Œufs carrés, lumineux, sonores.',
-   sp:{left:56,botpx:115,w:78,h:82,z:5,px:1,png:'lab.png'}},
+   sp:{left:55,botpx:120,w:72,h:75,z:5,px:1,png:'lab.png'}},
   {id:'space', icon:'🛰️', name:'Station orbitale',       base:330000000,   eps:44000,desc:'Pondre dans le vide spatial.',
-   sp:{left:8,top:5,w:64,h:50,z:1,px:0,png:'station.png'}},
+   sp:{left:8,top:4,w:62,h:48,z:1,px:0,png:'station.png'}},
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
-   sp:{left:50,top:7,w:52,h:52,z:1,px:0,png:'franc.png',anim:'franc'}},
+   sp:{left:50,top:6,w:50,h:50,z:1,px:0,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:43,top:14,w:55,h:68,z:2,px:0,png:'paradox.png',anim:'paradox'}}
+   sp:{left:45,top:10,w:52,h:65,z:1,px:0,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -1109,6 +1100,7 @@ function addDecorB(layer,file,key,left_pct,bot_px,w,h,anim,extraClass){
 }
 
 
+let _eggTimers={}; // per-emitter timers
 // EGG_EMITTERS: producers that emit eggs visually
 // Position values: lFn returns left in %, tFn returns top in % (for spawn point)
 const EGG_EMITTERS=[
@@ -1247,7 +1239,7 @@ function renderBesaceAndFloatUpg(){
   if(ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='besaceEl';
-    el.style.cssText=`left:32%;bottom:48px;width:50px;height:56px;transform:translate(-50%,0);z-index:6;`;
+    el.style.cssText=`left:30%;bottom:42px;width:50px;height:56px;transform:translate(-50%,0);z-index:6;`;
     if(PNG['besace']){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
@@ -1260,7 +1252,7 @@ function renderBesaceAndFloatUpg(){
   if(nextUpg&&ST.up.includes('b0')){
     const el=document.createElement('div');
     el.id='floatUpg';
-    el.style.cssText=`left:37%;bottom:115px;width:44px;height:44px;transform:translate(-50%,0);cursor:pointer;z-index:6;`;
+    el.style.cssText=`left:38%;bottom:105px;width:44px;height:44px;transform:translate(-50%,0);cursor:pointer;z-index:6;`;
     const canAfford=ST.eggs>=nextUpg.cost;
     const icoFile=nextUpg.ico.endsWith('.png')?nextUpg.ico:null;
     if(icoFile&&PNG[icoFile.replace('.png','')]){
@@ -1428,10 +1420,10 @@ function renderStats(){
 }
 
 function renderAll(){
-  try{ renderTop(); }catch(e){console.error('renderTop:',e);showDbg('renderTop: '+e.message);}
-  try{ renderSpritesIfNeeded(); }catch(e){console.error('renderSprites:',e);showDbg('renderSprites: '+e.message);}
-  try{ renderProd(); }catch(e){console.error('renderProd:',e);showDbg('renderProd: '+e.message);}
-  try{ renderUpg(); }catch(e){console.error('renderUpg:',e);showDbg('renderUpg: '+e.message);}
+  try{ renderTop(); }catch(e){console.error('renderTop:',e);}
+  try{ renderSpritesIfNeeded(); }catch(e){console.error('renderSprites:',e);}
+  try{ renderProd(); }catch(e){console.error('renderProd:',e);}
+  try{ renderUpg(); }catch(e){console.error('renderUpg:',e);}
   try{ renderAch(); }catch(e){console.error('renderAch:',e);}
   try{ renderStats(); }catch(e){console.error('renderStats:',e);}
   try{ renderScene(); }catch(e){console.error('renderScene:',e);}
