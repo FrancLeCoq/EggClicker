@@ -40,7 +40,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 #moonEl{width:58px;height:58px;}
 
 /* Clouds */
-.cloud{position:absolute;pointer-events:none;z-index:3;opacity:0;transition:opacity 4s ease;}
+.cloud{position:absolute;pointer-events:none;z-index:8;opacity:0;}
 .cloud img{width:100%;height:100%;object-fit:contain;display:block;}
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:0.8;}95%{opacity:0.8;}100%{left:calc(100% + 200px);opacity:0;}}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
@@ -898,30 +898,29 @@ function updateCelestials(h){
 let _clouds=[];
 let _cloudTimer=0; // kept for compat
 function buildClouds(){
-  const sky=document.getElementById('skyLayer');
+  // Clouds go directly in playfield (not skyLayer) so they stack above sprites
+  const container=document.getElementById('playfield');
   _clouds=[];
   const configs=[
-    {key:'nuage1',file:'nuage1.png',w:120,h:48},
-    {key:'nuage2',file:'nuage2.png',w:100,h:75},
+    {key:'nuage1',file:'nuage1.png',w:130,h:52},
+    {key:'nuage2',file:'nuage2.png',w:110,h:82},
   ];
-  configs.forEach((cfg,i)=>{
+  configs.forEach((cfg)=>{
     const div=document.createElement('div');
     div.className='cloud';
-    div.style.cssText=`opacity:0;position:absolute;pointer-events:none;z-index:3;left:-200px;top:0;width:${cfg.w}px;height:${cfg.h}px;`;
-    // Try PNG first, fallback to CSS cloud
+    div.style.cssText=`opacity:0;position:absolute;pointer-events:none;z-index:8;left:-200px;top:5%;width:${cfg.w}px;height:${cfg.h}px;`;
     const img=new Image();
     img.onload=()=>{
       img.style.cssText='width:100%;height:100%;display:block;';
       div.appendChild(img);
     };
     img.onerror=()=>{
-      // CSS fallback: white fluffy cloud shape
-      div.style.background='radial-gradient(ellipse at 50% 60%,rgba(255,255,255,.9) 60%,rgba(255,255,255,.0) 100%)';
-      div.style.borderRadius='50% 50% 40% 40%/60% 60% 40% 40%';
-      div.style.filter='drop-shadow(0 4px 8px rgba(0,0,0,.15))';
+      // CSS fallback cloud
+      div.style.background='radial-gradient(ellipse at 50% 55%,rgba(255,255,255,.92) 55%,rgba(240,245,255,.0) 100%)';
+      div.style.filter='drop-shadow(0 3px 6px rgba(0,0,0,.12))';
     };
     img.src=CFG.ap+cfg.file;
-    sky.appendChild(div);
+    container.appendChild(div);
     _clouds.push(div);
   });
 }
@@ -994,7 +993,7 @@ function buildRain(){
     d.style.cssText=`left:${Math.random()*110-5}%;top:0;width:${w}px;height:${h}px;animation-duration:${dur}s;animation-delay:-${delay}s;opacity:${0.4+Math.random()*.4};`;
     layer.appendChild(d);
   }
-  _rainCtx=null; // no canvas
+  let _rainCtx=null; // no canvas
 }
 function drawRain(){ /* CSS handles it */ }
 function drawRain(){
