@@ -45,7 +45,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:0.8;}95%{opacity:0.8;}100%{left:calc(100% + 200px);opacity:0;}}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
-#groundLayer{position:absolute;bottom:0;left:0;right:0;height:150px;z-index:4;background:linear-gradient(to bottom,#6a8848 0%,#5a7838 35%,#4a6028 70%,#3a5020 100%);border-radius:50% 50% 0 0/20% 20% 0 0;}
+#groundLayer{position:absolute;bottom:0;left:0;right:0;height:175px;z-index:4;background:linear-gradient(to bottom,#8ecf55 0%,#6aaa38 25%,#4e8825 55%,#3a6818 100%);border-radius:50% 50% 0 0/18% 18% 0 0;box-shadow:0 -4px 0 #a0d868;}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
@@ -1121,29 +1121,19 @@ function addDecorB(layer,file,key,left_pct,bot_px,w,h,anim,extraClass){
 }
 
 
-let _eggTimers={}; // per-emitter timers
+let _eggTimers={},_rainOpacity=0,_rainTarget=0,_rainDrops=[];; // per-emitter timers
 // EGG_EMITTERS: 4 sources only
 // Eggs come from: factory door, farm door, coop door, hen tail
 // Positions in % (left=center%, top=spawn point % from pf top)
 const EGG_EMITTERS=[
-  // hen tail: right side, near bottom of playfield
-  // hen: left:87%, botpx:0, h:68px → bottom edge at 0px, center at 34px from bottom
-  // As % of 380px pf: Y from top = (380-34)/380*100 = 91%
-  {id:'hen',    cond:()=>ST.pr.hen>0,
-   lFn:()=>89, tFn:()=>90},
-  // coop door: front, at ground level
-  // coop: left:10%, botpx:0, so door at bottom → Y from top ≈ 95%
-  {id:'coop',   cond:()=>ST.pr.coop>0,
-   lFn:()=>13, tFn:()=>90},
-  // farm door: left side of farm
-  // farm: left:13%, botpx:95px → bottom at 95px from pf_bottom
-  // Y from top = (380-95)/380*100 = 75% → door at bottom of farm = 75%+
-  {id:'farm',   cond:()=>ST.pr.farm>0,
-   lFn:()=>15, tFn:()=>80},
-  // factory: right side exit
-  // factory: left:90%, botpx:80px, h:85px → center at (380-80-42)/380*100=67%
-  {id:'factory',cond:()=>ST.pr.factory>0,
-   lFn:()=>93, tFn:()=>72},
+  // hen: right side at 90% H, 5px from bottom → Y from top = (pf_h-5)/pf_h*100 ≈ 98%
+  {id:'hen',    cond:()=>ST.pr.hen>0,     lFn:()=>90, tFn:()=>98, dir:'right'},
+  // coop: left at 8% H, 5px from bottom
+  {id:'coop',   cond:()=>ST.pr.coop>0,   lFn:()=>8,  tFn:()=>98, dir:'left'},
+  // farm: left at 5% H, 100px from bottom → Y from top = (pf_h-100)/pf_h*100
+  {id:'farm',   cond:()=>ST.pr.farm>0,   lFn:()=>5,  tFn:()=>74, dir:'left'},
+  // factory: right at 96% H, 85px from bottom → Y from top = (pf_h-85)/pf_h*100
+  {id:'factory',cond:()=>ST.pr.factory>0,lFn:()=>96, tFn:()=>78, dir:'right'},
 ];
 function updateEggs(dt){
   const eps=tEps();
@@ -1155,12 +1145,12 @@ function updateEggs(dt){
     const interval=1/baseRate;
     while(_eggTimers[em.id]>=interval){
       _eggTimers[em.id]-=interval;
-      spawnEggFrom(em.lFn(),em.tFn(),em.id==='factory');
+      spawnEggFrom(em.lFn(),em.tFn(),em.dir||'right');
     }
   });
 }
 
-function spawnEggFrom(leftPct,topPct,toFactory){
+function spawnEggFrom(leftPct,topPct,dir){
   const layer=document.getElementById('eggLayer');
   const pf=document.getElementById('playfield');
   const pw=pf.offsetWidth||375;
@@ -1169,11 +1159,30 @@ function spawnEggFrom(leftPct,topPct,toFactory){
   const startY=ph*topPct/100;
   const egg=document.createElement('div');
   egg.className='fegg';
-  egg.style.cssText=`width:18px;height:22px;left:${startX}px;top:${startY}px;transform:translate(-50%,-50%);`;
+  egg.style.cssText=`width:18px;height:22px;left:${startX}px;top:${startY}px;transform:translate(-50%,-50%);position:absolute;`;
   if(PNG['egg']){const i=new Image();i.src=CFG.ap+'egg.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';egg.appendChild(i);}
   else egg.textContent='🥚';
   layer.appendChild(egg);
-  rollToNearestEdge(egg,startX,startY,{width:pw,height:ph});
+  rollDirectional(egg,startX,startY,pw,ph,dir);
+}
+function rollDirectional(egg,sx,sy,pw,ph,dir){
+  // Roll in specified direction until off screen
+  const speed=(dir==='left'?-1:1)*(45+Math.random()*25);
+  const vy=-3+Math.random()*6; // slight vertical drift
+  const startTime=performance.now();
+  const tilt=dir==='left'?-1:1;
+  function anim(now){
+    if(!egg.parentNode)return;
+    const t=(now-startTime)/1000;
+    const x=sx+speed*t;
+    const y=sy+vy*t;
+    egg.style.left=x+'px';
+    egg.style.top=y+'px';
+    egg.style.transform=`translate(-50%,-50%) rotate(${t*180*tilt}deg)`;
+    if(x<-30||x>pw+30||y>ph+30){egg.remove();return;}
+    requestAnimationFrame(anim);
+  }
+  requestAnimationFrame(anim);
 }
 
 function rollToNearestEdge(egg,sx,sy,pf){
