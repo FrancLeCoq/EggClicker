@@ -1108,6 +1108,19 @@ function addDecorB(layer,file,key,left_pct,bot_px,w,h,anim,extraClass){
   layer.appendChild(div);
 }
 
+
+// EGG_EMITTERS: producers that emit eggs visually
+// Position values: lFn returns left in %, tFn returns top in % (for spawn point)
+const EGG_EMITTERS=[
+  {id:'hen',     cond:()=>ST.pr.hen>0,     lFn:()=>78, tFn:()=>88},
+  {id:'coop',    cond:()=>ST.pr.coop>0,    lFn:()=>11, tFn:()=>80},
+  {id:'farm',    cond:()=>ST.pr.farm>0,    lFn:()=>12, tFn:()=>65},
+  {id:'factory', cond:()=>ST.pr.factory>0, lFn:()=>84, tFn:()=>55},
+  {id:'lab',     cond:()=>ST.pr.lab>0,     lFn:()=>56, tFn:()=>65},
+  {id:'space',   cond:()=>ST.pr.space>0,   lFn:()=>10, tFn:()=>20},
+  {id:'franc',   cond:()=>ST.pr.franc>0,   lFn:()=>50, tFn:()=>15},
+];
+
 function updateEggs(dt){
   const eps=tEps();
   const baseRate=Math.min(1.5,.25+Math.log10(Math.max(1,eps))*.25);
@@ -1322,7 +1335,8 @@ function renderProd(){
   PROD.forEach((p,i)=>{
     const ever=ST.pr[p.id]>0;
     const prev=i===0?1:ST.pr[PROD[i-1].id];
-    if(!ever&&i>0&&prev<1&&ST.te<p.base*.3&&ST.le<p.base)return;
+    // Show items if user has bought one OR has some progress toward affording them
+    if(!ever&&i>0&&prev<1&&ST.te<p.base*.15&&ST.le<p.base)return;
     const cost=pCost(p),aff=ST.eggs>=cost;
     const div=document.createElement('div');
     div.className='item'+(aff?'':' locked');
@@ -1349,7 +1363,7 @@ function renderUpg(){
         if(r.t==='clicks')pct=ST.cl/r.n;
         else if(r.t==='prod')pct=(ST.pr[r.id]||0)/r.n;
       }
-      if(pct<0.5)return; // hide when less than 50% of req met
+      if(pct<0.2)return; // hide when less than 20% of req met
     }
     const aff=ST.eggs>=u.cost;if(aff&&!done)hasAff=true;
     const div=document.createElement('div');
