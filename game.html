@@ -27,7 +27,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .epsv{font-weight:600;font-style:normal;}
 
 /* PLAYFIELD */
-.pf{height:380px;max-height:calc(100vh - 180px);flex-shrink:0;position:relative;z-index:5;overflow:hidden;}
+.pf{height:380px;max-height:calc(100vh - 180px);flex-shrink:0;position:relative;z-index:5;overflow:hidden;;background:linear-gradient(to top,#6aaa38 0%,#6aaa38 37%,transparent 37%);}
 
 /* SKY LAYER */
 #skyLayer{position:absolute;top:0;left:0;right:0;bottom:140px;z-index:1;transition:background 10s ease;overflow:hidden;}
@@ -62,7 +62,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes spawnB{0%{transform:translate(-50%,0) scale(0);}60%{transform:translate(-50%,0) scale(1.15);}100%{transform:translate(-50%,0) scale(1);}}
 .spr img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
 .spr-em{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:1;}
-.sbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(107,26,26,.92);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:11px;padding:2px 6px;border-radius:8px;border:1.5px solid rgba(245,234,212,.9);box-shadow:0 2px 6px rgba(0,0,0,.5);min-width:22px;text-align:center;pointer-events:none;z-index:10;}
+.sbadge{position:absolute;top:65%;left:50%;transform:translate(-50%,-50%);background:rgba(107,26,26,.92);color:var(--paper);font-family:'Fraunces',serif;font-weight:900;font-size:11px;padding:2px 6px;border-radius:8px;border:1.5px solid rgba(245,234,212,.9);box-shadow:0 2px 6px rgba(0,0,0,.5);min-width:22px;text-align:center;pointer-events:none;z-index:10;}
 
 /* Sprite animations */
 .anim-hen{animation:henBreath 2.8s ease-in-out infinite;}
@@ -201,6 +201,22 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .mbtn.dan{background:var(--wine);color:var(--paper);border-color:var(--wine);}
 .mbtn.can{background:var(--cream);color:var(--ink);}
 .mbtn.gld{background:var(--yolk);color:var(--ink);border-color:var(--yolk-d);}
+
+/* UPGRADE PURCHASE ANIMATIONS */
+#upgAnim{position:fixed;inset:0;z-index:300;pointer-events:none;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.upg-splash{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:upgFadeInOut 5s ease forwards;}
+@keyframes upgFadeInOut{0%{opacity:0;transform:scale(.5);}15%{opacity:1;transform:scale(1);}80%{opacity:1;}100%{opacity:0;transform:scale(1.1);}}
+.upg-emoji{font-size:120px;animation:upgBob 0.8s ease-in-out infinite;}
+@keyframes upgBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.upg-label{font-family:'Fraunces',serif;font-weight:900;font-size:22px;color:var(--yolk);text-shadow:0 2px 8px rgba(0,0,0,.6);text-align:center;padding:12px 24px;background:rgba(42,24,16,.75);border-radius:12px;margin-top:16px;max-width:80%;}
+.upg-rockets .rocket{position:absolute;font-size:40px;animation:rocketLaunch 3s ease-in forwards;}
+@keyframes rocketLaunch{0%{transform:translateY(0) rotate(-45deg);opacity:1;}100%{transform:translateY(-120vh) rotate(-45deg);opacity:0;}}
+.upg-eggs-burst .egg{position:absolute;font-size:30px;animation:eggBurst 2s ease-out forwards;}
+@keyframes eggBurst{0%{transform:translate(0,0) scale(0);opacity:0;}20%{opacity:1;transform:scale(1.2);}100%{transform:translate(var(--dx),var(--dy)) scale(0.5);opacity:0;}}
+.upg-dna{font-size:100px;animation:dnaSpin 1.5s linear infinite;}
+@keyframes dnaSpin{to{transform:rotateY(360deg);}}
+.upg-chains .chain{font-size:50px;animation:chainWobble 0.5s ease-in-out infinite alternate;}
+@keyframes chainWobble{from{transform:rotate(-8deg);}to{transform:rotate(8deg);}}
 .panel::-webkit-scrollbar{width:6px;}
 .panel::-webkit-scrollbar-thumb{background:var(--muted);border-radius:3px;}
 /* FLOATING UPGRADE SYSTEM */
@@ -310,6 +326,7 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
   <button class="resetbtn" id="resetBtn">Effacer la sauvegarde</button>
 </section>
 
+<div id="upgAnim"></div>
 <!-- FOX ALARM MODAL -->
 <div id="foxModal">
   <div id="foxBg"></div>
@@ -320,11 +337,11 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
     <img id="foxImg" src="assets/renards.png" alt="Renards">
     <div id="foxMsg"></div>
     <button class="fox-btn hunt" id="huntBtn">🔫 Appeler le chasseur (10 000 🥚)</button>
-    <button class="fox-btn flee" id="fleeBtn">Fuir et perdre 50%</button>
+    <button class="fox-btn flee" id="fleeBtn">Payer 10 000 🥚 · ou perte 50% si &lt; 10k</button>
   </div>
 </div>
 <!-- HUNTER OVERLAY -->
-<div id="hunterOverlay"><div id="hunterImg">🧑‍🌾</div></div>
+<div id="hunterOverlay"><div id="hunterImg" style="font-size:160px;text-align:center">🧑‍🌾</div></div>
 
 <!-- MODALS -->
 <div class="mbg" id="resetModal"><div class="modal"><h2>Tout effacer ?</h2><p>Œufs, Plumes, trophées, prestiges — tout disparaît. Définitif.</p><div class="mbtns"><button class="mbtn can" id="cancelReset">Garder</button><button class="mbtn dan" id="confirmReset">Effacer</button></div></div></div>
@@ -385,9 +402,8 @@ const UPG=[
   {id:'p7',ico:'🧬',name:'CRISPR-Cocorico',       cost:400000000,    type:'prod',target:'lab',    mult:2,req:{t:'prod',id:'lab',n:10}},
   {id:'p8',ico:'🚀',name:'Propulseurs orbitaux',  cost:6e9,          type:'prod',target:'space',  mult:2,req:{t:'prod',id:'space',n:10}},
   {id:'p9',ico:'💎',name:'Smart contracts dorés', cost:100e9,        type:'prod',target:'franc',  mult:2,req:{t:'prod',id:'franc',n:10}},
-  {id:'g1',ico:'soleil.png',name:'Soleil pondeur',    cost:100000,   type:'global',mult:1.25,req:{t:'prod',id:'coop',n:25}},
-  {id:'g2',ico:'lune.png',  name:'Lune des pondeuses',cost:10000000, type:'global',mult:1.5, req:{t:'prod',id:'farm',n:50}},
-  {id:'g3',ico:'🏆',        name:"Trophée du Coq d'Or",cost:1e9,    type:'global',mult:2,   req:{t:'prod',id:'auto',n:50}}
+  {id:'g1',ico:'soleil.png',name:'Pondeurs Célestes ☀️🌙',cost:10e9,type:'global',mult:1.75,req:{t:'prod',id:'coop',n:25}},
+  {id:'g3',ico:'🏆',        name:"Trophée du Coq d'Or",cost:20e9,    type:'global',mult:2,   req:{t:'prod',id:'auto',n:50}}
 ];
 
 const ACH=[
@@ -442,6 +458,7 @@ async function preload(){
   checks.push(checkP('nuage1','nuage1.png'), checkP('nuage2','nuage2.png'));
   checks.push(checkP('plume_or','plume_or.png'));
   checks.push(checkP('coq_meditation','coq_meditation.png'));
+  checks.push(checkP('chasseur','chasseur.png'));
   checks.push(checkP('renards','renards.png'));
   checks.push(checkP('besace','besace.png'),checkP('besaceB','Besace.png'));
   checks.push(checkP('gants_caoutchouc','gants_caoutchouc.png'), checkP('gants_or','gants_or.png'));
@@ -516,6 +533,67 @@ function flashSave(txt,cloud=false){
   p.textContent=txt;p.classList.toggle('cloud',cloud);
   p.classList.add('vis');clearTimeout(_sT);
   _sT=setTimeout(()=>p.classList.remove('vis'),900);
+}
+
+
+// ============ UPGRADE PURCHASE ANIMATIONS ============
+const UPG_ANIM={
+  'p1':{ // Grain bio premium
+    build:()=>`<div class="upg-splash"><div class="upg-emoji">🌾</div><div class="upg-label">Grain Bio Premium !<br><span style="font-size:14px">Les poussins produisent ×2</span></div></div>`
+  },
+  'p3':{ // Nids confortables
+    build:()=>`<div class="upg-splash"><div class="upg-emoji">🪺</div><div class="upg-label">Nids Confortables !<br><span style="font-size:14px">Les poules pondent ×2</span></div></div>`
+  },
+  'p4':{ // Charte coopérative
+    build:()=>`<div class="upg-splash"><div class="upg-emoji">📜</div><div class="upg-label">Charte Coopérative signée !<br><span style="font-size:14px">La coopérative produit ×2</span></div></div>`
+  },
+  'p5':{ // IA de pondage
+    build:()=>`<div class="upg-splash"><div class="upg-emoji">💡</div><div class="upg-label">IA de Pondage activée !<br><span style="font-size:14px">La ferme auto produit ×2</span></div></div>`
+  },
+  'p6':{ // Tapis ultraconducteur
+    build:()=>{
+      let chains='';
+      for(let i=0;i<5;i++)chains+=`<span class="chain" style="margin:0 4px;animation-delay:${i*0.1}s">⛓️</span>`;
+      return `<div class="upg-splash"><div class="upg-chains" style="font-size:0">${chains}</div><div class="upg-label">Tapis Ultraconducteur !<br><span style="font-size:14px">L'usine d'œufs produit ×2</span></div></div>`;
+    }
+  },
+  'p7':{ // CRISPR-Cocorico
+    build:()=>`<div class="upg-splash"><div class="upg-dna">🧬</div><div class="upg-label">CRISPR-Cocorico !<br><span style="font-size:14px">Le labo produit ×2</span></div></div>`
+  },
+  'p8':{ // Propulseurs orbitaux
+    build:()=>{
+      let rockets='';
+      for(let i=0;i<8;i++){
+        const x=10+i*11;
+        const delay=Math.random()*2;
+        rockets+=`<div class="rocket" style="left:${x}%;bottom:0;animation-delay:${delay}s">🚀</div>`;
+      }
+      return `<div class="upg-splash" style="position:relative"><div class="upg-rockets" style="position:absolute;inset:0">${rockets}</div><div class="upg-label" style="margin-top:60px">Propulseurs Orbitaux !<br><span style="font-size:14px">La station produit ×2</span></div></div>`;
+    }
+  },
+  'g1':{ // Pondeurs Célestes
+    build:()=>{
+      let eggs='';
+      for(let i=0;i<12;i++){
+        const angle=i*30*(Math.PI/180);
+        const dx=Math.round(Math.cos(angle)*120);
+        const dy=Math.round(Math.sin(angle)*100);
+        eggs+=`<div class="egg" style="--dx:${dx}px;--dy:${dy}px;top:50%;left:50%;animation-delay:${i*0.1}s">🥚</div>`;
+      }
+      return `<div class="upg-splash"><div style="font-size:80px">☀️🌙</div><div class="upg-eggs-burst" style="position:relative;width:60px;height:60px">${eggs}</div><div class="upg-label">Pondeurs Célestes !<br><span style="font-size:14px">Soleil+Lune produisent ×1.75 global</span></div></div>`;
+    }
+  },
+  'g3':{ // Trophée du Coq d'Or
+    build:()=>`<div class="upg-splash"><div class="upg-emoji">🏆</div><div class="upg-label" style="color:#f5d020">Trophée du Coq d'Or !<br><span style="font-size:14px">Production globale ×2</span></div></div>`
+  },
+};
+function showUpgAnim(uid){
+  const cfg=UPG_ANIM[uid];
+  if(!cfg)return;
+  const container=document.getElementById('upgAnim');
+  if(!container)return;
+  container.innerHTML=cfg.build();
+  setTimeout(()=>{container.innerHTML='';},5200);
 }
 
 // ============ CLOUD SAVE ============
@@ -662,6 +740,7 @@ function buyUpg(u){
   }
   // Music apaisante swap
   if(u.id==='p2')switchMusic('ferme apaisante.mp3');
+  showUpgAnim(u.id);
   checkAch();renderAll();renderBesaceAndFloatUpg();save();
   showToast({ico:'✅',ttl:'Amélioration achetée !',name:u.name});
 }
@@ -745,12 +824,17 @@ function callHunter(){
   startHunterAnim();
 }
 function fleeFox(){
-  ST.eggs*=0.5;ST.te*=0.5;
+  if(ST.eggs>=10000){ST.eggs-=10000;}
+  else{ST.eggs*=0.5;ST.te*=0.5;}
   document.getElementById('foxModal').classList.remove('vis');
   _foxActive=false;renderAll();save();
 }
 function startHunterAnim(){
   const overlay=document.getElementById('hunterOverlay');
+  const hi=document.getElementById('hunterImg');
+  if(PNG['chasseur']){
+    hi.innerHTML=`<img src="${CFG.ap}chasseur.png" style="width:200px;height:200px;object-fit:contain;">`;
+  }
   overlay.classList.add('vis');
   // Show foxes in sprite layer then remove them one by one
   showFoxesOnField();
@@ -1330,6 +1414,7 @@ function buyFloatUpg(u,el){
     if(btn)btn.innerHTML=`<img src="${CFG.ap}coq_meditation.png" alt="Coq méditation">`;
   }
   if(u.id==='p2')switchMusic('ferme apaisante.mp3');
+  showUpgAnim(u.id);
   checkAch();renderAll();save();showToast({ico:'✅',ttl:'Amélioration achetée',name:u.name});
 }
 function canAffordUpg(u){return !ST.up.includes(u.id)&&reqOK(u.req)&&ST.eggs>=u.cost;}
