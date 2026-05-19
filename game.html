@@ -1393,25 +1393,24 @@ function renderBesaceAndFloatUpg(){
     pf.appendChild(el);
   }
   // Floating upgrade: show next available physical upgrade at purple triangle ~left:48%,top:68%
-  const nextUpg=UPG.find(u=>PHYS_UPGS.includes(u.id)&&!ST.up.includes(u.id)&&reqOK(u.req));
+  // Only show floating upgrade when player can actually afford it (green checkmark)
+  const nextUpg=UPG.find(u=>PHYS_UPGS.includes(u.id)&&!ST.up.includes(u.id)&&reqOK(u.req)&&ST.eggs>=u.cost);
   if(nextUpg&&(ST.up.includes('b0')||nextUpg.id==='b0')){
     const el=document.createElement('div');
     el.id='floatUpg';
     el.style.cssText=`left:50%;bottom:140px;width:52px;height:52px;transform:translate(-50%,0);cursor:pointer;z-index:11;`;
-    const canAfford=ST.eggs>=nextUpg.cost;
     const icoFile=nextUpg.ico.endsWith('.png')?nextUpg.ico:null;
     if(icoFile&&PNG[icoFile.replace('.png','')]){
       const i=new Image();i.src=CFG.ap+icoFile;i.style.cssText='width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(232,168,52,.8));';
-      if(!canAfford)i.style.filter='drop-shadow(0 0 4px rgba(100,100,100,.5)) grayscale(1)';
       el.appendChild(i);
     }else{el.style.fontSize='34px';el.textContent=icoFile?'📦':(nextUpg.ico||'📦');}
-    // Price badge
+    // Price badge - always green checkmark since we only show when affordable
     const pb=document.createElement('div');
     pb.style.cssText='position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);background:rgba(42,24,16,.8);color:var(--yolk);font-family:Fraunces,serif;font-size:10px;font-weight:900;padding:2px 5px;border-radius:6px;white-space:nowrap;';
-    pb.textContent=(canAfford?'✅ ':'🔒 ')+fS(nextUpg.cost)+'🥚';
+    pb.textContent='✅ '+fS(nextUpg.cost)+'🥚';
     el.appendChild(pb);
     el.title=nextUpg.name;
-    if(canAfford)el.onclick=()=>{buyFloatUpg(nextUpg,el);};
+    el.onclick=()=>{buyFloatUpg(nextUpg,el);};
     pf.appendChild(el);
   }
 }
@@ -1471,16 +1470,12 @@ function renderScene(){
 function renderProd(){
   const panel=document.getElementById('prodPanel');panel.innerHTML='';
   PROD.forEach((p,i)=>{
-    const ever=ST.pr[p.id]>0;
-    const prev=i===0?1:ST.pr[PROD[i-1].id];
-    // Show items if user has bought one OR has some progress toward affording them
-    if(!ever&&i>0&&prev<1&&ST.te<p.base*.15&&ST.le<p.base)return;
     const cost=pCost(p),aff=ST.eggs>=cost;
     const div=document.createElement('div');
     div.className='item'+(aff?'':' locked');
     const eps=p.eps*ST.pm[p.id]*ST.gm*plBonus()*achBonus();
     let icoH=PNG[p.id]?`<img src="${CFG.ap}${p.sp.png}" alt="">`:(p.icon||p.ico||'?');
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec chacun</div></div><div class="irt"><div class="icst">${fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec each</div></div><div class="irt"><div class="icst">${fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
     div.onclick=()=>buyProd(p);panel.appendChild(div);
   });
 }
@@ -1493,11 +1488,9 @@ function renderUpg(){
   UPG.forEach(u=>{
     const done=ST.up.includes(u.id);
     const req=reqOK(u.req);
-    // Only show upgrades that are purchased or accessible (req met)
-    if(!done&&!req)return;
-    const aff=ST.eggs>=u.cost;if(aff&&!done)hasAff=true;
+    const aff=ST.eggs>=u.cost;if(aff&&req&&!done)hasAff=true;
     const div=document.createElement('div');
-    div.className='item'+(done?' maxed':(aff?'':' locked'));
+    div.className='item'+(done?' maxed':((!req||!aff)?' locked':''));
     let eff='';
     if(u.type==='click')eff=`Click ×${u.mult}`;
     else if(u.type==='prod'){const t=PROD.find(p=>p.id===u.target);eff=`${t.name} ×${u.mult}`;}
@@ -1512,7 +1505,13 @@ function renderUpg(){
     }else{
       icoH=done?'✓':'?';
     }
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}</div></div><div class="irt"><div class="icst">${done?'✓':fS(u.cost)}</div></div>`;
+    // Show requirement hint if req not met
+    let reqHint='';
+    if(!done&&!req&&u.req){
+      const pn={chick:'curious chicks',hen:'laying hens',coop:'chicken coops',farm:'farm cooperatives',auto:'automated farms',factory:'egg factories',lab:'genetic labs',space:'orbital stations',franc:'$FRANC dimensions',paradox:'rooster paradoxes'};
+      reqHint=u.req.t==='clicks'?` · ${u.req.n} clicks needed`:` · ${u.req.n} ${pn[u.req.id]||u.req.id} needed`;
+    }
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}${reqHint}</div></div><div class="irt"><div class="icst">${done?'✓':fS(u.cost)}</div></div>`;
     div.onclick=()=>buyUpg(u);
     panel.appendChild(div);
   });
