@@ -1008,69 +1008,99 @@ function updateCelestials(h){
 
 // Clouds
 let _clouds=[];
-let _cloudTimer=0; // kept for compat
+let _cloudTimer=0;
+let _lastWeatherState=false; // track weather transitions
 function buildClouds(){
   const container=document.getElementById('playfield');
   _clouds=[];
-  const sizes=[[140,55],[110,80]];
-  sizes.forEach(([w,h],i)=>{
+  // 6 cloud slots: 3 small/medium for normal, 3 large for weather
+  const configs=[
+    {w:140,h:55,png:'nuage1.png',weather:false},
+    {w:110,h:80,png:'nuage2.png',weather:false},
+    {w:160,h:65,png:'nuage1.png',weather:false},
+    {w:220,h:85,png:'nuage1.png',weather:true},
+    {w:190,h:75,png:'nuage2.png',weather:true},
+    {w:250,h:90,png:'nuage1.png',weather:true},
+  ];
+  configs.forEach((cfg,i)=>{
     const div=document.createElement('div');
     div.className='cloud';
-    // CSS cloud background as immediate fallback
-    const style=i===0
+    div.dataset.weather=cfg.weather?'1':'0';
+    const bg=i%2===0
       ?'background:radial-gradient(ellipse 60% 50% at 50% 60%,rgba(255,255,255,.95) 60%,rgba(255,255,255,0));'
       :'background:radial-gradient(ellipse 55% 55% at 40% 55%,rgba(240,245,255,.95) 65%,rgba(255,255,255,0));';
-    div.style.cssText=`position:absolute;pointer-events:none;z-index:8;opacity:0;left:-250px;top:5%;width:${w}px;height:${h}px;${style}`;
-    // Try to load PNG on top
+    div.style.cssText=`position:absolute;pointer-events:none;z-index:8;opacity:0;left:-300px;top:5%;width:${cfg.w}px;height:${cfg.h}px;transition:filter 4s ease;${bg}`;
     const img=new Image();
     img.onload=()=>{
       img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;';
       div.appendChild(img);
-      div.style.background='none'; // let PNG show
+      div.style.background='none';
     };
-    img.src=CFG.ap+(i===0?'nuage1.png':'nuage2.png');
+    img.src=CFG.ap+cfg.png;
     container.appendChild(div);
     _clouds.push(div);
   });
 }
 
+function launchCloud(c,isWeather,staggerOffset){
+  const pf=document.getElementById('playfield');
+  const pw=(pf?pf.offsetWidth:375)+300;
+  // Weather: very slow (60-90s), normal: 40-65s
+  const dur=isWeather?(60+Math.random()*30):(40+Math.random()*25);
+  const topPct=Math.random()*(isWeather?24:18);
+  c.style.top=topPct+'%';
+  c.style.opacity=isWeather?'0.88':'0.72';
+  // Dark gray tint for weather clouds
+  c.style.filter=isWeather?'grayscale(0.5) brightness(0.75)':'grayscale(0) brightness(1)';
+  // Stagger: place cloud at a random position already mid-travel
+  const startOffset=staggerOffset?-(Math.random()*pw*0.8):0;
+  c.style.left=(startOffset-250)+'px';
+  void c.offsetWidth;
+  const startTime=Date.now()-((staggerOffset?Math.random()*dur*0.6:0)*1000);
+  c._animating=true;
+  function animCloud(){
+    if(!c._animating)return;
+    const t=(Date.now()-startTime)/1000;
+    const x=-250+(pw/dur)*t;
+    c.style.left=x+'px';
+    if(x>pw+50){c.style.left='-300px';c.style.opacity='0';c._animating=false;}
+    else requestAnimationFrame(animCloud);
+  }
+  requestAnimationFrame(animCloud);
+}
+
 function scheduleClouds(){
-  let _rainClouds=[];
   function launch(){
     if(!_clouds||_clouds.length===0){setTimeout(launch,2000);return;}
     const h=gameHour();
     const isNight=(h>=20||h<6);
     const isRain=(h>=15&&h<16)||(h>=3&&h<4);
     const isFog=(h>=8&&h<9)||(h>=20&&h<21);
-    if(isNight&&!isRain&&!isFog){setTimeout(launch,3000);return;}
-    // Pick cloud not already animating
+    const isWeather=isRain||isFog;
+
+    // Detect weather start → mass deploy all clouds across sky
+    if(isWeather&&!_lastWeatherState){
+      _lastWeatherState=true;
+      _clouds.forEach((c,idx)=>{
+        if(c._animating){c._animating=false;}
+        setTimeout(()=>launchCloud(c,true,true),idx*400);
+      });
+    }
+    if(!isWeather&&_lastWeatherState){_lastWeatherState=false;}
+
+    if(isNight&&!isWeather){setTimeout(launch,3000);return;}
+
+    // Normal cycling: pick any idle cloud
     const avail=_clouds.filter(c=>!c._animating);
     if(avail.length>0){
-      const c=avail[0];
-      c._animating=true;
-      const dur=isRain||isFog?(15+Math.random()*10):(40+Math.random()*25);
-      const topPct=Math.random()*18;
-      c.style.top=topPct+'%';
-      c.style.opacity=(isRain||isFog)?'0.9':'0.78';
-      c.style.left='-200px';
-      void c.offsetWidth;
-      const pf=document.getElementById('playfield');
-      const pw=(pf?pf.offsetWidth:375)+200;
-      const startTime=Date.now();
-      function animCloud(){
-        if(!c._animating)return;
-        const t=(Date.now()-startTime)/1000;
-        const x=-200+(pw/dur)*t;
-        c.style.left=x+'px';
-        if(x>pw){c.style.left='-200px';c.style.opacity='0';c._animating=false;}
-        else requestAnimationFrame(animCloud);
-      }
-      requestAnimationFrame(animCloud);
+      const c=avail[Math.floor(Math.random()*avail.length)];
+      launchCloud(c,isWeather,false);
     }
-    // Next cloud: faster during rain/fog
-    const next=isRain||isFog
-      ?(2+Math.random()*4)*1000   // rain/fog: cloud every 2-6s = lots of clouds
-      :(5+Math.random()*18)*1000; // normal: 5-23s
+
+    // Interval between cloud launches
+    const next=isWeather
+      ?(4+Math.random()*6)*1000    // weather: new cloud every 4-10s (fills sky gradually)
+      :(8+Math.random()*20)*1000;  // normal: 8-28s
     setTimeout(launch,next);
   }
   setTimeout(launch,1500);
@@ -1088,47 +1118,55 @@ function updateClouds(h){
 }
 
 function buildRain(){
-  // CSS-based rain drops (no canvas needed)
   const layer=document.getElementById('rainLayer');
   if(!layer)return;
   layer.innerHTML='';
-  for(let i=0;i<40;i++){
+  for(let i=0;i<80;i++){
     const d=document.createElement('div');
     d.className='rdrop';
-    const w=1+Math.random()*1.5;
-    const h=10+Math.random()*20;
-    const dur=0.5+Math.random()*0.5;
-    const delay=Math.random()*2;
-    d.style.cssText=`left:${Math.random()*110-5}%;top:0;width:${w}px;height:${h}px;animation-duration:${dur}s;animation-delay:-${delay}s;opacity:${0.4+Math.random()*.4};`;
+    const w=0.8+Math.random()*1.8;
+    const h=12+Math.random()*22;
+    const dur=0.4+Math.random()*0.5;
+    const delay=Math.random()*3;
+    const opacity=0.35+Math.random()*.5;
+    d.style.cssText=`left:${Math.random()*112-6}%;top:0;width:${w}px;height:${h}px;animation-duration:${dur}s;animation-delay:-${delay}s;opacity:${opacity};`;
     layer.appendChild(d);
   }
-  let _rainCtx=null; // no canvas
 }
 function drawRain(){ /* CSS handles it */ }
 function drawRain(){
   // CSS rain - just update opacity smoothly
   _rainOpacity+=(_rainTarget-_rainOpacity)*0.04;
 }
+function rainIntensity(phase){
+  // Quick ramp: 0→1 in first 15%
+  // Sustained dense peak: 15%→80%
+  // Slow calm fade: 80%→100%
+  if(phase<0.15)return phase/0.15;
+  if(phase<0.80)return 1.0;
+  return Math.max(0,(1.0-phase)/0.20);
+}
+
 function updateWeather(h){
   // Rain: 15-16h and 3-4h (12h apart)
   const isRain=(h>=15&&h<16)||(h>=3&&h<4);
   const rainProg=isRain?((h>=15?(h-15):(h-3))):0;
   if(isRain){
-    const phase=rainProg;
-    _rainTarget=Math.min(0.92,Math.sin(phase*Math.PI)*0.88+0.12);
+    const intensity=rainIntensity(rainProg);
+    _rainTarget=0.10+intensity*0.90; // 0.10 minimum, up to 1.0 at peak
   }else{
-    _rainTarget=0;
+    _rainTarget=Math.max(0,_rainTarget-0.008); // smooth decay after period ends
   }
-  // CSS rain layer
+  // CSS rain layer opacity
   const rl=document.getElementById('rainLayer');
-  if(rl)rl.style.opacity=(_rainTarget>0.05)?_rainTarget.toFixed(2):'0';
-  _rainOpacity+=((_rainTarget-_rainOpacity)*.02);
+  if(rl)rl.style.opacity=(_rainTarget>0.04)?_rainTarget.toFixed(3):'0';
+  _rainOpacity+=((_rainTarget-_rainOpacity)*.015);
   // Fog: 8-9h and 20-21h (12h apart)
   const isFog=(h>=8&&h<9)||(h>=20&&h<21);
   const fogBase=isFog?((h>=8&&h<9)?(h-8):(h-20)):0;
   const fogProg=isFog?Math.sin(fogBase*Math.PI):0;
   const fo=document.getElementById('fogOverlay');
-  fo.style.background=`rgba(210,228,245,${(fogProg*0.38).toFixed(3)})`;
+  fo.style.background=`rgba(210,228,245,${(fogProg*0.42).toFixed(3)})`;
 }
 
 // ============ SPRITES ============
