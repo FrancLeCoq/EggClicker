@@ -292,12 +292,7 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
   <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
   <div id="rainLayer"></div>
   
-  <div id="groundLayer">
-  <svg viewBox="0 0 480 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
-    <path d="M0 10 Q120 0 240 5 T480 10 L480 80 L0 80 Z" fill="#4a5d3a"/>
-    <path d="M0 30 Q120 22 240 28 T480 30 L480 80 L0 80 Z" fill="#364425"/>
-  </svg>
-</div>
+  <div id="groundLayer"><svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;"><defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9de84e"/><stop offset="35%" stop-color="#6aaa38"/><stop offset="70%" stop-color="#4a8020"/><stop offset="100%" stop-color="#345c1a"/></linearGradient></defs><path d="M0 145 L0 100 Q40 55 120 42 Q187.5 35 255 42 Q335 55 375 100 L375 145 Z" fill="url(#gg)"/><path d="M0 100 Q40 55 120 42 Q187.5 35 255 42 Q335 55 375 100 Q335 60 255 47 Q187.5 40 120 47 Q40 60 0 100 Z" fill="rgba(180,255,80,0.2)"/></svg></div>
   <div id="spriteLayer"></div>
   <div id="eggLayer"></div>
 
