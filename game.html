@@ -227,8 +227,8 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 /* TROPHY BIG UNLOCK */
 #trophyBigUnlock{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(42,24,16,.6);opacity:0;transition:opacity .3s;}
 #trophyBigUnlock.vis{opacity:1;}
-.trophy-big-emoji{font-size:160px;animation:trophySpin 1s linear infinite;filter:drop-shadow(0 0 30px rgba(232,168,52,.8));}
-@keyframes trophySpin{0%{transform:rotate(0deg) scale(1);}25%{transform:rotate(90deg) scale(1.1);}50%{transform:rotate(180deg) scale(1);}75%{transform:rotate(270deg) scale(1.1);}100%{transform:rotate(360deg) scale(1);}}
+.trophy-big-emoji{font-size:160px;animation:trophyPulse 1.5s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(232,168,52,.8));}
+@keyframes trophyPulse{0%,100%{transform:scale(1);}30%{transform:scale(1.15);}50%{transform:scale(0.95);}70%{transform:scale(1.1);}}
 .trophy-big-label{font-family:'Fraunces',serif;font-weight:900;font-size:20px;color:var(--yolk);text-shadow:0 2px 8px rgba(0,0,0,.6);text-align:center;margin-top:16px;background:rgba(42,24,16,.8);padding:10px 24px;border-radius:12px;}
 /* FLOATING UPGRADE SYSTEM */
 #besaceEl{position:absolute;z-index:8;pointer-events:auto;cursor:pointer;transition:transform .2s;}
@@ -807,29 +807,6 @@ function doPrestige(){
   checkAch();renderAll();save();cloudSave();
 }
 
-// ============ CHEAT ============
-let _cheatLvl=0;
-function applyCheat(){
-  _cheatLvl++;
-  if(_cheatLvl===1){ST.eggs+=1e9;ST.te+=1e9;showToast({ico:'💎',ttl:'CHEAT 1',name:'+1 Billion 🥚',cheat:true});}
-  else if(_cheatLvl===2){ST.eggs+=1e15;ST.te+=1e15;PROD.forEach(p=>ST.pr[p.id]+=5);_prodDirty=true;showToast({ico:'💎',ttl:'CHEAT 2',name:'+1Q 🥚 + 5 buildings',cheat:true});}
-  else{ST.eggs+=1e25;ST.te+=1e25;PROD.forEach(p=>ST.pr[p.id]+=20);_prodDirty=true;showToast({ico:'💎',ttl:'JACKPOT',name:'☄️ Maximum',cheat:true});}
-  checkAch();renderAll();save();
-}
-let _cbuf='';let _cT;
-document.addEventListener('keydown',e=>{
-  if(!e.key||e.key.length!==1)return;
-  _cbuf+=e.key.toUpperCase();if(_cbuf.length>10)_cbuf=_cbuf.slice(-10);
-  clearTimeout(_cT);_cT=setTimeout(()=>_cbuf='',2000);
-  if(_cbuf.endsWith('FRANC')){_cbuf='';applyCheat();}
-});
-let _pT;
-const _cheatTarget=document.getElementById('stageInfo')||document.getElementById('ecnt');
-if(_cheatTarget){
-  ['mousedown','touchstart'].forEach(ev=>_cheatTarget.addEventListener(ev,()=>{_pT=setTimeout(applyCheat,1500);}));
-  ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=>_cheatTarget.addEventListener(ev,()=>clearTimeout(_pT)));
-}
-window.cheat=applyCheat;
 
 
 
@@ -1516,11 +1493,11 @@ function renderUpg(){
   UPG.forEach(u=>{
     const done=ST.up.includes(u.id);
     const req=reqOK(u.req);
-    // Hide if req not met AND far from being met
-    // Show all upgrades - grayed out if not accessible
+    // Only show upgrades that are purchased or accessible (req met)
+    if(!done&&!req)return;
     const aff=ST.eggs>=u.cost;if(aff&&!done)hasAff=true;
     const div=document.createElement('div');
-    div.className='item'+(done?' maxed':(!req?' locked':(aff?'':' locked')));
+    div.className='item'+(done?' maxed':(aff?'':' locked'));
     let eff='';
     if(u.type==='click')eff=`Click ×${u.mult}`;
     else if(u.type==='prod'){const t=PROD.find(p=>p.id===u.target);eff=`${t.name} ×${u.mult}`;}
@@ -1535,12 +1512,7 @@ function renderUpg(){
     }else{
       icoH=done?'✓':'?';
     }
-    let reqText='';
-    if(!done&&!req&&u.req){
-      const prodNames2={chick:'curious chicks',hen:'laying hens',coop:'chicken coops',farm:'farm cooperatives',auto:'automated farms',factory:'egg factories',lab:'genetic labs',space:'orbital stations',franc:'$FRANC dimensions',paradox:'rooster paradoxes'};
-      reqText=u.req.t==='clicks'?` · 🔒 ${u.req.n} clicks`:` · 🔒 ${u.req.n} ${prodNames2[u.req.id]||u.req.id}`;
-    }
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}${reqText}</div></div><div class="irt"><div class="icst">${done?'✓':fS(u.cost)}</div></div>`;
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}</div></div><div class="irt"><div class="icst">${done?'✓':fS(u.cost)}</div></div>`;
     div.onclick=()=>buyUpg(u);
     panel.appendChild(div);
   });
