@@ -122,6 +122,8 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .item:active:not(.locked):not(.maxed){transform:translateY(2px);box-shadow:0 2px 0 rgba(42,24,16,.15);}
 .item.locked{opacity:.45;cursor:not-allowed;background:var(--warm);}
 .item.maxed{background:var(--leaf);color:var(--cream);cursor:default;}
+.item.avail{background:linear-gradient(135deg,#e8f5e2,#d4ecc8);border-color:#4a5d3a;}
+.item.avail .icst{color:#2d6b1a;}
 .iico{font-size:28px;flex-shrink:0;width:40px;text-align:center;}
 .iico img{width:36px;height:36px;object-fit:contain;vertical-align:middle;}
 .ibody{flex:1;min-width:0;}
@@ -318,7 +320,7 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
 
 
 <nav class="tabs">
-  <button class="tab active" data-p="prod">Buildings</button>
+  <button class="tab active" data-p="prod">Farm</button>
   <button class="tab" data-p="upg">Upgrades<span class="dot"></span></button>
   <button class="tab" data-p="ach">Trophies<span class="dot"></span></button>
   <button class="tab" data-p="stats">Stats</button>
@@ -334,7 +336,7 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
   <div class="stl"><span class="stll">Production/sec</span><span class="stlv" id="st4">0</span></div>
   <div class="stl"><span class="stll">Per click</span><span class="stlv" id="st5">1</span></div>
   <div class="stl"><span class="stll">Global multiplier</span><span class="stlv" id="st6">×1</span></div>
-  <div class="stl"><span class="stll">Buildings</span><span class="stlv" id="st7">0</span></div>
+  <div class="stl"><span class="stll">Farm Items</span><span class="stlv" id="st7">0</span></div>
   <div class="stl"><span class="stll">Golden Feathers</span><span class="stlv" id="st8">0</span></div>
   <div class="stl"><span class="stll">Prestiges</span><span class="stlv" id="st9">0</span></div>
   <div class="stl"><span class="stll">Mode</span><span class="stlv" id="st10">Trial</span></div>
@@ -428,14 +430,14 @@ const ACH=[
   {id:'a1', ico:'🥚',name:'First Egg',          desc:'First click',            chk:s=>s.cl>=1},
   {id:'a2', ico:'✋',name:'Hundred Cock-a-doodles',   desc:'100 clicks',               chk:s=>s.cl>=100},
   {id:'a3', ico:'💪',name:'Iron Finger',         desc:'1,000 clicks',             chk:s=>s.cl>=1000},
-  {id:'a4', ico:'🏗️',name:'First Building',    desc:'1 building purchased',       chk:s=>totB(s)>=1},
-  {id:'a5', ico:'🏘️',name:'Small Hamlet',         desc:'10 buildings',            chk:s=>totB(s)>=10},
-  {id:'a6', ico:'🌆',name:'Builder Empire',     desc:'100 buildings',           chk:s=>totB(s)>=100},
-  {id:'a7', ico:'🌍',name:'A Thousand Roofs',          desc:'1,000 buildings',         chk:s=>totB(s)>=1000},
+  {id:'a4', ico:'🌾',name:'First Farm Purchase',    desc:'1 farm item purchased',       chk:s=>totB(s)>=1},
+  {id:'a5', ico:'🏡',name:'Small Hamlet',         desc:'10 farm items',            chk:s=>totB(s)>=10},
+  {id:'a6', ico:'💰',name:'Farm Tycoon',     desc:'100 farm items',           chk:s=>totB(s)>=100},
+  {id:'a7', ico:'🏰',name:'Farm Empire',          desc:'1,000 farm items',         chk:s=>totB(s)>=1000},
   {id:'a8', ico:'🥬',name:'A Thousand Eggs',           desc:'1,000 eggs',              chk:s=>s.te>=1000},
   {id:'a9', ico:'🌽',name:'Million Eggs',       desc:'1M eggs',                chk:s=>s.te>=1e6},
   {id:'a10',ico:'🌟',name:'Billion Eggs',      desc:'1B eggs',               chk:s=>s.te>=1e9},
-  {id:'a11',ico:'🎯',name:'Collector',       desc:'1 of each building',    chk:s=>PROD.every(p=>s.pr[p.id]>=1)},
+  {id:'a11',ico:'🧺',name:'Farm Collector',       desc:'1 of each farm item',    chk:s=>PROD.every(p=>s.pr[p.id]>=1)},
   {id:'a12',ico:'🛒',name:'Upgrader',         desc:'5 upgrades',         chk:s=>s.up.length>=5},
   {id:'a13',ico:'✨',name:'All Upgrades',   desc:'All upgrades purchased',chk:s=>s.up.length>=UPG.length},
   {id:'a14',ico:'🪶',name:'First Prestige',     desc:'1 prestige',              chk:s=>s.ps>=1},
@@ -1472,10 +1474,10 @@ function renderProd(){
   PROD.forEach((p,i)=>{
     const cost=pCost(p),aff=ST.eggs>=cost;
     const div=document.createElement('div');
-    div.className='item'+(aff?'':' locked');
+    div.className='item'+(aff?' avail':' locked');
     const eps=p.eps*ST.pm[p.id]*ST.gm*plBonus()*achBonus();
     let icoH=PNG[p.id]?`<img src="${CFG.ap}${p.sp.png}" alt="">`:(p.icon||p.ico||'?');
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec each</div></div><div class="irt"><div class="icst">${fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec each</div></div><div class="irt"><div class="icst">${aff?'✅ '+fS(cost):fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
     div.onclick=()=>buyProd(p);panel.appendChild(div);
   });
 }
@@ -1488,9 +1490,11 @@ function renderUpg(){
   UPG.forEach(u=>{
     const done=ST.up.includes(u.id);
     const req=reqOK(u.req);
-    const aff=ST.eggs>=u.cost;if(aff&&req&&!done)hasAff=true;
+    const aff=ST.eggs>=u.cost;
+    const canBuy=req&&aff&&!done;
+    if(canBuy)hasAff=true;
     const div=document.createElement('div');
-    div.className='item'+(done?' maxed':((!req||!aff)?' locked':''));
+    div.className='item'+(done?' maxed':(canBuy?' avail':' locked'));
     let eff='';
     if(u.type==='click')eff=`Click ×${u.mult}`;
     else if(u.type==='prod'){const t=PROD.find(p=>p.id===u.target);eff=`${t.name} ×${u.mult}`;}
@@ -1511,7 +1515,9 @@ function renderUpg(){
       const pn={chick:'curious chicks',hen:'laying hens',coop:'chicken coops',farm:'farm cooperatives',auto:'automated farms',factory:'egg factories',lab:'genetic labs',space:'orbital stations',franc:'$FRANC dimensions',paradox:'rooster paradoxes'};
       reqHint=u.req.t==='clicks'?` · ${u.req.n} clicks needed`:` · ${u.req.n} ${pn[u.req.id]||u.req.id} needed`;
     }
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}${reqHint}</div></div><div class="irt"><div class="icst">${done?'✓':fS(u.cost)}</div></div>`;
+    // Cost display: ✅ when available, ✓ when purchased
+    const costDisplay=done?'✓':(canBuy?'✅ '+fS(u.cost):fS(u.cost));
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}${reqHint}</div></div><div class="irt"><div class="icst">${costDisplay}</div></div>`;
     div.onclick=()=>buyUpg(u);
     panel.appendChild(div);
   });
