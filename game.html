@@ -1040,9 +1040,9 @@ function scheduleClouds(){
     if(!_clouds||_clouds.length===0){setTimeout(launch,2000);return;}
     const h=gameHour();
     const isNight=(h>=20||h<6);
-    const isRain=(h>=15&&h<16);
-    const isFog=(h>=8&&h<9);
-    if(isNight){setTimeout(launch,3000);return;}
+    const isRain=(h>=15&&h<16)||(h>=3&&h<4);
+    const isFog=(h>=8&&h<9)||(h>=20&&h<21);
+    if(isNight&&!isRain&&!isFog){setTimeout(launch,3000);return;}
     // Pick cloud not already animating
     const avail=_clouds.filter(c=>!c._animating);
     if(avail.length>0){
@@ -1077,8 +1077,8 @@ function scheduleClouds(){
 }
 
 function updateClouds(h){
-  const isRain=h>=15&&h<16;
-  const isFog=h>=8&&h<9;
+  const isRain=(h>=15&&h<16)||(h>=3&&h<4);
+  const isFog=(h>=8&&h<9)||(h>=20&&h<21);
   const isNight=h>=20||h<6;
   if(isNight){
     _clouds.forEach(c=>{if(!c._animating){c.style.opacity='0';}});
@@ -1110,21 +1110,23 @@ function drawRain(){
   _rainOpacity+=(_rainTarget-_rainOpacity)*0.04;
 }
 function updateWeather(h){
-  // Rain 15-16h
-  const isRain=h>=15&&h<16;
-  const rainProg=isRain?(h-15):0;
+  // Rain: 15-16h and 3-4h (12h apart)
+  const isRain=(h>=15&&h<16)||(h>=3&&h<4);
+  const rainProg=isRain?((h>=15?(h-15):(h-3))):0;
   if(isRain){
     const phase=rainProg;
     _rainTarget=Math.min(0.92,Math.sin(phase*Math.PI)*0.88+0.12);
+  }else{
+    _rainTarget=0;
   }
   // CSS rain layer
   const rl=document.getElementById('rainLayer');
   if(rl)rl.style.opacity=(_rainTarget>0.05)?_rainTarget.toFixed(2):'0';
-  else _rainTarget=0;
   _rainOpacity+=((_rainTarget-_rainOpacity)*.02);
-  // Fog 8-9h
-  const isFog=h>=8&&h<9;
-  const fogProg=isFog?Math.sin((h-8)*Math.PI):0;
+  // Fog: 8-9h and 20-21h (12h apart)
+  const isFog=(h>=8&&h<9)||(h>=20&&h<21);
+  const fogBase=isFog?((h>=8&&h<9)?(h-8):(h-20)):0;
+  const fogProg=isFog?Math.sin(fogBase*Math.PI):0;
   const fo=document.getElementById('fogOverlay');
   fo.style.background=`rgba(210,228,245,${(fogProg*0.38).toFixed(3)})`;
 }
@@ -1619,7 +1621,9 @@ document.getElementById('goHome').onclick=()=>{location.href=CFG.home;};
 let _lt2=Date.now();
 function tick(){
   const now=Date.now();
-  const dt=(now-_lt2)/1000;_lt2=now;
+  let dt=(now-_lt2)/1000;_lt2=now;
+  // Cap dt to prevent burst production after browser throttling
+  if(dt>0.5)dt=0.5;
   const gain=tEps()*dt;
   if(gain>0){ST.eggs+=gain;ST.te+=gain;}
   // Game clock advance
@@ -1676,7 +1680,7 @@ async function init(){
   setInterval(tick,100);
   setInterval(slowLoop,800);
   setInterval(save,15000);
-  setInterval(()=>cloudSave(false),60000);
+  setInterval(()=>cloudSave(false),100000);
   if(tg){tg.ready();tg.expand();}
   initMusic();
 }
