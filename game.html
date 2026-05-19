@@ -292,12 +292,12 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
   <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
   <div id="rainLayer"></div>
   
-<div id="groundLayer">
+ <div id="groundLayer">
   <svg viewBox="0 0 480 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
     <!-- Couche principale (vert clair) -->
-    <path d="M0,145 L62.4,50 L192,45 L312,35 L417.6,55 L480,145 L480,145 L0,145 Z" fill="#4a5d3a"/>
+    <path d="M0,145 L0,50 C31,47 62,41 62.4,40 C126,32 157,18 192,15 C253,22 279,28 312,30 C346,33 394,43 417.6,45 C449,39 469,37 480,35 L480,145 Z" fill="#4a5d3a"/>
     <!-- Couche secondaire (vert foncé) -->
-    <path d="M0,145 L62.4,47 L192,42 L312,32 L417.6,52 L480,145 L480,145 L0,145 Z" fill="#364425"/>
+    <path d="M0,145 L0,45 C31,42 62,36 62.4,35 C126,27 157,12 192,10 C253,17 279,23 312,25 C346,28 394,38 417.6,40 C449,34 469,32 480,30 L480,145 Z" fill="#364425"/>
   </svg>
 </div>
   <div id="spriteLayer"></div>
