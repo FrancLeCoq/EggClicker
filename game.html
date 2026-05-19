@@ -45,7 +45,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:0.8;}95%{opacity:0.8;}100%{left:calc(100% + 200px);opacity:0;}}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
-#groundLayer{position:absolute;bottom:0;left:0;right:0;height:145px;z-index:4;background:#3d7020;overflow:visible;}
+#groundLayer{position:absolute;bottom:0;left:0;right:0;height:145px;z-index:4;background:#345c1a;overflow:hidden;}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
@@ -290,7 +290,7 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
   <div id="skyLayer"></div>
   <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
   <div id="rainLayer"></div>
-  <div id="groundLayer"></div>
+  <div id="groundLayer"><svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;position:absolute;bottom:0;left:0;right:0;"><defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9de84e"/><stop offset="35%" stop-color="#6aaa38"/><stop offset="70%" stop-color="#4a8020"/><stop offset="100%" stop-color="#345c1a"/></linearGradient></defs><path d="M0 145 L0 100 Q40 55 120 42 Q187.5 35 255 42 Q335 55 375 100 L375 145 Z" fill="url(#gg)"/><path d="M0 100 Q40 55 120 42 Q187.5 35 255 42 Q335 55 375 100 Q335 60 255 47 Q187.5 40 120 47 Q40 60 0 100 Z" fill="rgba(180,255,80,0.2)"/></svg></div>
   <div id="spriteLayer"></div>
   <div id="eggLayer"></div>
 
@@ -1643,27 +1643,8 @@ async function init(){
   }
   // First render with fallback emojis so UI shows immediately
   buildCelestials();buildClouds();buildRain();scheduleClouds();
-  // Inject SVG grass hill into groundLayer
-  (function(){
-    const gl=document.getElementById('groundLayer');
-    if(!gl)return;
-    // Bright hill shape - visible day and night
-    gl.innerHTML='<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;overflow:visible">'
-      +'<defs>'
-      +'<linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">'
-      +'<stop offset="0%" stop-color="#8fd44f"/>'
-      +'<stop offset="40%" stop-color="#6aaa38"/>'
-      +'<stop offset="100%" stop-color="#3d7020"/>'
-      +'</linearGradient>'
-      +'</defs>'
-      // Main hill - fills to bottom
-      +'<path d="M0 145 L0 95 Q90 42 187.5 38 Q285 42 375 95 L375 145 Z" fill="url(#gg)"/>'
-      // Bright highlight stripe at top of hill
-      +'<path d="M0 95 Q90 42 187.5 38 Q285 42 375 95 Q285 50 187.5 46 Q90 50 0 95 Z" fill="#a0e060" opacity="0.5"/>'
-      +'</svg>';
-    // Extra: set a background color as fallback
-    gl.style.background='#3d7020';
-  })();
+  // Ground: static SVG in HTML
+
   if(checkFoxAttack()){showFoxAlarm();}else{applyOffline();}
   checkAch();renderAll();
   // Then preload PNGs in background; once done, re-render with images
