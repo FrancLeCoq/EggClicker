@@ -36,8 +36,8 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 /* Sun/Moon */
 .celestial{position:absolute;pointer-events:none;transition:opacity 2s ease;z-index:2;}
 .celestial img{width:100%;height:100%;object-fit:contain;}
-#sunEl{width:70px;height:64px;}
-#moonEl{width:58px;height:58px;}
+#sunEl{width:90px;height:84px;}
+#moonEl{width:78px;height:78px;}
 
 /* Clouds */
 .cloud{position:absolute;pointer-events:none;z-index:8;opacity:0;}
@@ -389,7 +389,7 @@ const PROD=[
   {id:'franc', icon:'🪙', name:'Dimension $FRANC',       base:5100000000,  eps:260000,desc:'Œufs cryptés sur la chaîne.',
    sp:{left:50,top:0,w:75,h:75,z:1,px:0,png:'franc.png',anim:'franc'}},
   {id:'paradox',icon:'🌀',name:'Paradoxe du coq',        base:75000000000, eps:1600000,desc:"L'œuf et la poule, simultanément.",
-   sp:{left:55,botpx:190,w:68,h:65,z:1,px:0,png:'paradox.png',anim:'paradox'}}
+   sp:{left:55,botpx:160,w:78,h:75,z:1,px:0,png:'paradox.png',anim:'paradox'}}
 ];
 
 // ============ UPGRADES ============
@@ -960,11 +960,11 @@ function buildCelestials(){
   }
   _sunEl=document.createElement('div');
   _sunEl.id='sunEl';_sunEl.className='celestial';
-  makeImg(_sunEl,140,128,'soleil.png','Soleil.png','<div style="width:140px;height:128px;border-radius:50%;background:radial-gradient(circle at 38% 33%,#fff8a0,#ffd700 40%,#ff9000);box-shadow:0 0 22px 8px rgba(255,195,0,.6);"></div>');
+  makeImg(_sunEl,90,84,'soleil.png','Soleil.png','<div style="width:90px;height:84px;border-radius:50%;background:radial-gradient(circle at 38% 33%,#fff8a0,#ffd700 40%,#ff9000);box-shadow:0 0 22px 8px rgba(255,195,0,.6);"></div>');
   sky.appendChild(_sunEl);
   _moonEl=document.createElement('div');
   _moonEl.id='moonEl';_moonEl.className='celestial';
-  makeImg(_moonEl,116,116,'lune.png','Lune.png','<div style="width:116px;height:116px;border-radius:50% 0 50% 50%;background:radial-gradient(circle at 38% 33%,#fffbe0,#f5d020 50%,#e8a800);box-shadow:0 0 15px 5px rgba(240,200,0,.4);transform:rotate(-45deg);"></div>');
+  makeImg(_moonEl,78,78,'lune.png','Lune.png','<div style="width:78px;height:78px;border-radius:50% 0 50% 50%;background:radial-gradient(circle at 38% 33%,#fffbe0,#f5d020 50%,#e8a800);box-shadow:0 0 15px 5px rgba(240,200,0,.4);transform:rotate(-45deg);"></div>');
   sky.appendChild(_moonEl);
 }
 
