@@ -1441,11 +1441,22 @@ function renderTop(){
 let _lastSceneIdx=-1;
 // Ground: CSS gradient only
 function renderScene(){
-  const idx=Math.min(stageIdx(),6); // max at civ
+  const idx=Math.min(stageIdx(),6);
   if(idx===_lastSceneIdx)return;
   _lastSceneIdx=idx;
-  const bg=STAGES[idx].bg;
-  // ground is CSS only - no SVG
+  const gl=document.getElementById('groundLayer');
+  if(!gl)return;
+  const grassScenes={
+    pioneer:'<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="145" style="display:block;position:absolute;bottom:0;left:0;right:0;"><path d="M0 145 L0 95 Q95 75 187.5 72 Q280 75 375 95 L375 145 Z" fill="#4a5d3a"/><path d="M0 110 Q95 90 187.5 87 Q280 90 375 110 L375 145 L0 145 Z" fill="#364425"/></svg>',
+    small:'<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="145" style="display:block;position:absolute;bottom:0;left:0;right:0;"><path d="M0 145 L0 90 Q95 70 187.5 67 Q280 70 375 90 L375 145 Z" fill="#4a5d3a"/><path d="M0 108 Q95 88 187.5 85 Q280 88 375 108 L375 145 L0 145 Z" fill="#364425"/></svg>',
+    hamlet:'<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="145" style="display:block;position:absolute;bottom:0;left:0;right:0;"><path d="M0 145 L0 88 Q95 68 187.5 65 Q280 68 375 88 L375 145 Z" fill="#4a5d3a"/><path d="M0 106 Q95 86 187.5 83 Q280 86 375 106 L375 145 L0 145 Z" fill="#364425"/></svg>',
+    estate:'<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="145" style="display:block;position:absolute;bottom:0;left:0;right:0;"><path d="M0 145 L0 75 Q95 55 187.5 50 Q280 55 375 75 L375 145 Z" fill="#5a6d3a"/><path d="M0 100 Q95 80 187.5 75 Q280 80 375 100 L375 145 L0 145 Z" fill="#4a5d3a"/><path d="M0 118 Q95 105 187.5 102 Q280 105 375 118 L375 145 L0 145 Z" fill="#364425"/></svg>',
+    empire:'<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="145" style="display:block;position:absolute;bottom:0;left:0;right:0;"><path d="M0 145 L0 72 Q95 52 187.5 48 Q280 52 375 72 L375 145 Z" fill="#5a6d3a"/><path d="M0 100 Q95 80 187.5 77 Q280 80 375 100 L375 145 L0 145 Z" fill="#4a5d3a"/></svg>',
+    kingdom:'<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="145" style="display:block;position:absolute;bottom:0;left:0;right:0;"><path d="M0 125 L375 125 L375 145 L0 145 Z" fill="#364425"/></svg>',
+    civ:'<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="145" style="display:block;position:absolute;bottom:0;left:0;right:0;"><rect x="0" y="110" width="375" height="35" fill="#1a1428"/></svg>'
+  };
+  const bg=STAGES[Math.min(idx,STAGES.length-1)].bg;
+  gl.innerHTML=grassScenes[bg]||grassScenes.pioneer;
 }
 
 function renderProd(){
