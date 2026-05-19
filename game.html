@@ -45,7 +45,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:0.8;}95%{opacity:0.8;}100%{left:calc(100% + 200px);opacity:0;}}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
 /* Ground strip */
-#groundLayer{position:absolute;bottom:0;left:0;right:0;height:145px;z-index:4;background:#345c1a;overflow:hidden;}
+#groundLayer{position:absolute;bottom:0;left:0;right:0;height:145px !important;min-height:145px !important;z-index:4;background:#345c1a !important;overflow:visible !important;}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
