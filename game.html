@@ -44,8 +44,31 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .cloud img{width:100%;height:100%;object-fit:contain;display:block;}
 @keyframes cloudFloat{0%{left:-200px;opacity:0;}5%{opacity:0.8;}95%{opacity:0.8;}100%{left:calc(100% + 200px);opacity:0;}}5%{opacity:.85;}90%{opacity:.85;}100%{left:calc(100% + 200px);opacity:0;}}
 
-/* Scene stack (sky+grass per stage) */
-.scene-stack > div svg{width:100%;height:100%;display:block;}
+/* Ground strip */
+#groundLayer{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  pointer-events:none;
+}
+
+#grassFront{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:145px;
+  z-index:20;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+#grassFront img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
@@ -287,16 +310,21 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
 </header>
 
 <main class="pf" id="playfield">
-  <div class="scene-stack" id="sceneStack" style="position:absolute;inset:0;z-index:1;"></div>
-  <div id="skyLayer" style="position:absolute;inset:0;z-index:2;pointer-events:none;"></div>
-  <div id="weatherLayer" style="position:absolute;inset:0;z-index:3;pointer-events:none;"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
+  <div id="skyLayer"></div>
+  <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
   <div id="rainLayer"></div>
+  <div id="groundLayer"></div>
+
+  
   <div id="spriteLayer"></div>
   <div id="eggLayer"></div>
 
   <div class="coqarea" id="coqArea">
     <div class="coqbase"></div>
-    <button class="coqbtn" id="coqBtn" aria-label="Cliquer">🐓</button>
+    
+  <div id="grassFront">
+    <img src="assets/herbe.png" alt="Herbe">
+  </div><button class="coqbtn" id="coqBtn" aria-label="Cliquer">🐓</button>
   </div>
 </main>
 
@@ -423,19 +451,6 @@ const ACH=[
   {id:'a14',ico:'🪶',name:'Premier Prestige',     desc:'1 prestige',              chk:s=>s.ps>=1},
   {id:'a15',ico:'👑',name:'Le Coq Légendaire',    desc:'10 prestiges',            chk:s=>s.ps>=10}
 ];
-
-const SCENES = {
-  pioneer: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky1)"/><circle cx="380" cy="60" r="32" fill="#e8a834" opacity="0.6"/><circle cx="380" cy="60" r="22" fill="#e8a834"/><path d="M0 250 Q120 240 240 245 T480 250 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 270 Q120 262 240 268 T480 270 L480 320 L0 320 Z" fill="#364425"/></svg>`,
-  small: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky2)"/><circle cx="80" cy="50" r="28" fill="#e8a834"/><path d="M0 240 Q120 230 240 238 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 265 Q120 258 240 263 T480 265 L480 320 L0 320 Z" fill="#364425"/></svg>`,
-  hamlet: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f5d678"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky3)"/><circle cx="400" cy="55" r="26" fill="#e8a834"/><g fill="#4a5d3a" opacity="0.5"><circle cx="50" cy="220" r="20"/><circle cx="100" cy="225" r="16"/><circle cx="430" cy="218" r="22"/></g><path d="M0 240 Q120 230 240 238 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 265 Q120 258 240 263 T480 265 L480 320 L0 320 Z" fill="#364425"/></svg>`,
-  estate: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky4" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e8c878"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky4)"/><circle cx="80" cy="60" r="24" fill="#e8a834"/><path d="M0 200 Q100 180 200 195 T480 200 L480 320 L0 320 Z" fill="#5a6d3a"/><path d="M0 240 Q120 225 240 235 T480 240 L480 320 L0 320 Z" fill="#4a5d3a"/><path d="M0 270 Q120 260 240 268 T480 270 L480 320 L0 320 Z" fill="#364425"/></svg>`,
-  empire: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky5" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d8b878"/><stop offset="1" stop-color="#ead8b0"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky5)"/><circle cx="420" cy="50" r="22" fill="#c8841d"/><path d="M0 215 Q100 195 200 210 T480 215 L480 320 L0 320 Z" fill="#5a6d3a"/><path d="M0 250 Q120 238 240 246 T480 250 L480 320 L0 320 Z" fill="#4a5d3a"/></svg>`,
-  kingdom: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky6" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b89868"/><stop offset="1" stop-color="#d8b878"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky6)"/><circle cx="100" cy="50" r="18" fill="#c8841d" opacity="0.7"/><path d="M0 280 L480 280 L480 320 L0 320 Z" fill="#364425"/></svg>`,
-  civ: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky7" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#6b4830"/><stop offset="0.5" stop-color="#a87848"/><stop offset="1" stop-color="#d8a868"/></linearGradient></defs><rect width="480" height="320" fill="url(#sky7)"/><circle cx="240" cy="80" r="30" fill="#e8a834" opacity="0.8"/></svg>`,
-  cosmic: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><radialGradient id="sky8" cx="50%" cy="100%" r="80%"><stop offset="0" stop-color="#6b1a4a"/><stop offset="0.5" stop-color="#3a1830"/><stop offset="1" stop-color="#1a0820"/></radialGradient></defs><rect width="480" height="320" fill="url(#sky8)"/><g fill="#fbf3df"><circle cx="50" cy="40" r="1"/><circle cx="120" cy="60" r="1.5"/><circle cx="200" cy="30" r="1"/><circle cx="280" cy="50" r="1.2"/><circle cx="360" cy="35" r="1"/><circle cx="420" cy="55" r="1.5"/><circle cx="80" cy="90" r="1"/><circle cx="240" cy="80" r="1.3"/></g></svg>`,
-  franc: `<svg viewBox="0 0 480 320" preserveAspectRatio="xMidYMax slice"><defs><radialGradient id="sky9" cx="50%" cy="50%" r="80%"><stop offset="0" stop-color="#4a2860"/><stop offset="0.6" stop-color="#2a1840"/><stop offset="1" stop-color="#0a0820"/></radialGradient></defs><rect width="480" height="320" fill="url(#sky9)"/><g fill="#fbf3df"><circle cx="30" cy="30" r="0.8"/><circle cx="80" cy="50" r="1.2"/><circle cx="130" cy="20" r="1"/><circle cx="190" cy="40" r="0.8"/><circle cx="240" cy="25" r="1.4"/><circle cx="290" cy="50" r="1"/><circle cx="340" cy="30" r="1.2"/><circle cx="390" cy="55" r="0.8"/></g></svg>`
-};
-
 
 const STAGES=[
   {eps:0,    name:'Premier Cocorico',      bg:'pioneer'},
@@ -941,7 +956,8 @@ function getSkyColors(h){
 
 function updateSky(){
   const h=gameHour();
-  // Sky color handled by sceneStack SVGs - skyLayer is for celestials/clouds only
+  const {top,bot}=getSkyColors(h);
+  document.getElementById('skyLayer').style.background=`linear-gradient(to bottom, ${top}, ${bot})`;
   updateCelestials(h);
   updateClouds(h);
   updateWeather(h);
@@ -1450,29 +1466,14 @@ function renderTop(){
   else document.getElementById('plbadge').style.display='none';
 }
 
-let _lastSceneBg="";
+let _lastSceneIdx=-1;
 // Ground: CSS gradient only
 function renderScene(){
-  const idx = Math.min(stageIdx(), STAGES.length - 1);
-  const stageId = STAGES[idx].bg;
-  if(stageId === _lastSceneBg) return;
-  _lastSceneBg = stageId;
-  const stack = document.getElementById('sceneStack');
-  if(!stack) return;
-  let existing = stack.querySelector('[data-stage="' + stageId + '"]');
-  if(!existing){
-    existing = document.createElement('div');
-    existing.style.cssText = 'position:absolute;inset:0;opacity:0;transition:opacity 1.5s ease;';
-    existing.dataset.stage = stageId;
-    existing.innerHTML = SCENES[stageId] || SCENES['pioneer'] || '';
-    // Make SVG fill container
-    const svg = existing.querySelector('svg');
-    if(svg){ svg.style.cssText = 'width:100%;height:100%;display:block;'; }
-    stack.appendChild(existing);
-    void existing.offsetWidth;
-  }
-  stack.querySelectorAll('[data-stage]').forEach(s => s.style.opacity = '0');
-  existing.style.opacity = '1';
+  const idx=Math.min(stageIdx(),6); // max at civ
+  if(idx===_lastSceneIdx)return;
+  _lastSceneIdx=idx;
+  const bg=STAGES[idx].bg;
+  // ground is CSS only - no SVG
 }
 
 function renderProd(){
@@ -1665,7 +1666,7 @@ async function init(){
   }
   // First render with fallback emojis so UI shows immediately
   buildCelestials();buildClouds();buildRain();scheduleClouds();
-  _lastSceneBg="";renderScene();
+  // Ground: static SVG in HTML
 
   if(checkFoxAttack()){showFoxAlarm();}else{applyOffline();}
   checkAch();renderAll();
@@ -1678,7 +1679,7 @@ async function init(){
       btn.dataset.coqDefault='coq.png';
       btn.dataset.coqMed='coq_meditation.png';
     }
-    _prodDirty=true;_lastProdKey='';_lastSceneBg='';
+    _prodDirty=true;_lastProdKey='';
     renderAll();
   });
   if(!isUnlimited)startTrial();
@@ -1695,6 +1696,32 @@ window.addEventListener('pagehide',()=>{persistTrial();save();cloudSave(true);se
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persistTrial();save();cloudSave(true);}});
 init();
 </script>
-
+<div id="grassDebug" style="position:fixed;bottom:80px;left:10px;background:rgba(0,0,0,.85);color:#0f0;font:11px monospace;padding:6px 10px;z-index:9999;border-radius:6px;max-width:350px;"></div>
+<script>
+setTimeout(()=>{
+  const d=document.getElementById('grassDebug');
+  const gl=document.getElementById('groundLayer');
+  if(!d)return;
+  if(!gl){d.textContent='❌ groundLayer NOT FOUND in DOM';return;}
+  const cs=getComputedStyle(gl);
+  const rect=gl.getBoundingClientRect();
+  const svg=gl.querySelector('svg');
+  const childCount=gl.children.length;
+  d.innerHTML=[
+    'groundLayer debug:',
+    'display: '+cs.display,
+    'visibility: '+cs.visibility,
+    'opacity: '+cs.opacity,
+    'width×height: '+Math.round(rect.width)+'×'+Math.round(rect.height),
+    'top/left: '+Math.round(rect.top)+'/'+Math.round(rect.left),
+    'z-index: '+cs.zIndex,
+    'background: '+cs.backgroundColor,
+    'overflow: '+cs.overflow,
+    'children: '+childCount,
+    'has SVG: '+(svg?'YES ('+svg.getBoundingClientRect().width+'×'+svg.getBoundingClientRect().height+')':'NO'),
+    'innerHTML length: '+gl.innerHTML.length,
+  ].join('\n');
+},2000);
+</script>
 </body>
 </html>
