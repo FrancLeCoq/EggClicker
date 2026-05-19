@@ -124,6 +124,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .item.maxed{background:var(--leaf);color:var(--cream);cursor:default;}
 .item.avail{background:linear-gradient(135deg,#e8f5e2,#d4ecc8);border-color:#4a5d3a;}
 .item.avail .icst{color:#2d6b1a;}
+.gegg{display:inline-block;background:linear-gradient(135deg,#4a5d3a,#6a8a4a);border-radius:50%;width:18px;height:18px;text-align:center;line-height:18px;font-size:11px;vertical-align:middle;margin-right:3px;box-shadow:0 1px 3px rgba(0,0,0,.2);}
 .iico{font-size:28px;flex-shrink:0;width:40px;text-align:center;}
 .iico img{width:36px;height:36px;object-fit:contain;vertical-align:middle;}
 .ibody{flex:1;min-width:0;}
@@ -134,7 +135,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .icst{font-family:'Fraunces',serif;font-weight:900;font-size:14px;color:var(--wine);line-height:1;}
 .item.locked .icst{color:var(--muted);}
 .item.maxed .icst{color:var(--yolk);}
-.iown{font-size:10px;color:var(--muted);margin-top:2px;}
+.iown{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px;}
 .item.maxed .iown{color:rgba(245,234,212,.7);}
 
 /* Section divider in merged panel */
@@ -1409,7 +1410,7 @@ function renderBesaceAndFloatUpg(){
     // Price badge - always green checkmark since we only show when affordable
     const pb=document.createElement('div');
     pb.style.cssText='position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);background:rgba(42,24,16,.8);color:var(--yolk);font-family:Fraunces,serif;font-size:10px;font-weight:900;padding:2px 5px;border-radius:6px;white-space:nowrap;';
-    pb.textContent='✅ '+fS(nextUpg.cost)+'🥚';
+    pb.innerHTML='<span class="gegg">🥚</span>'+fS(nextUpg.cost)+'🥚';
     el.appendChild(pb);
     el.title=nextUpg.name;
     el.onclick=()=>{buyFloatUpg(nextUpg,el);};
@@ -1477,7 +1478,7 @@ function renderProd(){
     div.className='item'+(aff?' avail':' locked');
     const eps=p.eps*ST.pm[p.id]*ST.gm*plBonus()*achBonus();
     let icoH=PNG[p.id]?`<img src="${CFG.ap}${p.sp.png}" alt="">`:(p.icon||p.ico||'?');
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec each</div></div><div class="irt"><div class="icst">${aff?'✅ '+fS(cost):fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec each</div></div><div class="irt"><div class="icst">${aff?'<span class="gegg">🥚</span>'+fS(cost):fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
     div.onclick=()=>buyProd(p);panel.appendChild(div);
   });
 }
@@ -1516,7 +1517,7 @@ function renderUpg(){
       reqHint=u.req.t==='clicks'?` · ${u.req.n} clicks needed`:` · ${u.req.n} ${pn[u.req.id]||u.req.id} needed`;
     }
     // Cost display: ✅ when available, ✓ when purchased
-    const costDisplay=done?'✓':(canBuy?'✅ '+fS(u.cost):fS(u.cost));
+    const costDisplay=done?'✓':(canBuy?'<span class="gegg">🥚</span>'+fS(u.cost):fS(u.cost));
     div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}${reqHint}</div></div><div class="irt"><div class="icst">${costDisplay}</div></div>`;
     div.onclick=()=>buyUpg(u);
     panel.appendChild(div);
@@ -1633,7 +1634,7 @@ function slowLoop(){
   _slowTick++;
   renderSpritesIfNeeded();
   updateSky();
-  if(_slowTick%3===0){renderProd();renderUpg();checkAch();}
+  if(_slowTick%3===0){renderProd();renderUpg();checkAch();renderBesaceAndFloatUpg();}
   if(_slowTick%5===0){renderStats();renderScene();}
 }
 
