@@ -1448,17 +1448,18 @@ function renderScene(){
   _lastSceneBg=bg;
   const gl=document.getElementById('groundLayer');
   if(!gl)return;
-  const SVG_STYLE='position:absolute;bottom:0;left:0;width:100%;height:145px;display:block;';
-  const grassScenes={
-    pioneer:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${SVG_STYLE}"><defs><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9de84e"/><stop offset="35%" stop-color="#6aaa38"/><stop offset="70%" stop-color="#4a8020"/><stop offset="100%" stop-color="#345c1a"/></linearGradient></defs><path d="M0 145 L0 95 Q95 75 187.5 72 Q280 75 375 95 L375 145 Z" fill="url(#gg2)"/><path d="M0 110 Q95 90 187.5 87 Q280 90 375 110 L375 145 L0 145 Z" fill="rgba(180,255,80,0.18)"/></svg>`,
-    small:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${SVG_STYLE}"><defs><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8dd840"/><stop offset="40%" stop-color="#5a9830"/><stop offset="100%" stop-color="#345c1a"/></linearGradient></defs><path d="M0 145 L0 90 Q95 70 187.5 67 Q280 70 375 90 L375 145 Z" fill="url(#gg2)"/><path d="M0 108 Q95 88 187.5 85 Q280 88 375 108 L375 145 L0 145 Z" fill="rgba(180,255,80,0.18)"/></svg>`,
-    hamlet:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${SVG_STYLE}"><defs><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7dc838"/><stop offset="40%" stop-color="#4a8828"/><stop offset="100%" stop-color="#2a4c12"/></linearGradient></defs><path d="M0 145 L0 88 Q95 68 187.5 65 Q280 68 375 88 L375 145 Z" fill="url(#gg2)"/><path d="M0 106 Q95 86 187.5 83 Q280 86 375 106 L375 145 L0 145 Z" fill="rgba(180,255,80,0.15)"/></svg>`,
-    estate:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${SVG_STYLE}"><defs><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6db830"/><stop offset="40%" stop-color="#4a7820"/><stop offset="100%" stop-color="#2a4c12"/></linearGradient></defs><path d="M0 145 L0 75 Q95 55 187.5 50 Q280 55 375 75 L375 145 Z" fill="url(#gg2)"/><path d="M0 100 Q95 80 187.5 75 Q280 80 375 100 L375 145 L0 145 Z" fill="#4a5d3a"/><path d="M0 118 Q95 105 187.5 102 Q280 105 375 118 L375 145 L0 145 Z" fill="#364425"/></svg>`,
-    empire:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${SVG_STYLE}"><defs><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5da820"/><stop offset="40%" stop-color="#3a6818"/><stop offset="100%" stop-color="#1a3c0a"/></linearGradient></defs><path d="M0 145 L0 72 Q95 52 187.5 48 Q280 52 375 72 L375 145 Z" fill="url(#gg2)"/><path d="M0 100 Q95 80 187.5 77 Q280 80 375 100 L375 145 L0 145 Z" fill="#364425"/></svg>`,
-    kingdom:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${SVG_STYLE}"><rect x="0" y="120" width="375" height="25" fill="#364425"/></svg>`,
-    civ:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${SVG_STYLE}"><rect x="0" y="110" width="375" height="35" fill="#1a1428"/></svg>`
+  // Use solid fills only (no linearGradient - unreliable in injected SVG on mobile WebKit)
+  const S='position:absolute;bottom:0;left:0;width:100%;height:145px;display:block;';
+  const g={
+    pioneer:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${S}"><path d="M0 145 L0 95 Q95 72 187.5 68 Q280 72 375 95 L375 145 Z" fill="#6aaa38"/><path d="M0 110 Q95 88 187.5 84 Q280 88 375 110 L375 145 L0 145 Z" fill="#4a8020"/><path d="M0 128 L375 128 L375 145 L0 145 Z" fill="#345c1a"/></svg>`,
+    small:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${S}"><path d="M0 145 L0 90 Q95 68 187.5 64 Q280 68 375 90 L375 145 Z" fill="#5a9830"/><path d="M0 108 Q95 86 187.5 82 Q280 86 375 108 L375 145 L0 145 Z" fill="#4a8020"/><path d="M0 126 L375 126 L375 145 L0 145 Z" fill="#345c1a"/></svg>`,
+    hamlet:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${S}"><path d="M0 145 L0 88 Q95 66 187.5 62 Q280 66 375 88 L375 145 Z" fill="#4a8828"/><path d="M0 106 Q95 84 187.5 80 Q280 84 375 106 L375 145 L0 145 Z" fill="#3a6c18"/><path d="M0 124 L375 124 L375 145 L0 145 Z" fill="#2a4c12"/></svg>`,
+    estate:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${S}"><path d="M0 145 L0 75 Q95 52 187.5 48 Q280 52 375 75 L375 145 Z" fill="#4a7820"/><path d="M0 100 Q95 78 187.5 74 Q280 78 375 100 L375 145 L0 145 Z" fill="#3a6010"/><path d="M0 118 Q95 106 187.5 102 Q280 106 375 118 L375 145 L0 145 Z" fill="#2a4c12"/></svg>`,
+    empire:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${S}"><path d="M0 145 L0 72 Q95 50 187.5 46 Q280 50 375 72 L375 145 Z" fill="#3a6818"/><path d="M0 100 Q95 78 187.5 74 Q280 78 375 100 L375 145 L0 145 Z" fill="#2a4c12"/><path d="M0 122 L375 122 L375 145 L0 145 Z" fill="#1a3c0a"/></svg>`,
+    kingdom:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${S}"><rect x="0" y="118" width="375" height="27" fill="#364425"/><rect x="0" y="132" width="375" height="13" fill="#2a3818"/></svg>`,
+    civ:`<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="${S}"><rect x="0" y="108" width="375" height="37" fill="#1a1428"/></svg>`
   };
-  gl.innerHTML=grassScenes[bg]||grassScenes.pioneer;
+  gl.innerHTML=g[bg]||g.pioneer;
 }
 
 function renderProd(){
@@ -1664,7 +1665,7 @@ async function init(){
       btn.dataset.coqDefault='coq.png';
       btn.dataset.coqMed='coq_meditation.png';
     }
-    _prodDirty=true;_lastProdKey='';
+    _prodDirty=true;_lastProdKey='';_lastSceneBg='';
     renderAll();
   });
   if(!isUnlimited)startTrial();
