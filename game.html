@@ -1682,5 +1682,55 @@ window.addEventListener('pagehide',()=>{persistTrial();save();cloudSave(true);se
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persistTrial();save();cloudSave(true);}});
 init();
 </script>
+
+<script>
+// === DIAGNOSTIC GAZON ===
+(function(){
+  var gl = document.getElementById('groundLayer');
+  if(!gl) return;
+  var observer = new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      // Capture stack trace to find the culprit
+      var stack = new Error().stack || 'no stack';
+      var lines = stack.split('\n').slice(1,5).join(' | ');
+      var msg = '[GAZON] ' + m.type + ' on ' + m.target.id + 
+                ' | innerHTML.length=' + gl.innerHTML.length +
+                ' | h=' + gl.offsetHeight +
+                ' | style.h=' + gl.style.height +
+                ' | FROM: ' + lines;
+      console.warn(msg);
+      // Show on screen
+      var d = document.getElementById('__dbg');
+      if(d){ d.innerHTML = msg.substring(0,300); d.style.background='red'; }
+    });
+  });
+  observer.observe(gl, {
+    attributes: true,
+    childList: true,
+    subtree: true,
+    attributeFilter: ['style','class','height']
+  });
+  // Also watch parent playfield
+  var pf = document.getElementById('playfield');
+  if(pf){
+    new MutationObserver(function(mutations){
+      mutations.forEach(function(m){
+        if(m.type==='childList'){
+          m.removedNodes.forEach(function(n){
+            if(n.id==='groundLayer'){
+              var stack = new Error().stack || 'no stack';
+              console.error('[GAZON] groundLayer REMOVED FROM DOM! Stack: ' + stack);
+              var d = document.getElementById('__dbg');
+              if(d){ d.innerHTML = 'GROUNDLAYER REMOVED! ' + stack.substring(0,200); d.style.background='red'; }
+            }
+          });
+        }
+      });
+    }).observe(pf, {childList:true});
+  }
+  console.log('[GAZON] Observer attached');
+})();
+</script>
+<div id="__dbg" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);color:#0f0;font:10px monospace;padding:4px;z-index:9999;word-break:break-all;pointer-events:none;min-height:40px;"></div>
 </body>
 </html>
