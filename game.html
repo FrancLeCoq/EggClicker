@@ -46,39 +46,6 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 
 /* Ground strip */
 
-#groundLayer{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  height:145px;
-  min-height:145px;
-  z-index:4;
-  pointer-events:none;
-  overflow:hidden;
-}
-
-#grassFront{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  height:145px;
-  min-height:145px;
-  z-index:20;
-  pointer-events:none;
-  overflow:hidden;
-}
-
-#grassFront img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
@@ -323,20 +290,22 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
   <div id="skyLayer"></div>
   <div id="weatherLayer"><div id="fogOverlay"></div><canvas id="rainCanvas"></canvas></div>
   <div id="rainLayer"></div>
-  <div id="groundLayer"></div>
-
   
   <div id="spriteLayer"></div>
   <div id="eggLayer"></div>
 
   <div class="coqarea" id="coqArea">
     <div class="coqbase"></div>
-    
-  <div id="grassFront">
-    <img src="assets/herbe.png" alt="Herbe">
-  </div><button class="coqbtn" id="coqBtn" aria-label="Cliquer">🐓</button>
+    <button class="coqbtn" id="coqBtn" aria-label="Cliquer">🐓</button>
   </div>
 </main>
+<div id="grassHill" style="position:relative;z-index:6;margin-top:-145px;height:145px;pointer-events:none;max-width:480px;margin-left:auto;margin-right:auto;overflow:visible;">
+<svg viewBox="0 0 375 145" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+<defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9de84e"/><stop offset="35%" stop-color="#6aaa38"/><stop offset="70%" stop-color="#4a8020"/><stop offset="100%" stop-color="#345c1a"/></linearGradient></defs>
+<path d="M0 145 L0 100 Q40 55 120 42 Q187.5 35 255 42 Q335 55 375 100 L375 145 Z" fill="url(#gg)"/>
+<path d="M0 100 Q40 55 120 42 Q187.5 35 255 42 Q335 55 375 100 Q335 60 255 47 Q187.5 40 120 47 Q40 60 0 100 Z" fill="rgba(180,255,80,0.2)"/>
+</svg>
+</div>
 
 <nav class="tabs">
   <button class="tab active" data-p="prod">Bâtiments</button>
@@ -1706,32 +1675,6 @@ window.addEventListener('pagehide',()=>{persistTrial();save();cloudSave(true);se
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persistTrial();save();cloudSave(true);}});
 init();
 </script>
-<div id="grassDebug" style="position:fixed;bottom:80px;left:10px;background:rgba(0,0,0,.85);color:#0f0;font:11px monospace;padding:6px 10px;z-index:9999;border-radius:6px;max-width:350px;"></div>
-<script>
-setTimeout(()=>{
-  const d=document.getElementById('grassDebug');
-  const gl=document.getElementById('groundLayer');
-  if(!d)return;
-  if(!gl){d.textContent='❌ groundLayer NOT FOUND in DOM';return;}
-  const cs=getComputedStyle(gl);
-  const rect=gl.getBoundingClientRect();
-  const svg=gl.querySelector('svg');
-  const childCount=gl.children.length;
-  d.innerHTML=[
-    'groundLayer debug:',
-    'display: '+cs.display,
-    'visibility: '+cs.visibility,
-    'opacity: '+cs.opacity,
-    'width×height: '+Math.round(rect.width)+'×'+Math.round(rect.height),
-    'top/left: '+Math.round(rect.top)+'/'+Math.round(rect.left),
-    'z-index: '+cs.zIndex,
-    'background: '+cs.backgroundColor,
-    'overflow: '+cs.overflow,
-    'children: '+childCount,
-    'has SVG: '+(svg?'YES ('+svg.getBoundingClientRect().width+'×'+svg.getBoundingClientRect().height+')':'NO'),
-    'innerHTML length: '+gl.innerHTML.length,
-  ].join('\n');
-},2000);
-</script>
+
 </body>
 </html>
