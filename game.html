@@ -390,21 +390,21 @@ const PROD=[
    sp:{left:72,botpx:45,w:54,h:56,z:6,px:1,png:'chick.png',anim:'chick'}},
   {id:'hen',   icon:'🐔', name:'Laying Hen',         base:100,         eps:1,    desc:'The foundation of any decent farm.',
    sp:{left:87,botpx:0,w:71,h:68,z:6,px:1,png:'hen.png',anim:'hen',emits:true}},
-  {id:'coop',  icon:'🏠', name:'Chicken Coop',             base:1100,        eps:8,    desc:'A roof for the layers.',
+  {id:'coop',  icon:'🏠', name:'Chicken Coop',             base:1000,        eps:5,    desc:'A roof for the layers.',
    sp:{left:10,botpx:0,w:68,h:65,z:3,px:1,png:'coop.png'}},
-  {id:'farm',  icon:'🚜', name:'Farm Cooperative',   base:12000,       eps:47,   desc:'Strength in numbers.',
+  {id:'farm',  icon:'🚜', name:'Farm Cooperative',   base:10000,       eps:25,   desc:'Strength in numbers.',
    sp:{left:13,botpx:95,w:95,h:65,z:5,px:1,png:'farm.png'}},
-  {id:'auto',  icon:'⚙️', name:'Automated Farm',      base:130000,      eps:260,  desc:'Conveyor belts and eggs everywhere.',
+  {id:'auto',  icon:'⚙️', name:'Automated Farm',      base:100000,      eps:100,  desc:'Conveyor belts and eggs everywhere.',
    sp:{left:35,botpx:120,w:76,h:55,z:5,px:1,png:'auto.png'}},
-  {id:'factory',icon:'🏭',name:'Egg Factory',          base:1400000,     eps:1400, desc:'Industrial-scale clucking.',
+  {id:'factory',icon:'🏭',name:'Egg Factory',          base:1000000,     eps:500, desc:'Industrial-scale clucking.',
    sp:{left:90,botpx:80,w:94,h:105,z:5,px:1,png:'factory.png',door:{x:.70,y:.78}}},
-  {id:'lab',   icon:'🧪', name:'Genetic Lab',         base:20000000,    eps:7800, desc:'Square, glowing, sonic eggs.',
+  {id:'lab',   icon:'🧪', name:'Genetic Lab',         base:10000000,    eps:1000, desc:'Square, glowing, sonic eggs.',
    sp:{left:68,botpx:113,w:90,h:85,z:5,px:1,png:'lab.png'}},
-  {id:'space', icon:'🛰️', name:'Orbital Station',       base:330000000,   eps:44000,desc:'Laying eggs in outer space.',
+  {id:'space', icon:'🛰️', name:'Orbital Station',       base:100000000,   eps:10000,desc:'Laying eggs in outer space.',
    sp:{left:20,top:3,w:104,h:78,z:1,px:0,png:'station.png'}},
-  {id:'franc', icon:'🪙', name:'$FRANC Dimension',       base:5100000000,  eps:260000,desc:'Encrypted eggs on-chain.',
+  {id:'franc', icon:'🪙', name:'$FRANC Dimension',       base:1000000000,  eps:100000,desc:'Encrypted eggs on-chain.',
    sp:{left:50,top:0,w:65,h:65,z:1,px:0,png:'franc.png',anim:'franc'}},
-  {id:'paradox',icon:'🌀',name:'Rooster Paradox',        base:75000000000, eps:1600000,desc:'The egg and the chicken, simultaneously.',
+  {id:'paradox',icon:'🌀',name:'Rooster Paradox',        base:100000000000, eps:1000000,desc:'The egg and the chicken, simultaneously.',
    sp:{left:55,botpx:160,w:78,h:75,z:1,px:0,png:'paradox.png',anim:'paradox'}}
 ];
 
@@ -919,9 +919,40 @@ function initMusic(){
 }
 function switchMusic(file){
   if(!_bgMusic)return;
-  const t=_bgMusic.currentTime;
-  _bgMusic.src=CFG.ap+file;_bgMusic.currentTime=0;
-  _bgMusic.play().catch(()=>{});
+  _bgMusic.pause();
+  _bgMusic.src=CFG.ap+file;
+  _bgMusic.loop=true;
+  _bgMusic.volume=0.4;
+  _bgMusic.load();
+  _bgMusic.addEventListener('canplaythrough',function onReady(){
+    _bgMusic.removeEventListener('canplaythrough',onReady);
+    _bgMusic.play().catch(()=>{});
+  });
+  // Fallback if canplaythrough doesn't fire
+  setTimeout(()=>{_bgMusic.play().catch(()=>{});},500);
+}
+
+// ============ RAIN SOUND ============
+let _rainSound=null;
+let _rainSoundFading=false;
+function initRainSound(){
+  try{
+    _rainSound=new Audio(CFG.ap+'rain.mp3');
+    _rainSound.loop=true;
+    _rainSound.volume=0;
+    _rainSound.load();
+  }catch(e){console.log('Rain sound init error:',e);}
+}
+function updateRainSound(intensity){
+  if(!_rainSound)return;
+  const target=Math.min(0.5,intensity*0.55);
+  if(target>0.01){
+    if(_rainSound.paused){_rainSound.play().catch(()=>{});}
+    _rainSound.volume+=((target-_rainSound.volume)*0.08);
+  }else{
+    _rainSound.volume*=0.92;
+    if(_rainSound.volume<0.005&&!_rainSound.paused){_rainSound.pause();_rainSound.volume=0;}
+  }
 }
 
 // ============ DAY/NIGHT CYCLE ============
@@ -1183,6 +1214,8 @@ function updateWeather(h){
   const rl=document.getElementById('rainLayer');
   if(rl)rl.style.opacity=(_rainTarget>0.04)?_rainTarget.toFixed(3):'0';
   _rainOpacity+=((_rainTarget-_rainOpacity)*.015);
+  // Rain sound volume follows intensity
+  updateRainSound(_rainTarget);
 
   // Full-screen overlay: rain darkening OR fog gray veil
   const fs=document.getElementById('fogScreen');
@@ -1754,6 +1787,7 @@ async function init(){
   setInterval(()=>cloudSave(false),100000);
   if(tg){tg.ready();tg.expand();}
   initMusic();
+  initRainSound();
 }
 
 window.addEventListener('beforeunload',()=>{persistTrial();save();cloudSave(true);setFoxChance();});
