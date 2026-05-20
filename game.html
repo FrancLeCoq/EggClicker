@@ -49,8 +49,11 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
-#fogOverlay{position:absolute;inset:0;background:rgba(220,230,245,0);transition:background 15s ease;border-radius:0;}
-#fogScreen{position:fixed;inset:0;z-index:9;pointer-events:none;background:rgba(180,195,210,0);transition:background 8s ease;}
+#fogOverlay{position:absolute;inset:0;background:rgba(220,230,245,0);transition:background 8s ease;border-radius:0;overflow:hidden;}
+.fogband{position:absolute;width:160%;height:28%;left:-30%;background:linear-gradient(90deg,rgba(190,200,215,0) 0%,rgba(190,200,215,.45) 20%,rgba(195,205,218,.55) 50%,rgba(190,200,215,.45) 80%,rgba(190,200,215,0) 100%);border-radius:50%;pointer-events:none;opacity:0;filter:blur(8px);transition:opacity 6s ease;}
+@keyframes fogDrift1{0%{transform:translateX(-10%);}50%{transform:translateX(12%);}100%{transform:translateX(-10%);}}
+@keyframes fogDrift2{0%{transform:translateX(8%);}50%{transform:translateX(-14%);}100%{transform:translateX(8%);}}
+@keyframes fogDrift3{0%{transform:translateX(-5%) scaleY(1);}33%{transform:translateX(10%) scaleY(1.2);}66%{transform:translateX(-8%) scaleY(0.8);}100%{transform:translateX(-5%) scaleY(1);}}
 #rainCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;}
 #rainLayer{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 8s ease;}
 .rdrop{position:absolute;background:linear-gradient(180deg,rgba(180,210,255,0),rgba(180,215,255,.7));border-radius:0 0 2px 2px;animation:rainFall linear infinite;}
@@ -151,7 +154,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 .ach-body{flex:1;}
 .ach-name{font-family:'Fraunces',serif;font-weight:600;font-size:12.5px;line-height:1.1;}
 .ach-det{font-size:10px;color:var(--muted);margin-top:2px;}
-.ach-bon{font-family:'Fraunces',serif;font-weight:900;font-size:12px;color:var(--yolk-d);}
+.ach-bon{font-family:'Fraunces',serif;font-weight:900;font-size:14px;color:#4a5d3a;background:linear-gradient(135deg,#e8f5e2,#d4ecc8);padding:2px 8px;border-radius:8px;}
 
 /* PRESTIGE CARD */
 .pcard{background:linear-gradient(135deg,var(--wine),var(--wine-d));color:var(--paper);padding:18px;border-radius:6px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden;box-shadow:var(--shlg);}
@@ -273,7 +276,6 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 </head>
 <body>
 <div class="spill" id="spill">Saved</div>
-<div id="fogScreen"></div>
 
 <script>
 window.onerror=function(msg,src,ln,col,err){console.error('ERR L'+ln+': '+msg);return false;};
@@ -668,7 +670,7 @@ function checkAch(){
   });
   if(newly.length){
     newly.forEach((a,i)=>setTimeout(()=>{
-      showToast({ico:a.ico,ttl:'Trophy unlocked',name:a.name});
+      showToast({ico:a.ico,ttl:'Trophy unlocked · +1% global',name:a.name});
       showBigTrophy(a.ico,a.name);
     },i*6000));
     save();
@@ -678,7 +680,7 @@ function checkAch(){
 function showBigTrophy(emoji,name){
   const el=document.getElementById('trophyBigUnlock');
   document.getElementById('trophyBigEmoji').textContent=emoji;
-  document.getElementById('trophyBigLabel').textContent=name;
+  document.getElementById('trophyBigLabel').innerHTML=name+'<br><span style="font-size:14px;opacity:.8">+1% global</span>';
   el.classList.add('vis');
   setTimeout(()=>el.classList.remove('vis'),5000);
 }
@@ -1186,6 +1188,32 @@ function drawRain(){
   // CSS rain - just update opacity smoothly
   _rainOpacity+=(_rainTarget-_rainOpacity)*0.04;
 }
+let _fogBands=[];
+function buildFogBands(){
+  const fo=document.getElementById('fogOverlay');
+  if(!fo)return;
+  _fogBands=[];
+  const configs=[
+    {top:'10%',h:'30%',anim:'fogDrift1',dur:'25s',blur:10},
+    {top:'30%',h:'35%',anim:'fogDrift2',dur:'32s',blur:12},
+    {top:'55%',h:'28%',anim:'fogDrift3',dur:'28s',blur:8},
+    {top:'5%', h:'25%',anim:'fogDrift2',dur:'35s',blur:14},
+    {top:'70%',h:'22%',anim:'fogDrift1',dur:'22s',blur:6},
+    {top:'40%',h:'32%',anim:'fogDrift3',dur:'30s',blur:11},
+  ];
+  configs.forEach((cfg,i)=>{
+    const b=document.createElement('div');
+    b.className='fogband';
+    b.style.top=cfg.top;
+    b.style.height=cfg.h;
+    b.style.animation=`${cfg.anim} ${cfg.dur} ease-in-out infinite`;
+    b.style.animationDelay=(-i*4)+'s';
+    b.style.filter=`blur(${cfg.blur}px)`;
+    fo.appendChild(b);
+    _fogBands.push(b);
+  });
+}
+
 function rainIntensity(phase){
   // Quick ramp: 0→1 in first 15%
   // Sustained dense peak: 15%→80%
@@ -1217,22 +1245,26 @@ function updateWeather(h){
   // Rain sound volume follows intensity
   updateRainSound(_rainTarget);
 
-  // Full-screen overlay: rain darkening OR fog gray veil
-  const fs=document.getElementById('fogScreen');
-  if(fs){
-    if(isFog){
-      fs.style.background=`rgba(160,175,195,${(fogProg*0.45).toFixed(3)})`;
-    }else if(isRain){
-      const rainDark=rainIntensity(rainProg)*0.18;
-      fs.style.background=`rgba(80,90,110,${rainDark.toFixed(3)})`;
-    }else{
-      fs.style.background='rgba(160,175,195,0)';
-    }
-  }
-
-  // Playfield local fog overlay
+  // Fog bands: animate opacity per band with variation
   const fo=document.getElementById('fogOverlay');
-  fo.style.background=`rgba(170,185,205,${(fogProg*0.55).toFixed(3)})`;
+  if(isFog){
+    fo.style.background=`rgba(170,185,205,${(fogProg*0.35).toFixed(3)})`;
+    _fogBands.forEach((b,i)=>{
+      // Each band has slightly different intensity curve
+      const phase=fogBase;
+      const offset=Math.sin(phase*Math.PI+i*1.1)*0.3;
+      const bandOpacity=Math.max(0,Math.min(1,fogProg*(0.6+offset)));
+      b.style.opacity=bandOpacity.toFixed(3);
+    });
+  }else if(isRain){
+    // Light darkening during rain on playfield only
+    const rainDark=rainIntensity(rainProg)*0.15;
+    fo.style.background=`rgba(80,90,110,${rainDark.toFixed(3)})`;
+    _fogBands.forEach(b=>{b.style.opacity='0';});
+  }else{
+    fo.style.background='rgba(170,185,205,0)';
+    _fogBands.forEach(b=>{b.style.opacity='0';});
+  }
 }
 
 // ============ SPRITES ============
@@ -1650,7 +1682,7 @@ function renderAch(){
   ACH.forEach(a=>{
     const ok=ST.ach.includes(a.id);
     const div=document.createElement('div');div.className='ach'+(ok?' ok':'');
-    div.innerHTML=`<div class="ach-ico">${a.ico}</div><div class="ach-body"><div class="ach-name">${ok?a.name:'???'}</div><div class="ach-det">${a.desc}</div></div><div class="ach-bon">+1%</div>`;
+    div.innerHTML=`<div class="ach-ico">${a.ico}</div><div class="ach-body"><div class="ach-name">${ok?a.name:'???'}</div><div class="ach-det">${a.desc}</div></div><div class="ach-bon">+1% global</div>`;
     panel.appendChild(div);
   });
 }
@@ -1763,7 +1795,7 @@ async function init(){
     document.getElementById('trialEndModal').classList.add('vis');
   }
   // First render with fallback emojis so UI shows immediately
-  buildCelestials();buildClouds();buildRain();scheduleClouds();
+  buildCelestials();buildClouds();buildRain();buildFogBands();scheduleClouds();
   // Ground: static SVG in HTML
 
   if(checkFoxAttack()){showFoxAlarm();}else{applyOffline();}
