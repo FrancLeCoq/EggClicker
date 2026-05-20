@@ -50,6 +50,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 /* Weather layer */
 #weatherLayer{position:absolute;inset:0;z-index:5;pointer-events:none;}
 #fogOverlay{position:absolute;inset:0;background:rgba(220,230,245,0);transition:background 15s ease;border-radius:0;}
+#fogScreen{position:fixed;inset:0;z-index:9;pointer-events:none;background:rgba(180,195,210,0);transition:background 8s ease;}
 #rainCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;}
 #rainLayer{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 8s ease;}
 .rdrop{position:absolute;background:linear-gradient(180deg,rgba(180,210,255,0),rgba(180,215,255,.7));border-radius:0 0 2px 2px;animation:rainFall linear infinite;}
@@ -272,6 +273,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 </head>
 <body>
 <div class="spill" id="spill">Saved</div>
+<div id="fogScreen"></div>
 
 <script>
 window.onerror=function(msg,src,ln,col,err){console.error('ERR L'+ln+': '+msg);return false;};
@@ -1009,23 +1011,28 @@ function updateCelestials(h){
 // Clouds
 let _clouds=[];
 let _cloudTimer=0;
-let _lastWeatherState=false; // track weather transitions
+let _lastWeatherState=false;
 function buildClouds(){
   const container=document.getElementById('playfield');
   _clouds=[];
-  // 6 cloud slots: 3 small/medium for normal, 3 large for weather
+  // 12 cloud slots for continuous weather coverage
   const configs=[
-    {w:140,h:55,png:'nuage1.png',weather:false},
-    {w:110,h:80,png:'nuage2.png',weather:false},
-    {w:160,h:65,png:'nuage1.png',weather:false},
-    {w:220,h:85,png:'nuage1.png',weather:true},
-    {w:190,h:75,png:'nuage2.png',weather:true},
-    {w:250,h:90,png:'nuage1.png',weather:true},
+    {w:140,h:55,png:'nuage1.png'},
+    {w:110,h:80,png:'nuage2.png'},
+    {w:160,h:65,png:'nuage1.png'},
+    {w:220,h:85,png:'nuage1.png'},
+    {w:190,h:75,png:'nuage2.png'},
+    {w:250,h:90,png:'nuage1.png'},
+    {w:200,h:70,png:'nuage2.png'},
+    {w:175,h:65,png:'nuage1.png'},
+    {w:230,h:80,png:'nuage2.png'},
+    {w:260,h:95,png:'nuage1.png'},
+    {w:180,h:60,png:'nuage2.png'},
+    {w:210,h:78,png:'nuage1.png'},
   ];
   configs.forEach((cfg,i)=>{
     const div=document.createElement('div');
     div.className='cloud';
-    div.dataset.weather=cfg.weather?'1':'0';
     const bg=i%2===0
       ?'background:radial-gradient(ellipse 60% 50% at 50% 60%,rgba(255,255,255,.95) 60%,rgba(255,255,255,0));'
       :'background:radial-gradient(ellipse 55% 55% at 40% 55%,rgba(240,245,255,.95) 65%,rgba(255,255,255,0));';
@@ -1042,28 +1049,36 @@ function buildClouds(){
   });
 }
 
+function isWeatherNow(){
+  const h=gameHour();
+  return(h>=15&&h<16)||(h>=3&&h<4)||(h>=8&&h<9)||(h>=20&&h<21);
+}
+
 function launchCloud(c,isWeather,staggerOffset){
   const pf=document.getElementById('playfield');
   const pw=(pf?pf.offsetWidth:375)+300;
-  // Weather: very slow (60-90s), normal: 40-65s
-  const dur=isWeather?(60+Math.random()*30):(40+Math.random()*25);
-  const topPct=Math.random()*(isWeather?24:18);
+  const dur=isWeather?(35+Math.random()*25):(40+Math.random()*25);
+  const topPct=Math.random()*(isWeather?28:18);
   c.style.top=topPct+'%';
-  c.style.opacity=isWeather?'0.88':'0.72';
-  // Dark gray tint for weather clouds
-  c.style.filter=isWeather?'grayscale(0.5) brightness(0.75)':'grayscale(0) brightness(1)';
-  // Stagger: place cloud at a random position already mid-travel
-  const startOffset=staggerOffset?-(Math.random()*pw*0.8):0;
-  c.style.left=(startOffset-250)+'px';
+  c.style.opacity=isWeather?'0.92':'0.72';
+  c.style.filter=isWeather?'grayscale(0.5) brightness(0.7)':'grayscale(0) brightness(1)';
+  const startOffset=staggerOffset?-(Math.random()*pw*0.85):0;
+  c.style.left=(startOffset-280)+'px';
   void c.offsetWidth;
-  const startTime=Date.now()-((staggerOffset?Math.random()*dur*0.6:0)*1000);
+  const startTime=Date.now()-((staggerOffset?Math.random()*dur*0.7:0)*1000);
   c._animating=true;
   function animCloud(){
     if(!c._animating)return;
     const t=(Date.now()-startTime)/1000;
-    const x=-250+(pw/dur)*t;
+    const x=-280+(pw/dur)*t;
     c.style.left=x+'px';
-    if(x>pw+50){c.style.left='-300px';c.style.opacity='0';c._animating=false;}
+    if(x>pw+50){
+      c.style.left='-300px';c.style.opacity='0';c._animating=false;
+      // Auto-relaunch immediately if still weather
+      if(isWeatherNow()){
+        setTimeout(()=>launchCloud(c,true,false),200+Math.random()*1500);
+      }
+    }
     else requestAnimationFrame(animCloud);
   }
   requestAnimationFrame(animCloud);
@@ -1078,29 +1093,32 @@ function scheduleClouds(){
     const isFog=(h>=8&&h<9)||(h>=20&&h<21);
     const isWeather=isRain||isFog;
 
-    // Detect weather start → mass deploy all clouds across sky
+    // Detect weather start → mass deploy ALL clouds staggered across sky
     if(isWeather&&!_lastWeatherState){
       _lastWeatherState=true;
       _clouds.forEach((c,idx)=>{
         if(c._animating){c._animating=false;}
-        setTimeout(()=>launchCloud(c,true,true),idx*400);
+        setTimeout(()=>launchCloud(c,true,true),idx*300);
       });
     }
     if(!isWeather&&_lastWeatherState){_lastWeatherState=false;}
 
     if(isNight&&!isWeather){setTimeout(launch,3000);return;}
 
-    // Normal cycling: pick any idle cloud
+    // Continuously relaunch idle clouds during weather
     const avail=_clouds.filter(c=>!c._animating);
-    if(avail.length>0){
+    if(isWeather){
+      avail.forEach((c,i)=>{
+        setTimeout(()=>{if(!c._animating)launchCloud(c,true,false);},i*600);
+      });
+    }else if(avail.length>0){
       const c=avail[Math.floor(Math.random()*avail.length)];
-      launchCloud(c,isWeather,false);
+      launchCloud(c,false,false);
     }
 
-    // Interval between cloud launches
     const next=isWeather
-      ?(4+Math.random()*6)*1000    // weather: new cloud every 4-10s (fills sky gradually)
-      :(8+Math.random()*20)*1000;  // normal: 8-28s
+      ?(2+Math.random()*3)*1000    // weather: check every 2-5s, relaunch ALL idle
+      :(8+Math.random()*20)*1000;
     setTimeout(launch,next);
   }
   setTimeout(launch,1500);
@@ -1109,12 +1127,11 @@ function scheduleClouds(){
 function updateClouds(h){
   const isRain=(h>=15&&h<16)||(h>=3&&h<4);
   const isFog=(h>=8&&h<9)||(h>=20&&h<21);
+  const isWeather=isRain||isFog;
   const isNight=h>=20||h<6;
-  if(isNight){
+  if(isNight&&!isWeather){
     _clouds.forEach(c=>{if(!c._animating){c.style.opacity='0';}});
   }
-  // Rain/fog handled by scheduleClouds checking those conditions
-  // No static override needed - let animation run naturally with more clouds
 }
 
 function buildRain(){
@@ -1151,22 +1168,38 @@ function updateWeather(h){
   // Rain: 15-16h and 3-4h (12h apart)
   const isRain=(h>=15&&h<16)||(h>=3&&h<4);
   const rainProg=isRain?((h>=15?(h-15):(h-3))):0;
-  if(isRain){
-    const intensity=rainIntensity(rainProg);
-    _rainTarget=0.10+intensity*0.90; // 0.10 minimum, up to 1.0 at peak
-  }else{
-    _rainTarget=Math.max(0,_rainTarget-0.008); // smooth decay after period ends
-  }
-  // CSS rain layer opacity
-  const rl=document.getElementById('rainLayer');
-  if(rl)rl.style.opacity=(_rainTarget>0.04)?_rainTarget.toFixed(3):'0';
-  _rainOpacity+=((_rainTarget-_rainOpacity)*.015);
   // Fog: 8-9h and 20-21h (12h apart)
   const isFog=(h>=8&&h<9)||(h>=20&&h<21);
   const fogBase=isFog?((h>=8&&h<9)?(h-8):(h-20)):0;
   const fogProg=isFog?Math.sin(fogBase*Math.PI):0;
+
+  // Rain intensity
+  if(isRain){
+    const intensity=rainIntensity(rainProg);
+    _rainTarget=0.10+intensity*0.90;
+  }else{
+    _rainTarget=Math.max(0,_rainTarget-0.008);
+  }
+  const rl=document.getElementById('rainLayer');
+  if(rl)rl.style.opacity=(_rainTarget>0.04)?_rainTarget.toFixed(3):'0';
+  _rainOpacity+=((_rainTarget-_rainOpacity)*.015);
+
+  // Full-screen overlay: rain darkening OR fog gray veil
+  const fs=document.getElementById('fogScreen');
+  if(fs){
+    if(isFog){
+      fs.style.background=`rgba(160,175,195,${(fogProg*0.45).toFixed(3)})`;
+    }else if(isRain){
+      const rainDark=rainIntensity(rainProg)*0.18;
+      fs.style.background=`rgba(80,90,110,${rainDark.toFixed(3)})`;
+    }else{
+      fs.style.background='rgba(160,175,195,0)';
+    }
+  }
+
+  // Playfield local fog overlay
   const fo=document.getElementById('fogOverlay');
-  fo.style.background=`rgba(210,228,245,${(fogProg*0.42).toFixed(3)})`;
+  fo.style.background=`rgba(170,185,205,${(fogProg*0.55).toFixed(3)})`;
 }
 
 // ============ SPRITES ============
