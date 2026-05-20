@@ -29,39 +29,6 @@ Egg Clicker is a French-rooster-themed idle clicker where you tap Francis Le Coq
 
 ---
 
-## File Structure
-
-```
-game.html          ← entire game (HTML + CSS + JS, ~1 700 lines)
-assets/
-  chick.png        ← Curious Chick sprite
-  hen.png          ← Laying Hen sprite
-  coop.png         ← Chicken Coop sprite
-  farm.png         ← Farm Cooperative sprite
-  auto.png         ← Automated Farm sprite
-  factory.png      ← Egg Factory sprite
-  lab.png          ← Genetic Lab sprite
-  station.png      ← Orbital Station sprite
-  franc.png        ← $FRANC Dimension sprite
-  paradox.png      ← Rooster Paradox sprite
-  coq.png          ← Main rooster click target
-  besace.png       ← Storage Satchel icon
-  gants_caoutchouc.png
-  botte_caoutchouc.png
-  gants_or.png
-  botte_or.png
-  soleil.png       ← Sun (celestial)
-  lune.png         ← Moon (celestial)
-  nuage1.png       ← Cloud variant 1
-  nuage2.png       ← Cloud variant 2
-  chasseur.png     ← Hunter (fox event)
-  ferme.mp3        ← Default background music
-  ferme apaisante.mp3 ← Soothing Music upgrade track
-  rain.mp3         ← Rain ambiance loop
-```
-
----
-
 ## How to Play
 
 1. **Click Francis** (the rooster) to collect eggs manually.
@@ -249,37 +216,3 @@ On load, offline production is credited at **50% efficiency** for the time away 
 | Holder 🪙 | Unlimited | ✓ | URL param `?mode=unlimited` or connected wallet |
 
 When the trial ends, a modal prompts wallet connection. Progress is preserved in localStorage regardless.
-
----
-
-## Configuration
-
-All runtime constants live in the `CFG` object at the top of the `<script>`:
-
-```js
-const CFG = {
-  wallet: 'https://franclecoq.github.io/Wallet/connect-wallet.html', // wallet connect URL
-  home:   './index.html',          // back-to-home URL
-  trial:  600,                     // trial duration in seconds (10 min)
-  be:     'https://…supabase.co/functions/v1', // cloud save endpoint
-  ap:     'assets/'                // assets folder path
-};
-```
-
----
-
-## Assets
-
-All assets are loaded with graceful fallback — if a PNG is missing, the game substitutes a CSS-drawn shape or emoji. No asset is strictly required for the game to run.
-
----
-
-## Technical Notes
-
-- **Single file** — no bundler, no framework, no external CDN
-- **Egg production** uses `Date.now()` delta (`dt`), capped at 0.5s per tick to prevent browser-throttle bursts
-- **Tick rate**: ~100ms (via `setInterval`)
-- **Slow loop**: every 800ms — renders producer/upgrade lists, checks achievements, refreshes floating upgrade
-- **Sprites** rendered as absolutely-positioned `<img>` elements over the playfield canvas area; positions defined per-producer in `PROD[].sp`
-- **Number formatting**: k / M / B / T / exponential
-- **Locale**: English (`en-US`)
