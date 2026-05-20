@@ -4,25 +4,6 @@ A single-file incremental/idle clicker game built in vanilla HTML, CSS and JavaS
 
 ---
 
-## Table of Contents
-
-1. [Overview](#overview)
-2. [File Structure](#file-structure)
-3. [How to Play](#how-to-play)
-4. [Farm — Producers](#farm--producers)
-5. [Upgrades](#upgrades)
-6. [Trophies](#trophies)
-7. [Prestige System](#prestige-system)
-8. [Events — Fox Attack](#events--fox-attack)
-9. [Day / Night & Weather](#day--night--weather)
-10. [Saving & Cloud Sync](#saving--cloud-sync)
-11. [Trial vs Holder Mode](#trial-vs-holder-mode)
-12. [Configuration](#configuration)
-13. [Assets](#assets)
-14. [Technical Notes](#technical-notes)
-
----
-
 ## Overview
 
 Egg Clicker is a French-rooster-themed idle clicker where you tap Francis Le Coq to collect eggs, reinvest into a growing farm empire, unlock upgrades, earn trophies, and prestige to climb further. The game evolves through 9 named stages, a living day/night sky, weather events, and blockchain-flavored end-game content.
