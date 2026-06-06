@@ -4,13 +4,74 @@ A single-file incremental/idle clicker game built in vanilla HTML, CSS and JavaS
 
 ---
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [File Structure](#file-structure)
+3. [How to Play](#how-to-play)
+4. [Farm — Producers](#farm--producers)
+5. [Upgrades](#upgrades)
+6. [Trophies](#trophies)
+7. [Prestige System](#prestige-system)
+8. [Events — Fox Attack](#events--fox-attack)
+9. [Day / Night & Weather](#day--night--weather)
+10. [Saving (Local Only)](#saving-local-only)
+11. [Trial vs Holder Mode](#trial-vs-holder-mode)
+12. [Configuration](#configuration)
+13. [Assets](#assets)
+14. [Technical Notes](#technical-notes)
+
+---
+
 ## Overview
 
 Egg Clicker is a French-rooster-themed idle clicker where you tap Francis Le Coq to collect eggs, reinvest into a growing farm empire, unlock upgrades, earn trophies, and prestige to climb further. The game evolves through 9 named stages, a living day/night sky, weather events, and blockchain-flavored end-game content.
 
 ---
 
+## File Structure
+
+```
+game.html          ← entire game (HTML + CSS + JS, ~1 700 lines)
+assets/
+  chick.png        ← Curious Chick sprite
+  hen.png          ← Laying Hen sprite
+  coop.png         ← Chicken Coop sprite
+  farm.png         ← Farm Cooperative sprite
+  auto.png         ← Automated Farm sprite
+  factory.png      ← Egg Factory sprite
+  lab.png          ← Genetic Lab sprite
+  station.png      ← Orbital Station sprite
+  franc.png        ← $FRANC Dimension sprite
+  paradox.png      ← Rooster Paradox sprite
+  coq.png          ← Main rooster click target
+  besace.png       ← Storage Satchel icon
+  gants_caoutchouc.png
+  botte_caoutchouc.png
+  gants_or.png
+  botte_or.png
+  soleil.png       ← Sun (celestial)
+  lune.png         ← Moon (celestial)
+  nuage1.png       ← Cloud variant 1
+  nuage2.png       ← Cloud variant 2
+  chasseur.png     ← Hunter (fox event)
+  ferme.mp3        ← Default background music
+  ferme apaisante.mp3 ← Soothing Music upgrade track
+  rain.mp3         ← Rain ambiance loop
+```
+
+---
+
 ## How to Play
+
+The game opens on a **start screen** with:
+
+- **Resume game** — loads your local save and credits offline production
+- **New game** — wipes the save and starts fresh (asks for confirmation)
+- **Connect wallet** — opens the wallet-connect page; the icon shows a **closed padlock 🔒** when no wallet is linked and an **open padlock 🔓** when connected (Holder mode)
+- **Language flags** 🇫🇷 / 🇬🇧 — choose French or English; the choice is remembered
+
+Once in game:
 
 1. **Click Francis** (the rooster) to collect eggs manually.
 2. **Buy Farm items** in the Farm tab to produce eggs automatically every second.
@@ -173,27 +234,73 @@ The default background track is `ferme.mp3`. When the player purchases the **Soo
 
 ---
 
-## Saving & Cloud Sync
+## Saving (Local Only)
 
-| Trigger | Local save | Cloud save |
-|---|---|---|
-| Auto (timer) | Every **15 seconds** | Every **100 seconds** |
-| Purchase / prestige | Immediate | Immediate |
-| Tab hidden / app backgrounded | Immediate | Immediate |
-| Page unload | Immediate | Immediate (beacon) |
+The game uses **local save only** — there is no cloud sync and no Supabase communication for game data.
 
-**Local save** uses `localStorage` (key: `francCoq`).  
-**Cloud save** uses Supabase Edge Functions — available to Holders only (wallet linked).
+| Trigger | Local save |
+|---|---|
+| Auto (timer) | Every **15 seconds** (only once a game has started) |
+| Purchase / prestige | Immediate |
+| Tab hidden / app backgrounded | Immediate |
+| Page unload | Immediate |
 
-On load, offline production is credited at **50% efficiency** for the time away (capped, no fox-attack bypass).
+**Local save** uses `localStorage` (key: `francCoq`). Language preference is stored separately (`francCoqLang`), and the fox-attack flag in its own key.
+
+On **Resume**, offline production is credited at **50% efficiency** for the time away (capped at 8h). A **New game** wipes all local save data and starts fresh.
+
+> **Note:** Cloud save/load (previously two Supabase Edge Function calls, `game-save` and `game-load`) has been fully removed. The only external dependency that remains is the wallet-connect page and $FRANC holder detection.
 
 ---
 
 ## Trial vs Holder Mode
 
-| Mode | Session limit | Cloud save | How to activate |
-|---|---|---|---|
-| Trial | 10 minutes | ✗ | Default |
-| Holder 🪙 | Unlimited | ✓ | URL param `?mode=unlimited` or connected wallet |
+| Mode | Session limit | How to activate |
+|---|---|---|
+| Trial | 10 minutes | Default |
+| Holder 🪙 | Unlimited | URL param `?mode=unlimited` or connected wallet |
 
 When the trial ends, a modal prompts wallet connection. Progress is preserved in localStorage regardless.
+
+---
+
+## Configuration
+
+All runtime constants live in the `CFG` object at the top of the `<script>`:
+
+```js
+const CFG = {
+  wallet: 'https://franclecoq.github.io/Wallet/connect-wallet.html', // wallet connect URL
+  home:   './index.html',          // back-to-home URL
+  trial:  600,                     // trial duration in seconds (10 min)
+  ap:     'assets/'                // assets folder path
+};
+```
+
+---
+
+## Assets
+
+All assets are loaded with graceful fallback — if a PNG is missing, the game substitutes a CSS-drawn shape or emoji. No asset is strictly required for the game to run.
+
+---
+
+## Languages (FR / EN)
+
+The game is fully bilingual. All text — producers, upgrades, trophies, stages, UI labels, modals, toasts, and fox events — is stored in an `I18N` dictionary with `en` and `fr` entries. A `t(key)` helper plus `pName/pDesc/uName/aName/aDesc/stageName/prodReqName` helpers pull the right language at render time.
+
+- Switching language re-renders everything instantly, no reload needed.
+- The choice persists in `localStorage` (`francCoqLang`).
+- To add a new language, add a third key to `I18N` with the same structure.
+
+---
+
+## Technical Notes
+
+- **Single file** — no bundler, no framework, no external CDN
+- **Egg production** uses `Date.now()` delta (`dt`), capped at 0.5s per tick to prevent browser-throttle bursts
+- **Tick rate**: ~100ms (via `setInterval`)
+- **Slow loop**: every 800ms — renders producer/upgrade lists, checks achievements, refreshes floating upgrade
+- **Sprites** rendered as absolutely-positioned `<img>` elements over the playfield canvas area; positions defined per-producer in `PROD[].sp`
+- **Number formatting**: k / M / B / T / exponential
+- **Locale**: English (`en-US`)
