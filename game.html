@@ -233,6 +233,21 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 
 /* TROPHY BIG UNLOCK */
 #trophyBigUnlock{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(42,24,16,.6);opacity:0;transition:opacity .3s;}
+#startScreen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#2a1810,#6b1a1a);transition:opacity .4s;}
+#startScreen.hidden{opacity:0;pointer-events:none;}
+#startCard{text-align:center;padding:30px 24px;max-width:340px;width:88%;}
+#startLogo{font-size:72px;line-height:1;margin-bottom:6px;}
+#startTitle{font-family:'Fraunces',serif;font-weight:900;font-size:34px;color:var(--yolk);margin:0;letter-spacing:.02em;}
+#startSub{font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:rgba(245,234,212,.75);margin-bottom:26px;}
+.start-btn{display:block;width:100%;font-family:'Fraunces',serif;font-weight:700;font-size:17px;padding:14px;border-radius:14px;border:none;cursor:pointer;margin-bottom:12px;transition:transform .1s;}
+.start-btn:active{transform:translateY(2px);}
+.start-btn.resume{background:linear-gradient(135deg,#e8a834,#f5d020);color:#2a1810;box-shadow:0 4px 0 #b8851f;}
+.start-btn.newgame{background:rgba(245,234,212,.92);color:var(--wine);box-shadow:0 4px 0 rgba(245,234,212,.4);}
+.start-btn.wallet{background:rgba(42,24,16,.5);color:var(--yolk);border:1.5px solid rgba(232,168,52,.5);font-size:15px;}
+#startLangRow{margin-top:18px;font-family:'Fraunces',serif;font-size:13px;color:rgba(245,234,212,.7);font-style:italic;}
+.lang-flag{font-size:32px;background:rgba(245,234,212,.1);border:2px solid transparent;border-radius:10px;padding:4px 10px;cursor:pointer;transition:all .15s;}
+.lang-flag.sel{border-color:var(--yolk);background:rgba(232,168,52,.2);}
+.lang-flag:active{transform:scale(.92);}
 #trophyBigUnlock.vis{opacity:1;}
 .trophy-big-emoji{font-size:160px;animation:trophyPulse 1.5s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(232,168,52,.8));}
 @keyframes trophyPulse{0%,100%{transform:scale(1);}30%{transform:scale(1.15);}50%{transform:scale(0.95);}70%{transform:scale(1.1);}}
@@ -299,7 +314,7 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
         <span class="hpill" id="holderPill" style="display:none">🪙 HOLDER</span>
         <div id="clockEl" style="font-family:'Fraunces',serif;font-size:11px;font-weight:600;color:rgba(245,234,212,.65);">06:00</div>
       </div>
-      <div class="eps"><div><span class="epsv" id="epsv">0</span> eggs/sec</div><div style="font-size:10px;opacity:.7"><span id="clkv">1</span>/click · ×<span id="gmult">1</span></div></div>
+      <div class="eps"><div><span class="epsv" id="epsv">0</span> <span id="epsLabel">eggs/sec</span></div><div style="font-size:10px;opacity:.7"><span id="clkv">1</span><span id="clkLabel">/click</span> · ×<span id="gmult">1</span></div></div>
     </div>
   </div>
 </header>
@@ -325,29 +340,29 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
 
 
 <nav class="tabs">
-  <button class="tab active" data-p="prod">Farm</button>
-  <button class="tab" data-p="upg">Upgrades<span class="dot"></span></button>
-  <button class="tab" data-p="ach">Trophies<span class="dot"></span></button>
-  <button class="tab" data-p="stats">Stats</button>
+  <button class="tab active" data-p="prod" data-i18n="farm">Farm</button>
+  <button class="tab" data-p="upg" data-i18n="upgrades">Upgrades<span class="dot"></span></button>
+  <button class="tab" data-p="ach" data-i18n="trophies">Trophies<span class="dot"></span></button>
+  <button class="tab" data-p="stats" data-i18n="stats">Stats</button>
 </nav>
 
 <section class="panel" id="prodPanel"></section>
 <section class="panel hidden" id="upgPanel"></section>
 <section class="panel hidden" id="achPanel"></section>
 <section class="panel hidden" id="statsPanel">
-  <div class="stl"><span class="stll">Eggs (session)</span><span class="stlv" id="st1">0</span></div>
-  <div class="stl"><span class="stll">Eggs lifetime</span><span class="stlv" id="st2">0</span></div>
-  <div class="stl"><span class="stll">Clicks</span><span class="stlv" id="st3">0</span></div>
-  <div class="stl"><span class="stll">Production/sec</span><span class="stlv" id="st4">0</span></div>
-  <div class="stl"><span class="stll">Per click</span><span class="stlv" id="st5">1</span></div>
-  <div class="stl"><span class="stll">Global multiplier</span><span class="stlv" id="st6">×1</span></div>
-  <div class="stl"><span class="stll">Farm Items</span><span class="stlv" id="st7">0</span></div>
-  <div class="stl"><span class="stll">Golden Feathers</span><span class="stlv" id="st8">0</span></div>
-  <div class="stl"><span class="stll">Prestiges</span><span class="stlv" id="st9">0</span></div>
-  <div class="stl"><span class="stll">Mode</span><span class="stlv" id="st10">Trial</span></div>
-  <div class="stl"><span class="stll">Game time</span><span class="stlv" id="st11">06:00</span></div>
-  <div class="stl"><span class="stll">24h Projection</span><span class="stlv" id="st12">0 🥚</span></div>
-  <button class="resetbtn" id="resetBtn">Delete save data</button>
+  <div class="stl"><span class="stll" data-i18n="st_eggsSession">Eggs (session)</span><span class="stlv" id="st1">0</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_eggsLife">Eggs lifetime</span><span class="stlv" id="st2">0</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_clicks">Clicks</span><span class="stlv" id="st3">0</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_prodSec">Production/sec</span><span class="stlv" id="st4">0</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_perClick">Per click</span><span class="stlv" id="st5">1</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_globalMult">Global multiplier</span><span class="stlv" id="st6">×1</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_farmItems">Farm Items</span><span class="stlv" id="st7">0</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_feathers">Golden Feathers</span><span class="stlv" id="st8">0</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_prestiges">Prestiges</span><span class="stlv" id="st9">0</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_mode">Mode</span><span class="stlv" id="st10">Trial</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_gameTime">Game time</span><span class="stlv" id="st11">06:00</span></div>
+  <div class="stl"><span class="stll" data-i18n="st_proj">24h Projection</span><span class="stlv" id="st12">0 🥚</span></div>
+  <button class="resetbtn" id="resetBtn" data-i18n="deleteSave">Delete save data</button>
 </section>
 
 <div id="upgAnim"></div>
@@ -369,10 +384,29 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
 <div id="hunterOverlay"><div id="hunterImg" style="font-size:160px;text-align:center">🧑‍🌾</div></div>
 
 <!-- MODALS -->
-<div class="mbg" id="resetModal"><div class="modal"><h2>Delete everything?</h2><p>Eggs, Feathers, trophies, prestiges — everything is gone. Permanent.</p><div class="mbtns"><button class="mbtn can" id="cancelReset">Keep</button><button class="mbtn dan" id="confirmReset">Delete</button></div></div></div>
-<div class="mbg" id="prestigeModal"><div class="modal"><div class="mico">🪶</div><h2>Prestige Cycle</h2><p>Convert your run into <strong>Golden Feathers</strong>. You start over — but each Feather gives <strong>+2% permanent</strong>.</p><div class="mbig" id="pgain">+0 🪶</div><div class="mbtns"><button class="mbtn can" id="cancelPres">Cancel</button><button class="mbtn pri" id="confirmPres">Prestige!</button></div></div></div>
-<div class="mbg" id="offlineModal"><div class="modal"><div class="mico">😴</div><h2>Welcome back</h2><p>Away for <span id="offDur">0 min</span> — your hens worked at 50%.</p><div class="mbig" id="offGain">+0 🥚</div><div class="mbtns"><button class="mbtn pri" id="closeOff">Collect</button></div></div></div>
-<div class="mbg" id="trialEndModal"><div class="modal"><div class="mico">🪙</div><h2>Session ended</h2><p>The 10 minutes are up. Link a <strong>$FRANC</strong> wallet to play unlimited + cloud save.</p><p style="font-size:12px;color:var(--muted);font-style:italic">Your progress is saved.</p><div class="mbtns" style="flex-direction:column"><button class="mbtn gld" id="goWallet" style="margin-bottom:8px">🪙 Connect my wallet</button><button class="mbtn can" id="goHome">Back to home</button></div></div></div>
+<div class="mbg" id="resetModal"><div class="modal"><h2 id="rmTitle">Delete everything?</h2><p id="rmBody">Eggs, Feathers, trophies, prestiges — everything is gone. Permanent.</p><div class="mbtns"><button class="mbtn can" id="cancelReset">Keep</button><button class="mbtn dan" id="confirmReset">Delete</button></div></div></div>
+<div class="mbg" id="prestigeModal"><div class="modal"><div class="mico">🪶</div><h2 id="pmTitle">Prestige Cycle</h2><p id="pmBody">Convert your run into <strong>Golden Feathers</strong>. You start over — but each Feather gives <strong>+2% permanent</strong>.</p><div class="mbig" id="pgain">+0 🪶</div><div class="mbtns"><button class="mbtn can" id="cancelPres">Cancel</button><button class="mbtn pri" id="confirmPres">Prestige!</button></div></div></div>
+<div class="mbg" id="offlineModal"><div class="modal"><div class="mico">😴</div><h2 id="omTitle">Welcome back</h2><p id="omBody">Away for <span id="offDur">0 min</span> — your hens worked at 50%.</p><div class="mbig" id="offGain">+0 🥚</div><div class="mbtns"><button class="mbtn pri" id="closeOff">Collect</button></div></div></div>
+<div class="mbg" id="trialEndModal"><div class="modal"><div class="mico">🪙</div><h2 id="tmTitle">Session ended</h2><p id="tmBody">The 10 minutes are up. Link a <strong>$FRANC</strong> wallet to play unlimited.</p><p id="tmSub" style="font-size:12px;color:var(--muted);font-style:italic">Your progress is saved.</p><div class="mbtns" style="flex-direction:column"><button class="mbtn gld" id="goWallet" style="margin-bottom:8px">🪙 Connect my wallet</button><button class="mbtn can" id="goHome">Back to home</button></div></div></div>
+
+<!-- START SCREEN -->
+<div id="startScreen">
+  <div id="startCard">
+    <div id="startLogo">🐓</div>
+    <h1 id="startTitle">Egg Clicker</h1>
+    <div id="startSub">Francis the Rooster Farm</div>
+    <button class="start-btn resume" id="ssResume">▶️ Resume game</button>
+    <button class="start-btn newgame" id="ssNew">✨ New game</button>
+    <button class="start-btn wallet" id="ssWallet"><span id="ssLockIco">🔒</span> <span id="ssWalletTxt">Connect wallet</span></button>
+    <div id="startLangRow">
+      <span id="ssLangLabel">Language</span>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:6px;">
+        <button class="lang-flag" id="langFR" title="Français">🇫🇷</button>
+        <button class="lang-flag" id="langEN" title="English">🇬🇧</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -380,11 +414,153 @@ const CFG={
   wallet:'https://franclecoq.github.io/Wallet/connect-wallet.html',
   home:'./index.html',
   trial:600,
-  be:'https://mubqtnqulpyehkgubhnh.supabase.co/functions/v1',
   ap:'assets/'
 };
 const urlP=new URLSearchParams(location.search);
 let isUnlimited=urlP.get('mode')==='unlimited';
+
+// ============ I18N (FR / EN) ============
+let LANG=localStorage.getItem('francCoqLang')||'en';
+const I18N={
+  en:{
+    farm:'Farm',upgrades:'Upgrades',trophies:'Trophies',stats:'Stats',
+    eggsSec:'eggs/sec',perClick:'/click',stage:'stage',
+    trial:'TRIAL',holder:'HOLDER',
+    st_eggsSession:'Eggs (session)',st_eggsLife:'Eggs lifetime',st_clicks:'Clicks',
+    st_prodSec:'Production/sec',st_perClick:'Per click',st_globalMult:'Global multiplier',
+    st_farmItems:'Farm Items',st_feathers:'Golden Feathers',st_prestiges:'Prestiges',
+    st_mode:'Mode',st_gameTime:'Game time',st_proj:'24h Projection',
+    deleteSave:'Delete save data',modeTrial:'Trial',modeHolder:'🪙 Holder',
+    upgradesHdr:'UPGRADES',prestigeHdr:'PRESTIGE — GOLDEN FEATHERS',
+    featherCycle:'The Feather Cycle',startOver:'Start over to grow stronger',
+    feathersOwned:'Feathers owned',currentBonus:'Current bonus',bonusAfter:'Bonus after prestige',
+    nextFeather:'Next Feather in',prestigeBtn:'Prestige!',prestigeReq:'+1B eggs required',
+    eachTrophy:'each trophy',globalPlus:'+1% global',clicksNeeded:'clicks needed',needed:'needed',
+    clickX:'Click ×',globalX:'Global ×',
+    trophyUnlocked:'Trophy unlocked · +1% global',
+    alreadyBought:'Already purchased',reqNotMet:'Requirement not met',notEnough:'Not enough eggs',
+    needTxt:'Need',upgradeBought:'Upgrade purchased!',upgradeBought2:'Upgrade purchased',
+    notAvailable:'Not yet available',clicksReq:'clicks required',req:'required',
+    saved:'Saved',
+    // modals
+    deleteTitle:'Delete everything?',deleteBody:'Eggs, Feathers, trophies, prestiges — everything is gone. Permanent.',
+    keep:'Keep',del:'Delete',
+    prestigeTitle:'Prestige Cycle',prestigeBody:'Convert your run into <strong>Golden Feathers</strong>. You start over — but each Feather gives <strong>+2% permanent</strong>.',
+    cancel:'Cancel',prestigeGo:'Prestige!',
+    welcomeBack:'Welcome back',awayFor:'Away for',hensWorked:'your hens worked at 50%.',collect:'Collect',
+    sessionEnded:'Session ended',sessionBody:'The 10 minutes are up. Link a <strong>$FRANC</strong> wallet to play unlimited.',
+    progressSaved:'Your progress is saved.',connectWallet:'🪙 Connect my wallet',backHome:'Back to home',
+    foxTitle:'🚨 FARM IN DANGER 🚨',foxCallHunter:'CALL THE HUNTER!',
+    foxBtnPay:'🔫 Call the hunter (10,000 🥚)',foxBtnSub:'Pay 10,000 🥚 · or lose 50% if < 10k',
+    foxAttack:'A pack of foxes attacked your farm while you were away! All production is halted.<br><br><strong>Call the hunter for 10,000 eggs</strong> to save your farm.',
+    foxAttackPoor:'A pack of foxes attacked your farm! You don\'t have enough eggs for the hunter.<br><br><strong>You lose 50% of your stash...</strong>',
+    foxSaved:'Farm saved!',foxFled:'The foxes fled!',
+    // start screen
+    ssResume:'Resume game',ssNew:'New game',ssWallet:'Connect wallet',ssLang:'Language',
+    ssNewConfirm:'Start a new game? Your current progress will be lost.',ssSub:'Francis the Rooster Farm',
+    prod:{
+      chick:{n:'Curious Chick',d:'Not much, but it\'s a start.'},
+      hen:{n:'Laying Hen',d:'The foundation of any decent farm.'},
+      coop:{n:'Chicken Coop',d:'A roof for the layers.'},
+      farm:{n:'Farm Cooperative',d:'Strength in numbers.'},
+      auto:{n:'Automated Farm',d:'Conveyor belts and eggs everywhere.'},
+      factory:{n:'Egg Factory',d:'Industrial-scale clucking.'},
+      lab:{n:'Genetic Lab',d:'Square, glowing, sonic eggs.'},
+      space:{n:'Orbital Station',d:'Laying eggs in outer space.'},
+      franc:{n:'$FRANC Dimension',d:'Encrypted eggs on-chain.'},
+      paradox:{n:'Rooster Paradox',d:'The egg and the chicken, simultaneously.'}
+    },
+    upg:{
+      b0:{n:'Storage Satchel',d:'Your farmer supply bag — stores your upgrades'},
+      u1:{n:'Farmer Gloves'},u2:{n:'Rubber Boots'},u3:{n:'Golden Gloves'},u4:{n:'Golden Boots'},u5:{n:'Rooster Meditation'},
+      p1:{n:'Premium Organic Grain'},p2:{n:'Soothing Music'},p3:{n:'Comfortable Nests'},p4:{n:'Cooperative Charter'},
+      p5:{n:'Laying AI'},p6:{n:'Ultra-Conductor Belt'},p7:{n:'CRISPR-CockaDoodle'},p8:{n:'Orbital Thrusters'},
+      p9:{n:'Golden Smart Contracts'},g1:{n:'Celestial Layers ☀️🌙'},g3:{n:'Golden Rooster Trophy'}
+    },
+    ach:{
+      a1:{n:'First Egg',d:'First click'},a2:{n:'Hundred Cock-a-doodles',d:'100 clicks'},a3:{n:'Iron Finger',d:'1,000 clicks'},
+      a4:{n:'First Farm Purchase',d:'1 farm item purchased'},a5:{n:'Small Hamlet',d:'10 farm items'},
+      a6:{n:'Farm Tycoon',d:'100 farm items'},a7:{n:'Farm Empire',d:'1,000 farm items'},
+      a8:{n:'A Thousand Eggs',d:'1,000 eggs'},a9:{n:'Million Eggs',d:'1M eggs'},a10:{n:'Billion Eggs',d:'1B eggs'},
+      a11:{n:'Farm Collector',d:'1 of each farm item'},a12:{n:'Upgrader',d:'5 upgrades'},
+      a13:{n:'All Upgrades',d:'All upgrades purchased'},a14:{n:'First Prestige',d:'1 prestige'},a15:{n:'The Legendary Rooster',d:'10 prestiges'}
+    },
+    stage:['First Cock-a-doodle','Small Humble Farm','Poultry Hamlet','Francis Rooster Estate','Laying Empire','Egg Kingdom','Egg-laying Civilization','Cock-a-doodle Dimension','$FRANC Multiverse'],
+    prodReq:{chick:'curious chicks',hen:'laying hens',coop:'chicken coops',farm:'farm cooperatives',auto:'automated farms',factory:'egg factories',lab:'genetic labs',space:'orbital stations',franc:'$FRANC dimensions',paradox:'rooster paradoxes'}
+  },
+  fr:{
+    farm:'Ferme',upgrades:'Améliorations',trophies:'Trophées',stats:'Stats',
+    eggsSec:'œufs/sec',perClick:'/clic',stage:'étape',
+    trial:'ESSAI',holder:'HOLDER',
+    st_eggsSession:'Œufs (session)',st_eggsLife:'Œufs totaux',st_clicks:'Clics',
+    st_prodSec:'Production/sec',st_perClick:'Par clic',st_globalMult:'Multiplicateur global',
+    st_farmItems:'Éléments de ferme',st_feathers:'Plumes d\'or',st_prestiges:'Prestiges',
+    st_mode:'Mode',st_gameTime:'Heure du jeu',st_proj:'Projection 24h',
+    deleteSave:'Effacer la sauvegarde',modeTrial:'Essai',modeHolder:'🪙 Holder',
+    upgradesHdr:'AMÉLIORATIONS',prestigeHdr:'PRESTIGE — PLUMES D\'OR',
+    featherCycle:'Le Cycle des Plumes',startOver:'Recommence pour devenir plus fort',
+    feathersOwned:'Plumes possédées',currentBonus:'Bonus actuel',bonusAfter:'Bonus après prestige',
+    nextFeather:'Prochaine Plume dans',prestigeBtn:'Prestige !',prestigeReq:'+1 Md d\'œufs requis',
+    eachTrophy:'chaque trophée',globalPlus:'+1% global',clicksNeeded:'clics requis',needed:'requis',
+    clickX:'Clic ×',globalX:'Global ×',
+    trophyUnlocked:'Trophée débloqué · +1% global',
+    alreadyBought:'Déjà acheté',reqNotMet:'Condition non remplie',notEnough:'Pas assez d\'œufs',
+    needTxt:'Il faut',upgradeBought:'Amélioration achetée !',upgradeBought2:'Amélioration achetée',
+    notAvailable:'Pas encore disponible',clicksReq:'clics requis',req:'requis',
+    saved:'Sauvegardé',
+    deleteTitle:'Tout effacer ?',deleteBody:'Œufs, Plumes, trophées, prestiges — tout disparaît. Définitif.',
+    keep:'Garder',del:'Effacer',
+    prestigeTitle:'Cycle de Prestige',prestigeBody:'Convertis ta partie en <strong>Plumes d\'Or</strong>. Tu repars de zéro — mais chaque Plume donne <strong>+2% permanent</strong>.',
+    cancel:'Annuler',prestigeGo:'Prestige !',
+    welcomeBack:'Bon retour',awayFor:'Absent pendant',hensWorked:'tes poules ont travaillé à 50%.',collect:'Récupérer',
+    sessionEnded:'Session terminée',sessionBody:'Les 10 minutes sont écoulées. Lie un wallet <strong>$FRANC</strong> pour jouer sans limite.',
+    progressSaved:'Ta progression est sauvegardée.',connectWallet:'🪙 Connecter mon wallet',backHome:'Retour à l\'accueil',
+    foxTitle:'🚨 FERME EN DANGER 🚨',foxCallHunter:'APPELLE LE CHASSEUR !',
+    foxBtnPay:'🔫 Appeler le chasseur (10 000 🥚)',foxBtnSub:'Payer 10 000 🥚 · ou perte 50% si < 10k',
+    foxAttack:'Une horde de renards a attaqué ta ferme pendant ton absence ! Toute production est à l\'arrêt.<br><br><strong>Appelle le chasseur pour 10 000 œufs</strong> et récupère ta ferme.',
+    foxAttackPoor:'Une horde de renards a attaqué ta ferme ! Tu n\'as pas assez d\'œufs pour le chasseur.<br><br><strong>Tu perds 50% de ta cagnotte...</strong>',
+    foxSaved:'Ferme sauvée !',foxFled:'Les renards ont fui !',
+    ssResume:'Reprendre la partie',ssNew:'Nouvelle partie',ssWallet:'Connecter le wallet',ssLang:'Langue',
+    ssNewConfirm:'Démarrer une nouvelle partie ? Ta progression actuelle sera perdue.',ssSub:'La Ferme du Coq Francis',
+    prod:{
+      chick:{n:'Poussin curieux',d:'Pas grand-chose, mais c\'est un début.'},
+      hen:{n:'Poule pondeuse',d:'La base de toute ferme digne de ce nom.'},
+      coop:{n:'Poulailler',d:'Un toit pour les pondeuses.'},
+      farm:{n:'Coopérative agricole',d:'L\'union fait la force.'},
+      auto:{n:'Ferme automatisée',d:'Tapis roulants et œufs partout.'},
+      factory:{n:'Usine à œufs',d:'Le caquetage à l\'échelle industrielle.'},
+      lab:{n:'Labo génétique',d:'Œufs carrés, lumineux, sonores.'},
+      space:{n:'Station orbitale',d:'Pondre des œufs dans l\'espace.'},
+      franc:{n:'Dimension $FRANC',d:'Œufs cryptés sur la blockchain.'},
+      paradox:{n:'Paradoxe du coq',d:'L\'œuf et la poule, simultanément.'}
+    },
+    upg:{
+      b0:{n:'Besace de stockage',d:'Ton sac de fermier — stocke tes améliorations'},
+      u1:{n:'Gants de fermier'},u2:{n:'Bottes en caoutchouc'},u3:{n:'Gants dorés'},u4:{n:'Bottes dorées'},u5:{n:'Méditation du coq'},
+      p1:{n:'Grain bio premium'},p2:{n:'Musique apaisante'},p3:{n:'Nids douillets'},p4:{n:'Charte coopérative'},
+      p5:{n:'IA de ponte'},p6:{n:'Tapis ultra-conducteur'},p7:{n:'CRISPR-Cocorico'},p8:{n:'Propulseurs orbitaux'},
+      p9:{n:'Smart contracts dorés'},g1:{n:'Pondeuses célestes ☀️🌙'},g3:{n:'Trophée du Coq d\'Or'}
+    },
+    ach:{
+      a1:{n:'Premier œuf',d:'Premier clic'},a2:{n:'Cent cocoricos',d:'100 clics'},a3:{n:'Doigt de fer',d:'1 000 clics'},
+      a4:{n:'Premier achat de ferme',d:'1 élément de ferme acheté'},a5:{n:'Petit hameau',d:'10 éléments de ferme'},
+      a6:{n:'Magnat de la ferme',d:'100 éléments de ferme'},a7:{n:'Empire fermier',d:'1 000 éléments de ferme'},
+      a8:{n:'Mille œufs',d:'1 000 œufs'},a9:{n:'Million d\'œufs',d:'1 M d\'œufs'},a10:{n:'Milliard d\'œufs',d:'1 Md d\'œufs'},
+      a11:{n:'Collectionneur',d:'1 de chaque élément'},a12:{n:'Améliorateur',d:'5 améliorations'},
+      a13:{n:'Toutes les améliorations',d:'Toutes les améliorations achetées'},a14:{n:'Premier prestige',d:'1 prestige'},a15:{n:'Le Coq Légendaire',d:'10 prestiges'}
+    },
+    stage:['Premier Cocorico','Petite ferme modeste','Hameau avicole','Domaine du Coq Francis','Empire pondeur','Royaume des œufs','Civilisation ovipare','Dimension Cocorico','Multivers $FRANC'],
+    prodReq:{chick:'poussins curieux',hen:'poules pondeuses',coop:'poulaillers',farm:'coopératives agricoles',auto:'fermes automatisées',factory:'usines à œufs',lab:'labos génétiques',space:'stations orbitales',franc:'dimensions $FRANC',paradox:'paradoxes du coq'}
+  }
+};
+function t(k){return (I18N[LANG]&&I18N[LANG][k]!==undefined)?I18N[LANG][k]:(I18N.en[k]||k);}
+function pName(id){return (I18N[LANG].prod[id]||I18N.en.prod[id]).n;}
+function pDesc(id){return (I18N[LANG].prod[id]||I18N.en.prod[id]).d;}
+function uName(id){return (I18N[LANG].upg[id]||I18N.en.upg[id]).n;}
+function aName(id){return (I18N[LANG].ach[id]||I18N.en.ach[id]).n;}
+function aDesc(id){return (I18N[LANG].ach[id]||I18N.en.ach[id]).d;}
+function stageName(i){return (I18N[LANG].stage[i]!==undefined?I18N[LANG].stage:I18N.en.stage)[i];}
+function prodReqName(id){return (I18N[LANG].prodReq[id]||I18N.en.prodReq[id]||id);}
 
 // ============ PRODUCERS ============
 const PROD=[
@@ -535,7 +711,7 @@ function calcPlumes(){return ST.te<1e9?0:Math.floor(Math.sqrt(ST.te/1e9));}
 
 // ============ SAVE/LOAD ============
 function save(){
-  try{ST.lst=Date.now();localStorage.setItem(KEY,JSON.stringify(ST));flashSave('Saved');}catch(e){}
+  try{ST.lst=Date.now();localStorage.setItem(KEY,JSON.stringify(ST));flashSave(t('saved'));}catch(e){}
 }
 function load(){
   try{
@@ -635,32 +811,10 @@ function showUpgAnim(uid){
   setTimeout(()=>{container.innerHTML='';},5200);
 }
 
-// ============ CLOUD SAVE ============
+// ============ CLOUD SAVE REMOVED — LOCAL SAVE ONLY ============
 const tg=window.Telegram?.WebApp;
-let _lastCloud=0;
-async function cloudSave(beacon=false){
-  if(!isUnlimited||!tg?.initData)return;
-  const now=Date.now();
-  if(!beacon&&now-_lastCloud<30000)return;
-  _lastCloud=now;
-  const pl=JSON.stringify({initData:tg.initData,state:ST,clientTime:now});
-  try{
-    if(beacon&&navigator.sendBeacon){
-      navigator.sendBeacon(CFG.be+'/game-save',new Blob([pl],{type:'application/json'}));
-    }else{
-      const r=await fetch(CFG.be+'/game-save',{method:'POST',headers:{'Content-Type':'application/json'},body:pl,keepalive:true});
-      if(r.ok)flashSave('☁ Cloud',true);
-    }
-  }catch(e){}
-}
-async function cloudLoad(){
-  if(!isUnlimited||!tg?.initData)return null;
-  try{
-    const r=await fetch(CFG.be+'/game-load',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData})});
-    if(!r.ok)return null;
-    const d=await r.json();return d.state?{state:d.state,savedAt:d.lastSaved}:null;
-  }catch(e){return null;}
-}
+async function cloudSave(beacon=false){ /* disabled: local save only */ }
+async function cloudLoad(){ return null; /* disabled: local save only */ }
 
 // ============ ACHIEVEMENTS ============
 function checkAch(){
@@ -670,8 +824,8 @@ function checkAch(){
   });
   if(newly.length){
     newly.forEach((a,i)=>setTimeout(()=>{
-      showToast({ico:a.ico,ttl:'Trophy unlocked · +1% global',name:a.name});
-      showBigTrophy(a.ico,a.name);
+      showToast({ico:a.ico,ttl:t('trophyUnlocked'),name:aName(a.id)});
+      showBigTrophy(a.ico,aName(a.id));
     },i*6000));
     save();
     renderAch();
@@ -680,7 +834,7 @@ function checkAch(){
 function showBigTrophy(emoji,name){
   const el=document.getElementById('trophyBigUnlock');
   document.getElementById('trophyBigEmoji').textContent=emoji;
-  document.getElementById('trophyBigLabel').innerHTML=name+'<br><span style="font-size:14px;opacity:.8">+1% global</span>';
+  document.getElementById('trophyBigLabel').innerHTML=name+'<br><span style="font-size:14px;opacity:.8">'+t('globalPlus')+'</span>';
   el.classList.add('vis');
   setTimeout(()=>el.classList.remove('vis'),5000);
 }
@@ -704,7 +858,8 @@ function applyOffline(){
   if(gain<1)return;
   ST.eggs+=gain;ST.te+=gain;
   document.getElementById('offGain').textContent='+'+fmt(gain)+' 🥚';
-  document.getElementById('offDur').textContent=el>3600?`${Math.floor(el/3600)}h ${Math.floor((el%3600)/60)}min`:`${Math.floor(el/60)} min`;
+  const dur=el>3600?`${Math.floor(el/3600)}h ${Math.floor((el%3600)/60)}min`:`${Math.floor(el/60)} min`;
+  document.getElementById('omBody').innerHTML=`${t('awayFor')} <span id="offDur">${dur}</span> — ${t('hensWorked')}`;
   document.getElementById('offlineModal').classList.add('vis');
 }
 
@@ -774,13 +929,12 @@ function buyProd(p){
   checkAch();renderAll();save();
 }
 function buyUpg(u){
-  if(ST.up.includes(u.id)){showToast({ico:'✅',ttl:'Already purchased',name:u.name});return;}
+  if(ST.up.includes(u.id)){showToast({ico:'✅',ttl:t('alreadyBought'),name:uName(u.id)});return;}
   if(!reqOK(u.req)){
-    const prodNames={chick:'curious chicks',hen:'laying hens',coop:'chicken coops',farm:'farm cooperatives',auto:'automated farms',factory:'egg factories',lab:'genetic labs',space:'orbital stations',franc:'$FRANC dimensions',paradox:'rooster paradoxes'};
-    const cond=u.req?(u.req.t==='clicks'?`${u.req.n} clicks required`:`${u.req.n} ${prodNames[u.req.id]||u.req.id} required`):'Not yet available';
-    showToast({ico:'🔒',ttl:'Requirement not met',name:cond});return;
+    const cond=u.req?(u.req.t==='clicks'?`${u.req.n} ${t('clicksReq')}`:`${u.req.n} ${prodReqName(u.req.id)} ${t('req')}`):t('notAvailable');
+    showToast({ico:'🔒',ttl:t('reqNotMet'),name:cond});return;
   }
-  if(ST.eggs<u.cost){showToast({ico:'🥚',ttl:'Not enough eggs',name:`Need ${fS(u.cost)} 🥚`});return;}
+  if(ST.eggs<u.cost){showToast({ico:'🥚',ttl:t('notEnough'),name:`${t('needTxt')} ${fS(u.cost)} 🥚`});return;}
   ST.eggs-=u.cost;ST.up.push(u.id);
   applyUpg(u);_prodDirty=true;
   // Coq méditation swap
@@ -792,7 +946,7 @@ function buyUpg(u){
   if(u.id==='p2')switchMusic('ferme apaisante.mp3');
   showUpgAnim(u.id);
   checkAch();renderAll();renderBesaceAndFloatUpg();save();
-  showToast({ico:'✅',ttl:'Upgrade purchased!',name:u.name});
+  showToast({ico:'✅',ttl:t('upgradeBought'),name:uName(u.id)});
 }
 function applyUpg(u){
   if(u.type==='click')ST.cv*=u.mult;
@@ -811,7 +965,7 @@ function doPrestige(){
   ST.eggs=0;ST.te=0;ST.cl=0;ST.cv=1;ST.gm=1;
   PROD.forEach(p=>{ST.pr[p.id]=0;ST.pm[p.id]=1;});
   ST.up=[];_prodDirty=true;
-  checkAch();renderAll();save();cloudSave();
+  checkAch();renderAll();save();
 }
 
 
@@ -836,9 +990,7 @@ function showFoxAlarm(){
   _foxActive=true;
   localStorage.removeItem(FOX_KEY);
   const hasCash=ST.eggs>=10000;
-  const msg=hasCash
-    ?`A pack of foxes attacked your farm while you were away! All production is halted.<br><br><strong>Call the hunter for 10,000 eggs</strong> to save your farm.`
-    :`A pack of foxes attacked your farm! You don\'t have enough eggs for the hunter.<br><br><strong>You lose 50% of your stash...</strong>`;
+  const msg=hasCash?t('foxAttack'):t('foxAttackPoor');
   document.getElementById('foxMsg').innerHTML=msg;
   const huntBtn=document.getElementById('huntBtn');
   huntBtn.disabled=!hasCash;
@@ -869,7 +1021,7 @@ function startHunterAnim(){
       overlay.classList.remove('vis');
       clearAllFoxes();
       _foxActive=false;renderAll();save();
-      showToast({ico:'🔫',ttl:'Farm saved!',name:'The foxes fled!'});
+      showToast({ico:'🔫',ttl:t('foxSaved'),name:t('foxFled')});
     }
   },1000);
 }
@@ -1316,7 +1468,7 @@ function makeSpr(p){
   if(sp.anim)div.classList.add('anim-'+sp.anim);
   if(PNG[p.id]){
     const img=document.createElement('img');
-    img.src=CFG.ap+sp.png;img.alt=p.name;img.draggable=false;
+    img.src=CFG.ap+sp.png;img.alt=pName(p.id);img.draggable=false;
     img.style.cssText='width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;';
     div.appendChild(img);
   }else{
@@ -1530,7 +1682,7 @@ function renderBesaceAndFloatUpg(){
       const i=new Image();i.src=CFG.ap+'besace.png';i.style.cssText='width:100%;height:100%;object-fit:contain;';
       el.appendChild(i);
     }else{el.style.fontSize='40px';el.textContent='🎒';}
-    el.title='Storage Satchel';
+    el.title=uName('b0');
     pf.appendChild(el);
   }
   // Floating upgrade: show next available physical upgrade at purple triangle ~left:48%,top:68%
@@ -1550,7 +1702,7 @@ function renderBesaceAndFloatUpg(){
     pb.style.cssText='position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);background:rgba(42,24,16,.8);color:var(--yolk);font-family:Fraunces,serif;font-size:10px;font-weight:900;padding:2px 5px;border-radius:6px;white-space:nowrap;';
     pb.innerHTML='<span class="gegg">🥚</span>'+fS(nextUpg.cost)+'🥚';
     el.appendChild(pb);
-    el.title=nextUpg.name;
+    el.title=uName(nextUpg.id);
     el.onclick=()=>{buyFloatUpg(nextUpg,el);};
     pf.appendChild(el);
   }
@@ -1580,7 +1732,7 @@ function buyFloatUpg(u,el){
   }
   if(u.id==='p2')switchMusic('ferme apaisante.mp3');
   showUpgAnim(u.id);
-  checkAch();renderAll();save();showToast({ico:'✅',ttl:'Upgrade purchased',name:u.name});
+  checkAch();renderAll();save();showToast({ico:'✅',ttl:t('upgradeBought2'),name:uName(u.id)});
 }
 function canAffordUpg(u){return !ST.up.includes(u.id)&&reqOK(u.req)&&ST.eggs>=u.cost;}
 
@@ -1592,7 +1744,7 @@ function renderTop(){
   document.getElementById('gmult').textContent=(plBonus()*achBonus()*ST.gm).toFixed(2);
   const idx=stageIdx();
   // fname/flabel elements removed - stageInfo is the only stage display now
-  const si=document.getElementById('stageInfo');if(si)si.textContent=`stage ${idx+1} · ${STAGES[idx].name}`;
+  const si=document.getElementById('stageInfo');if(si)si.textContent=`${t('stage')} ${idx+1} · ${stageName(idx)}`;
 
   if(ST.pl>0){document.getElementById('plbadge').style.display='';document.getElementById('plcount').textContent=ST.pl;}
   else document.getElementById('plbadge').style.display='none';
@@ -1616,7 +1768,7 @@ function renderProd(){
     div.className='item'+(aff?' avail':' locked');
     const eps=p.eps*ST.pm[p.id]*ST.gm*plBonus()*achBonus();
     let icoH=PNG[p.id]?`<img src="${CFG.ap}${p.sp.png}" alt="">`:(p.icon||p.ico||'?');
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${p.name}</div><div class="idet">${p.desc} · <b>${fS(eps)}</b>/sec each</div></div><div class="irt"><div class="icst">${aff?'<span class="gegg">🥚</span>'+fS(cost):fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${pName(p.id)}</div><div class="idet">${pDesc(p.id)} · <b>${fS(eps)}</b>/sec ${LANG==='fr'?'chacun':'each'}</div></div><div class="irt"><div class="icst">${aff?'<span class="gegg">🥚</span>'+fS(cost):fS(cost)}</div><div class="iown">×${ST.pr[p.id]}</div></div>`;
     div.onclick=()=>buyProd(p);panel.appendChild(div);
   });
 }
@@ -1625,7 +1777,7 @@ function renderUpg(){
   const panel=document.getElementById('upgPanel');panel.innerHTML='';
   let hasAff=false;
   // UPGRADES section
-  const upgDiv=document.createElement('div');upgDiv.className='sec-divider';upgDiv.textContent='UPGRADES';panel.appendChild(upgDiv);
+  const upgDiv=document.createElement('div');upgDiv.className='sec-divider';upgDiv.textContent=t('upgradesHdr');panel.appendChild(upgDiv);
   UPG.forEach(u=>{
     const done=ST.up.includes(u.id);
     const req=reqOK(u.req);
@@ -1635,9 +1787,9 @@ function renderUpg(){
     const div=document.createElement('div');
     div.className='item'+(done?' maxed':(canBuy?' avail':' locked'));
     let eff='';
-    if(u.type==='click')eff=`Click ×${u.mult}`;
-    else if(u.type==='prod'){const t=PROD.find(p=>p.id===u.target);eff=`${t.name} ×${u.mult}`;}
-    else if(u.type==='global')eff=`Global ×${u.mult}`;
+    if(u.type==='click')eff=`${t('clickX')}${u.mult}`;
+    else if(u.type==='prod'){eff=`${pName(u.target)} ×${u.mult}`;}
+    else if(u.type==='global')eff=`${t('globalX')}${u.mult}`;
     // Icon: PNG or emoji
     let icoH;
     const icoFile=u.ico;
@@ -1651,21 +1803,20 @@ function renderUpg(){
     // Show requirement hint if req not met
     let reqHint='';
     if(!done&&!req&&u.req){
-      const pn={chick:'curious chicks',hen:'laying hens',coop:'chicken coops',farm:'farm cooperatives',auto:'automated farms',factory:'egg factories',lab:'genetic labs',space:'orbital stations',franc:'$FRANC dimensions',paradox:'rooster paradoxes'};
-      reqHint=u.req.t==='clicks'?` · ${u.req.n} clicks needed`:` · ${u.req.n} ${pn[u.req.id]||u.req.id} needed`;
+      reqHint=u.req.t==='clicks'?` · ${u.req.n} ${t('clicksNeeded')}`:` · ${u.req.n} ${prodReqName(u.req.id)} ${t('needed')}`;
     }
-    // Cost display: ✅ when available, ✓ when purchased
+    // Cost display: green egg when available, ✓ when purchased
     const costDisplay=done?'✓':(canBuy?'<span class="gegg">🥚</span>'+fS(u.cost):fS(u.cost));
-    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${u.name}</div><div class="idet">${eff}${reqHint}</div></div><div class="irt"><div class="icst">${costDisplay}</div></div>`;
+    div.innerHTML=`<div class="iico">${icoH}</div><div class="ibody"><div class="iname">${uName(u.id)}</div><div class="idet">${eff}${reqHint}</div></div><div class="irt"><div class="icst">${costDisplay}</div></div>`;
     div.onclick=()=>buyUpg(u);
     panel.appendChild(div);
   });
   // PRESTIGE section at bottom
-  const presDiv=document.createElement('div');presDiv.className='sec-divider';presDiv.style.marginTop='16px';presDiv.textContent='PRESTIGE — GOLDEN FEATHERS';panel.appendChild(presDiv);
+  const presDiv=document.createElement('div');presDiv.className='sec-divider';presDiv.style.marginTop='16px';presDiv.textContent=t('prestigeHdr');panel.appendChild(presDiv);
   const pl=calcPlumes();
   const en=Math.max(0,Math.pow(pl+1,2)*1e9-ST.te);
   const pc=document.createElement('div');pc.className='pcard';
-  pc.innerHTML=`<div class="ptitle">The Feather Cycle</div><div class="psub">Start over to grow stronger</div><div class="pbig">+${pl} 🪶</div><div class="pline"><span>Feathers owned</span><span>${ST.pl}</span></div><div class="pline"><span>Current bonus</span><span>×${plBonus().toFixed(2)}</span></div><div class="pline"><span>Bonus after prestige</span><span>×${(1+(ST.pl+pl)*.02).toFixed(2)}</span></div><div class="pline"><span>Next Feather in</span><span>${fS(en)} 🥚</span></div><button class="pbtn" id="presBtn" ${pl<1?'disabled':''}>${pl>=1?'Prestige!':'+1B eggs required'}</button>`;
+  pc.innerHTML=`<div class="ptitle">${t('featherCycle')}</div><div class="psub">${t('startOver')}</div><div class="pbig">+${pl} 🪶</div><div class="pline"><span>${t('feathersOwned')}</span><span>${ST.pl}</span></div><div class="pline"><span>${t('currentBonus')}</span><span>×${plBonus().toFixed(2)}</span></div><div class="pline"><span>${t('bonusAfter')}</span><span>×${(1+(ST.pl+pl)*.02).toFixed(2)}</span></div><div class="pline"><span>${t('nextFeather')}</span><span>${fS(en)} 🥚</span></div><button class="pbtn" id="presBtn" ${pl<1?'disabled':''}>${pl>=1?t('prestigeBtn'):t('prestigeReq')}</button>`;
   panel.appendChild(pc);
   const pb=pc.querySelector('#presBtn');
   if(pb&&pl>=1)pb.onclick=()=>{document.getElementById('pgain').textContent='+'+pl+' 🪶';document.getElementById('prestigeModal').classList.add('vis');};
@@ -1677,12 +1828,12 @@ function renderAch(){
   const panel=document.getElementById('achPanel');panel.innerHTML='';
   const h=document.createElement('div');
   h.style.cssText='text-align:center;padding:8px 4px 16px;font-family:Fraunces,serif;font-size:13px;color:var(--muted);font-style:italic';
-  h.innerHTML=`<strong style="color:var(--wine);font-style:normal">${ST.ach.length} / ${ACH.length}</strong> · each trophy <strong style="color:var(--yolk-d);font-style:normal">+1% global</strong>`;
+  h.innerHTML=`<strong style="color:var(--wine);font-style:normal">${ST.ach.length} / ${ACH.length}</strong> · ${t('eachTrophy')} <strong style="color:var(--yolk-d);font-style:normal">${t('globalPlus')}</strong>`;
   panel.appendChild(h);
   ACH.forEach(a=>{
     const ok=ST.ach.includes(a.id);
     const div=document.createElement('div');div.className='ach'+(ok?' ok':'');
-    div.innerHTML=`<div class="ach-ico">${a.ico}</div><div class="ach-body"><div class="ach-name">${ok?a.name:'???'}</div><div class="ach-det">${a.desc}</div></div><div class="ach-bon">+1% global</div>`;
+    div.innerHTML=`<div class="ach-ico">${a.ico}</div><div class="ach-body"><div class="ach-name">${ok?aName(a.id):'???'}</div><div class="ach-det">${aDesc(a.id)}</div></div><div class="ach-bon">${t('globalPlus')}</div>`;
     panel.appendChild(div);
   });
 }
@@ -1697,8 +1848,65 @@ function renderStats(){
   document.getElementById('st7').textContent=totB(ST).toLocaleString('en-US');
   document.getElementById('st8').textContent=ST.pl||0;
   document.getElementById('st9').textContent=ST.ps||0;
-  document.getElementById('st10').textContent=isUnlimited?'🪙 Holder':'Trial 10min';
+  document.getElementById('st10').textContent=isUnlimited?t('modeHolder'):(LANG==='fr'?'Essai 10min':'Trial 10min');
   const proj=tEps()*86400;const s12=document.getElementById('st12');if(s12)s12.textContent=fmt(proj)+' 🥚';
+}
+
+// ============ I18N STATIC + START SCREEN ============
+function applyStaticI18n(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const txt=t(key);
+    const dot=el.querySelector('.dot');
+    if(dot){
+      el.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent='';});
+      el.insertBefore(document.createTextNode(txt),dot);
+    }else{
+      el.textContent=txt;
+    }
+  });
+  const set=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
+  set('rmTitle',t('deleteTitle'));set('rmBody',t('deleteBody'));
+  document.getElementById('cancelReset').textContent=t('keep');
+  document.getElementById('confirmReset').textContent=t('del');
+  set('pmTitle',t('prestigeTitle'));set('pmBody',t('prestigeBody'));
+  document.getElementById('cancelPres').textContent=t('cancel');
+  document.getElementById('confirmPres').textContent=t('prestigeGo');
+  set('omTitle',t('welcomeBack'));
+  document.getElementById('closeOff').textContent=t('collect');
+  set('tmTitle',t('sessionEnded'));set('tmBody',t('sessionBody'));set('tmSub',t('progressSaved'));
+  document.getElementById('goWallet').textContent=t('connectWallet');
+  document.getElementById('goHome').textContent=t('backHome');
+  set('foxTitle',t('foxTitle'));set('foxSubtitle',t('foxCallHunter'));
+  document.getElementById('huntBtn').textContent=t('foxBtnPay');
+  document.getElementById('fleeBtn').textContent=t('foxBtnSub');
+  document.getElementById('ssResume').innerHTML='▶️ '+t('ssResume');
+  document.getElementById('ssNew').innerHTML='✨ '+t('ssNew');
+  document.getElementById('ssWalletTxt').textContent=t('ssWallet');
+  document.getElementById('ssLangLabel').textContent=t('ssLang');
+  const ssub=document.getElementById('startSub');if(ssub)ssub.textContent=t('ssSub');
+  const mp=document.getElementById('modePill');if(mp)mp.textContent=t('trial');
+  const hp=document.getElementById('holderPill');if(hp)hp.textContent='🪙 '+t('holder');
+  const el=document.getElementById('epsLabel');if(el)el.textContent=t('eggsSec');
+  const cl=document.getElementById('clkLabel');if(cl)cl.textContent=t('perClick');
+}
+let _gameStarted=false;
+function setLang(l){
+  LANG=l;localStorage.setItem('francCoqLang',l);
+  applyStaticI18n();
+  document.getElementById('langFR').classList.toggle('sel',l==='fr');
+  document.getElementById('langEN').classList.toggle('sel',l==='en');
+  if(_gameStarted)renderAll();
+}
+function updateLockIcon(){
+  const ico=document.getElementById('ssLockIco');
+  if(ico)ico.textContent=isUnlimited?'🔓':'🔒';
+}
+function hideStartScreen(){
+  const ss=document.getElementById('startScreen');
+  ss.classList.add('hidden');
+  setTimeout(()=>{ss.style.display='none';},450);
 }
 
 function renderAll(){
@@ -1760,10 +1968,11 @@ function tick(){
   let dt=(now-_lt2)/1000;_lt2=now;
   // Cap dt to prevent burst production after browser throttling
   if(dt>0.5)dt=0.5;
-  const gain=tEps()*dt;
-  if(gain>0){ST.eggs+=gain;ST.te+=gain;}
-  // Game clock advance
-  ST.gameClock+=dt;
+  if(_gameStarted){
+    const gain=tEps()*dt;
+    if(gain>0){ST.eggs+=gain;ST.te+=gain;}
+    ST.gameClock+=dt;
+  }
   updateEggs(dt);
   drawRain();
   renderTop();
@@ -1779,28 +1988,48 @@ function slowLoop(){
 }
 
 // ============ INIT ============
-async function init(){
-  load();recompUpg();
-  if(isUnlimited){
-    document.getElementById('holderPill').style.display='';
-    const cloud=await cloudLoad();
-    if(cloud&&cloud.savedAt&&cloud.savedAt>(ST.lst||0)){
-      Object.assign(ST,cloud.state);
-      PROD.forEach(p=>{if(!(p.id in ST.pr))ST.pr[p.id]=0;if(!(p.id in ST.pm))ST.pm[p.id]=1;});
-      recompUpg();flashSave('☁ Restored',true);
-    }
+function startGame(isNew){
+  if(isNew){
+    localStorage.removeItem(KEY);
+    ST.eggs=0;ST.te=0;ST.le=0;ST.cl=0;ST.cv=1;ST.gm=1;
+    PROD.forEach(p=>{ST.pr[p.id]=0;ST.pm[p.id]=1;});
+    ST.up=[];ST.ach=[];ST.ps=0;ST.pl=0;ST.trial=0;ST.gameClock=0;
+    localStorage.removeItem(FOX_KEY);
+    _prodDirty=true;_lastProdKey='';_lastSceneIdx=-1;
+  }else{
+    // Resume: apply offline gains / fox check
+    if(checkFoxAttack()){showFoxAlarm();}else{applyOffline();}
   }
   if(!isUnlimited&&ST.trial>=CFG.trial){
     document.getElementById('coqBtn').disabled=true;
     document.getElementById('trialEndModal').classList.add('vis');
   }
-  // First render with fallback emojis so UI shows immediately
-  buildCelestials();buildClouds();buildRain();buildFogBands();scheduleClouds();
-  // Ground: static SVG in HTML
-
-  if(checkFoxAttack()){showFoxAlarm();}else{applyOffline();}
+  _gameStarted=true;
+  hideStartScreen();
   checkAch();renderAll();
-  // Then preload PNGs in background; once done, re-render with images
+  if(!isUnlimited)startTrial();
+  // Start music on user gesture
+  initMusic();initRainSound();
+}
+
+async function init(){
+  load();recompUpg();
+  // i18n + start screen setup
+  applyStaticI18n();
+  document.getElementById('langFR').classList.toggle('sel',LANG==='fr');
+  document.getElementById('langEN').classList.toggle('sel',LANG==='en');
+  document.getElementById('langFR').onclick=()=>setLang('fr');
+  document.getElementById('langEN').onclick=()=>setLang('en');
+  document.getElementById('ssResume').onclick=()=>startGame(false);
+  document.getElementById('ssNew').onclick=()=>{
+    if(confirm(t('ssNewConfirm')))startGame(true);
+  };
+  document.getElementById('ssWallet').onclick=()=>{location.href=CFG.wallet;};
+  updateLockIcon();
+  if(isUnlimited){document.getElementById('holderPill').style.display='';}
+  // Build scene in background (visible behind start screen)
+  buildCelestials();buildClouds();buildRain();buildFogBands();scheduleClouds();
+  checkAch();renderAll();
   preload().then(()=>{
     if(PNG['coq']){
       const btn=document.getElementById('coqBtn');
@@ -1812,19 +2041,16 @@ async function init(){
     _prodDirty=true;_lastProdKey='';
     renderAll();
   });
-  if(!isUnlimited)startTrial();
+  // Background loops run so the scene animates behind the start screen
   setInterval(tick,100);
   setInterval(slowLoop,800);
-  setInterval(save,15000);
-  setInterval(()=>cloudSave(false),100000);
+  setInterval(()=>{if(_gameStarted)save();},15000);
   if(tg){tg.ready();tg.expand();}
-  initMusic();
-  initRainSound();
 }
 
-window.addEventListener('beforeunload',()=>{persistTrial();save();cloudSave(true);setFoxChance();});
-window.addEventListener('pagehide',()=>{persistTrial();save();cloudSave(true);setFoxChance();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){persistTrial();save();cloudSave(true);}});
+window.addEventListener('beforeunload',()=>{if(_gameStarted){persistTrial();save();setFoxChance();}});
+window.addEventListener('pagehide',()=>{if(_gameStarted){persistTrial();save();setFoxChance();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&_gameStarted){persistTrial();save();}});
 init();
 </script>
 
