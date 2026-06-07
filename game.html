@@ -424,7 +424,7 @@ let LANG=localStorage.getItem('francCoqLang')||'en';
 const I18N={
   en:{
     farm:'Farm',upgrades:'Upgrades',trophies:'Trophies',stats:'Stats',
-    eggsSec:'eggs/sec',perClick:'/click',stage:'stage',
+    eggsSec:'eggs/sec',perClick:'/click',stageLabel:'stage',
     trial:'TRIAL',holder:'HOLDER',
     st_eggsSession:'Eggs (session)',st_eggsLife:'Eggs lifetime',st_clicks:'Clicks',
     st_prodSec:'Production/sec',st_perClick:'Per click',st_globalMult:'Global multiplier',
@@ -490,7 +490,7 @@ const I18N={
   },
   fr:{
     farm:'Ferme',upgrades:'Améliorations',trophies:'Trophées',stats:'Stats',
-    eggsSec:'œufs/sec',perClick:'/clic',stage:'étape',
+    eggsSec:'œufs/sec',perClick:'/clic',stageLabel:'étape',
     trial:'ESSAI',holder:'HOLDER',
     st_eggsSession:'Œufs (session)',st_eggsLife:'Œufs totaux',st_clicks:'Clics',
     st_prodSec:'Production/sec',st_perClick:'Par clic',st_globalMult:'Multiplicateur global',
@@ -1744,7 +1744,7 @@ function renderTop(){
   document.getElementById('gmult').textContent=(plBonus()*achBonus()*ST.gm).toFixed(2);
   const idx=stageIdx();
   // fname/flabel elements removed - stageInfo is the only stage display now
-  const si=document.getElementById('stageInfo');if(si)si.textContent=`${t('stage')} ${idx+1} · ${stageName(idx)}`;
+  const si=document.getElementById('stageInfo');if(si)si.textContent=`${t('stageLabel')} ${idx+1} · ${stageName(idx)}`;
 
   if(ST.pl>0){document.getElementById('plbadge').style.display='';document.getElementById('plcount').textContent=ST.pl;}
   else document.getElementById('plbadge').style.display='none';
