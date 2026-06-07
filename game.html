@@ -233,21 +233,6 @@ body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);m
 
 /* TROPHY BIG UNLOCK */
 #trophyBigUnlock{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(42,24,16,.6);opacity:0;transition:opacity .3s;}
-#startScreen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#2a1810,#6b1a1a);transition:opacity .4s;}
-#startScreen.hidden{opacity:0;pointer-events:none;}
-#startCard{text-align:center;padding:30px 24px;max-width:340px;width:88%;}
-#startLogo{font-size:72px;line-height:1;margin-bottom:6px;}
-#startTitle{font-family:'Fraunces',serif;font-weight:900;font-size:34px;color:var(--yolk);margin:0;letter-spacing:.02em;}
-#startSub{font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:rgba(245,234,212,.75);margin-bottom:26px;}
-.start-btn{display:block;width:100%;font-family:'Fraunces',serif;font-weight:700;font-size:17px;padding:14px;border-radius:14px;border:none;cursor:pointer;margin-bottom:12px;transition:transform .1s;}
-.start-btn:active{transform:translateY(2px);}
-.start-btn.resume{background:linear-gradient(135deg,#e8a834,#f5d020);color:#2a1810;box-shadow:0 4px 0 #b8851f;}
-.start-btn.newgame{background:rgba(245,234,212,.92);color:var(--wine);box-shadow:0 4px 0 rgba(245,234,212,.4);}
-.start-btn.wallet{background:rgba(42,24,16,.5);color:var(--yolk);border:1.5px solid rgba(232,168,52,.5);font-size:15px;}
-#startLangRow{margin-top:18px;font-family:'Fraunces',serif;font-size:13px;color:rgba(245,234,212,.7);font-style:italic;}
-.lang-flag{font-size:32px;background:rgba(245,234,212,.1);border:2px solid transparent;border-radius:10px;padding:4px 10px;cursor:pointer;transition:all .15s;}
-.lang-flag.sel{border-color:var(--yolk);background:rgba(232,168,52,.2);}
-.lang-flag:active{transform:scale(.92);}
 #trophyBigUnlock.vis{opacity:1;}
 .trophy-big-emoji{font-size:160px;animation:trophyPulse 1.5s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(232,168,52,.8));}
 @keyframes trophyPulse{0%,100%{transform:scale(1);}30%{transform:scale(1.15);}50%{transform:scale(0.95);}70%{transform:scale(1.1);}}
@@ -389,25 +374,6 @@ window.addEventListener('unhandledrejection',function(e){console.error('REJ:',(e
 <div class="mbg" id="offlineModal"><div class="modal"><div class="mico">😴</div><h2 id="omTitle">Welcome back</h2><p id="omBody">Away for <span id="offDur">0 min</span> — your hens worked at 50%.</p><div class="mbig" id="offGain">+0 🥚</div><div class="mbtns"><button class="mbtn pri" id="closeOff">Collect</button></div></div></div>
 <div class="mbg" id="trialEndModal"><div class="modal"><div class="mico">🪙</div><h2 id="tmTitle">Session ended</h2><p id="tmBody">The 10 minutes are up. Link a <strong>$FRANC</strong> wallet to play unlimited.</p><p id="tmSub" style="font-size:12px;color:var(--muted);font-style:italic">Your progress is saved.</p><div class="mbtns" style="flex-direction:column"><button class="mbtn gld" id="goWallet" style="margin-bottom:8px">🪙 Connect my wallet</button><button class="mbtn can" id="goHome">Back to home</button></div></div></div>
 
-<!-- START SCREEN -->
-<div id="startScreen">
-  <div id="startCard">
-    <div id="startLogo">🐓</div>
-    <h1 id="startTitle">Egg Clicker</h1>
-    <div id="startSub">Francis the Rooster Farm</div>
-    <button class="start-btn resume" id="ssResume">▶️ Resume game</button>
-    <button class="start-btn newgame" id="ssNew">✨ New game</button>
-    <button class="start-btn wallet" id="ssWallet"><span id="ssLockIco">🔒</span> <span id="ssWalletTxt">Connect wallet</span></button>
-    <div id="startLangRow">
-      <span id="ssLangLabel">Language</span>
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:6px;">
-        <button class="lang-flag" id="langFR" title="Français">🇫🇷</button>
-        <button class="lang-flag" id="langEN" title="English">🇬🇧</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
 'use strict';
 const CFG={
@@ -455,9 +421,6 @@ const I18N={
     foxAttack:'A pack of foxes attacked your farm while you were away! All production is halted.<br><br><strong>Call the hunter for 10,000 eggs</strong> to save your farm.',
     foxAttackPoor:'A pack of foxes attacked your farm! You don\'t have enough eggs for the hunter.<br><br><strong>You lose 50% of your stash...</strong>',
     foxSaved:'Farm saved!',foxFled:'The foxes fled!',
-    // start screen
-    ssResume:'Resume game',ssNew:'New game',ssWallet:'Connect wallet',ssLang:'Language',
-    ssNewConfirm:'Start a new game? Your current progress will be lost.',ssSub:'Francis the Rooster Farm',
     prod:{
       chick:{n:'Curious Chick',d:'Not much, but it\'s a start.'},
       hen:{n:'Laying Hen',d:'The foundation of any decent farm.'},
@@ -520,8 +483,6 @@ const I18N={
     foxAttack:'Une horde de renards a attaqué ta ferme pendant ton absence ! Toute production est à l\'arrêt.<br><br><strong>Appelle le chasseur pour 10 000 œufs</strong> et récupère ta ferme.',
     foxAttackPoor:'Une horde de renards a attaqué ta ferme ! Tu n\'as pas assez d\'œufs pour le chasseur.<br><br><strong>Tu perds 50% de ta cagnotte...</strong>',
     foxSaved:'Ferme sauvée !',foxFled:'Les renards ont fui !',
-    ssResume:'Reprendre la partie',ssNew:'Nouvelle partie',ssWallet:'Connecter le wallet',ssLang:'Langue',
-    ssNewConfirm:'Démarrer une nouvelle partie ? Ta progression actuelle sera perdue.',ssSub:'La Ferme du Coq Francis',
     prod:{
       chick:{n:'Poussin curieux',d:'Pas grand-chose, mais c\'est un début.'},
       hen:{n:'Poule pondeuse',d:'La base de toute ferme digne de ce nom.'},
@@ -1881,11 +1842,6 @@ function applyStaticI18n(){
   set('foxTitle',t('foxTitle'));set('foxSubtitle',t('foxCallHunter'));
   document.getElementById('huntBtn').textContent=t('foxBtnPay');
   document.getElementById('fleeBtn').textContent=t('foxBtnSub');
-  document.getElementById('ssResume').innerHTML='▶️ '+t('ssResume');
-  document.getElementById('ssNew').innerHTML='✨ '+t('ssNew');
-  document.getElementById('ssWalletTxt').textContent=t('ssWallet');
-  document.getElementById('ssLangLabel').textContent=t('ssLang');
-  const ssub=document.getElementById('startSub');if(ssub)ssub.textContent=t('ssSub');
   const mp=document.getElementById('modePill');if(mp)mp.textContent=t('trial');
   const hp=document.getElementById('holderPill');if(hp)hp.textContent='🪙 '+t('holder');
   const el=document.getElementById('epsLabel');if(el)el.textContent=t('eggsSec');
@@ -1895,18 +1851,7 @@ let _gameStarted=false;
 function setLang(l){
   LANG=l;localStorage.setItem('francCoqLang',l);
   applyStaticI18n();
-  document.getElementById('langFR').classList.toggle('sel',l==='fr');
-  document.getElementById('langEN').classList.toggle('sel',l==='en');
   if(_gameStarted)renderAll();
-}
-function updateLockIcon(){
-  const ico=document.getElementById('ssLockIco');
-  if(ico)ico.textContent=isUnlimited?'🔓':'🔒';
-}
-function hideStartScreen(){
-  const ss=document.getElementById('startScreen');
-  ss.classList.add('hidden');
-  setTimeout(()=>{ss.style.display='none';},450);
 }
 
 function renderAll(){
@@ -2005,31 +1950,19 @@ function startGame(isNew){
     document.getElementById('trialEndModal').classList.add('vis');
   }
   _gameStarted=true;
-  hideStartScreen();
   checkAch();renderAll();
   if(!isUnlimited)startTrial();
-  // Start music on user gesture
   initMusic();initRainSound();
 }
 
 async function init(){
+  // Language: URL param ?lang=fr|en takes priority (set by home screen), else saved pref
+  const urlLang=urlP.get('lang');
+  if(urlLang==='fr'||urlLang==='en'){LANG=urlLang;localStorage.setItem('francCoqLang',LANG);}
   load();recompUpg();
-  // i18n + start screen setup
   applyStaticI18n();
-  document.getElementById('langFR').classList.toggle('sel',LANG==='fr');
-  document.getElementById('langEN').classList.toggle('sel',LANG==='en');
-  document.getElementById('langFR').onclick=()=>setLang('fr');
-  document.getElementById('langEN').onclick=()=>setLang('en');
-  document.getElementById('ssResume').onclick=()=>startGame(false);
-  document.getElementById('ssNew').onclick=()=>{
-    if(confirm(t('ssNewConfirm')))startGame(true);
-  };
-  document.getElementById('ssWallet').onclick=()=>{location.href=CFG.wallet;};
-  updateLockIcon();
   if(isUnlimited){document.getElementById('holderPill').style.display='';}
-  // Build scene in background (visible behind start screen)
   buildCelestials();buildClouds();buildRain();buildFogBands();scheduleClouds();
-  checkAch();renderAll();
   preload().then(()=>{
     if(PNG['coq']){
       const btn=document.getElementById('coqBtn');
@@ -2041,11 +1974,12 @@ async function init(){
     _prodDirty=true;_lastProdKey='';
     renderAll();
   });
-  // Background loops run so the scene animates behind the start screen
   setInterval(tick,100);
   setInterval(slowLoop,800);
   setInterval(()=>{if(_gameStarted)save();},15000);
   if(tg){tg.ready();tg.expand();}
+  // Start directly: ?new=1 → fresh game, otherwise resume
+  startGame(urlP.get('new')==='1');
 }
 
 window.addEventListener('beforeunload',()=>{if(_gameStarted){persistTrial();save();setFoxChance();}});

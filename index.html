@@ -22,8 +22,7 @@
     padding: 20px;
     overflow-x: hidden;
   }
-  
-  /* Sparkles animation in background */
+
   .sparkle {
     position: fixed;
     width: 3px;
@@ -39,7 +38,7 @@
     0%, 100% { opacity: 0; transform: scale(0.5); }
     50% { opacity: 0.8; transform: scale(1); }
   }
-  
+
   .card {
     width: 100%;
     max-width: 360px;
@@ -51,10 +50,10 @@
     position: relative;
     z-index: 1;
   }
-  
+
   .header { text-align: center; margin-bottom: 22px; }
-  .header .logo { 
-    font-size: 64px; 
+  .header .logo {
+    font-size: 64px;
     margin-bottom: 6px;
     filter: drop-shadow(0 0 12px rgba(255,215,0,0.6));
     animation: bob 2.5s ease-in-out infinite;
@@ -79,8 +78,7 @@
     letter-spacing: 1px;
   }
   .header .sub b { color: #FFD700; }
-  
-  /* PLAY BUTTON */
+
   .btn {
     width: 100%;
     padding: 18px;
@@ -102,32 +100,46 @@
     overflow: hidden;
   }
   .btn:active { transform: scale(0.97); opacity: 0.9; }
-  .btn-play {
+
+  /* RESUME (primary green) */
+  .btn-resume {
     background: linear-gradient(135deg, #16a34a, #15803d);
     box-shadow: 0 4px 20px rgba(22,163,74,0.5);
-    font-size: 26px;
-    padding: 22px;
+    font-size: 24px;
+    padding: 20px;
   }
-  .btn-play::before {
+  .btn-resume::before {
     content: '▶';
     font-family: sans-serif;
-    font-size: 22px;
+    font-size: 20px;
     background: rgba(255,255,255,0.25);
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     padding-left: 3px;
   }
-  
+
+  /* NEW GAME (purple) */
+  .btn-new {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    box-shadow: 0 4px 20px rgba(124,58,237,0.45);
+    font-size: 20px;
+    padding: 16px;
+  }
+  .btn-new::before { content: '✨'; font-size: 18px; }
+
+  /* WALLET / UNLOCK */
   .btn-unlock {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    box-shadow: 0 4px 20px rgba(22,163,74,0.5);
+    background: rgba(168,85,247,0.12);
+    border: 1.5px solid rgba(168,85,247,0.45);
+    box-shadow: none;
     flex-direction: column;
     gap: 4px;
     padding: 14px;
+    color: #e9d5ff;
   }
   .btn-unlock-main {
     display: flex;
@@ -144,13 +156,17 @@
     opacity: 0.9;
     text-transform: none;
   }
-  
+
   .btn-holder {
     background: linear-gradient(135deg, #4ade80, #16a34a);
     color: #0d3320;
     box-shadow: 0 4px 20px rgba(250,204,21,0.5);
     text-shadow: 0 0 8px rgba(255,255,255,0.4);
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px;
   }
+  .btn-holder .btn-unlock-main::before { content: '🔓'; }
   .btn-holder-sub {
     font-family: 'Fredoka One', cursive;
     font-size: 11px;
@@ -159,14 +175,40 @@
     letter-spacing: 1px;
     text-transform: none;
   }
-  
-  /* RULES SECTION */
+
+  /* LANGUAGE ROW */
+  .lang-row {
+    text-align: center;
+    margin: 14px 0 4px;
+  }
+  .lang-label {
+    font-family: 'Bangers', cursive;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #c084fc;
+    margin-bottom: 8px;
+  }
+  .lang-flags { display: flex; gap: 12px; justify-content: center; }
+  .lang-flag {
+    font-size: 30px;
+    background: rgba(168,85,247,0.1);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .lang-flag.sel { border-color: #FFD700; background: rgba(255,215,0,0.15); box-shadow: 0 0 12px rgba(255,215,0,0.3); }
+  .lang-flag:active { transform: scale(0.92); }
+
+  /* RULES */
   .rules-card {
     background: rgba(168,85,247,0.08);
     border: 1.5px solid rgba(168,85,247,0.25);
     border-radius: 16px;
     padding: 14px 16px;
-    margin-top: 8px;
+    margin-top: 12px;
   }
   .rules-title {
     font-family: 'Bangers', cursive;
@@ -192,52 +234,45 @@
   .rule-icon { font-size: 16px; flex-shrink: 0; line-height: 1.2; }
   .rule b { color: #fff; font-weight: normal; font-family: 'Bangers', cursive; letter-spacing: 1.5px; font-size: 14px; }
   .rule .accent { color: #FFD700; font-family: 'Bangers', cursive; letter-spacing: 1.5px; font-size: 15px; }
-  
-  /* Status badge */
-  .status-pill {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 10px;
-    letter-spacing: 1px;
-    margin-top: 8px;
-    font-family: 'Bangers', cursive;
-  }
-  .status-checking { background: rgba(168,85,247,0.2); color: #c084fc; }
-  .status-disconnected { background: rgba(234,88,12,0.15); color: #fb923c; }
-  .status-no-franc { background: rgba(217,119,6,0.15); color: #fcd34d; }
-  .status-holder { background: rgba(22,163,74,0.2); color: #86efac; border: 1px solid rgba(163,230,53,0.4); }
-  .status-hidden { display: none; }
 </style>
 </head>
 <body>
 
-<!-- Twinkling sparkles -->
 <div id="sparkleContainer"></div>
 
 <div class="card">
   <div class="header">
     <div class="logo">🐓</div>
     <h1>EGG CLICKER</h1>
-    <p class="sub">TAP THE ROOSTER · BUILD THE EMPIRE<br><b>$FRANC</b> HOLDERS PLAY UNLIMITED</p>
+    <p class="sub" id="subText"></p>
   </div>
 
-  <button class="btn btn-play" id="playBtn" onclick="startGame()">PLAY</button>
+  <button class="btn btn-resume" id="resumeBtn" onclick="resumeGame()"><span id="resumeTxt">Resume game</span></button>
+
+  <button class="btn btn-new" id="newBtn" onclick="newGame()"><span id="newTxt">New game</span></button>
 
   <button class="btn btn-unlock" id="unlockBtn" onclick="openWallet()">
-    <div class="btn-unlock-main">TAP TO UNLOCK UNLIMITED</div>
+    <div class="btn-unlock-main" id="unlockMain">Connect wallet</div>
     <div class="btn-unlock-sub" id="walletStatus">Wallet not connected · checking…</div>
   </button>
 
+  <div class="lang-row">
+    <div class="lang-label" id="langLabel">LANGUAGE</div>
+    <div class="lang-flags">
+      <button class="lang-flag" id="flagFR" title="Français" onclick="setLang('fr')">🇫🇷</button>
+      <button class="lang-flag" id="flagEN" title="English" onclick="setLang('en')">🇬🇧</button>
+    </div>
+  </div>
+
   <div class="rules-card">
-    <div class="rules-title">$FRANC RULES</div>
+    <div class="rules-title" id="rulesTitle">$FRANC RULES</div>
     <div class="rule">
       <div class="rule-icon">💜</div>
-      <div>Without <b>$FRANC</b> : <span class="accent">10 min session</span> · progress saved</div>
+      <div id="ruleTrial"></div>
     </div>
     <div class="rule">
       <div class="rule-icon">💚</div>
-      <div>Holding <b>$FRANC</b> : <span class="accent">unlimited play</span> + cloud save + leaderboard</div>
+      <div id="ruleHolder"></div>
     </div>
   </div>
 </div>
@@ -245,11 +280,77 @@
 <script>
 const BACKEND  = 'https://mubqtnqulpyehkgubhnh.supabase.co/functions/v1';
 const WALLET_URL = 'https://franclecoq.github.io/Wallet/connect-wallet.html';
-const GAME_URL = './game.html'; // relative to this homepage
+const GAME_URL = './game.html';
 
 const tg = window.Telegram?.WebApp;
 
-// Sparkle particles
+// ============ I18N ============
+let LANG = localStorage.getItem('francCoqLang') || 'en';
+const I18N = {
+  en: {
+    sub: 'TAP THE ROOSTER · BUILD THE EMPIRE<br><b>$FRANC</b> HOLDERS PLAY UNLIMITED',
+    resume: 'Resume game',
+    newGame: 'New game',
+    connectWallet: 'Connect wallet',
+    langLabel: 'LANGUAGE',
+    rulesTitle: '$FRANC RULES',
+    ruleTrial: 'Without <b>$FRANC</b> : <span class="accent">10 min session</span> · progress saved',
+    ruleHolder: 'Holding <b>$FRANC</b> : <span class="accent">unlimited play</span>',
+    newConfirm: 'Start a new game? Your saved progress will be lost.',
+    wOpenTelegram: 'Open via Telegram to connect',
+    wLinkedNoFranc: 'Wallet linked · no $FRANC · 10 min trial',
+    wNotConnected: 'Wallet not connected · 10 min trial',
+    wError: 'Connection error · 10 min trial',
+    wChecking: 'Wallet not connected · checking…',
+    holderMain: '🪙 $FRANC HOLDER · UNLIMITED',
+    holderSub: (b) => `${b} $FRANC detected`
+  },
+  fr: {
+    sub: 'TAPE LE COQ · BÂTIS L\'EMPIRE<br>LES HOLDERS <b>$FRANC</b> JOUENT SANS LIMITE',
+    resume: 'Reprendre la partie',
+    newGame: 'Nouvelle partie',
+    connectWallet: 'Connecter le wallet',
+    langLabel: 'LANGUE',
+    rulesTitle: 'RÈGLES $FRANC',
+    ruleTrial: 'Sans <b>$FRANC</b> : <span class="accent">session 10 min</span> · progression sauvegardée',
+    ruleHolder: 'Avec <b>$FRANC</b> : <span class="accent">jeu illimité</span>',
+    newConfirm: 'Démarrer une nouvelle partie ? Ta progression sauvegardée sera perdue.',
+    wOpenTelegram: 'Ouvre via Telegram pour connecter',
+    wLinkedNoFranc: 'Wallet lié · pas de $FRANC · essai 10 min',
+    wNotConnected: 'Wallet non connecté · essai 10 min',
+    wError: 'Erreur de connexion · essai 10 min',
+    wChecking: 'Wallet non connecté · vérification…',
+    holderMain: '🪙 HOLDER $FRANC · ILLIMITÉ',
+    holderSub: (b) => `${b} $FRANC détecté`
+  }
+};
+function t(k){ return I18N[LANG][k] !== undefined ? I18N[LANG][k] : I18N.en[k]; }
+
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.getElementById('subText').innerHTML = t('sub');
+  document.getElementById('resumeTxt').textContent = t('resume');
+  document.getElementById('newTxt').textContent = t('newGame');
+  document.getElementById('langLabel').textContent = t('langLabel');
+  document.getElementById('rulesTitle').textContent = t('rulesTitle');
+  document.getElementById('ruleTrial').innerHTML = t('ruleTrial');
+  document.getElementById('ruleHolder').innerHTML = t('ruleHolder');
+  document.getElementById('flagFR').classList.toggle('sel', LANG === 'fr');
+  document.getElementById('flagEN').classList.toggle('sel', LANG === 'en');
+  // Refresh wallet button label (unless already holder)
+  if (!isHolder) {
+    const main = document.getElementById('unlockMain');
+    if (main) main.textContent = t('connectWallet');
+  }
+  refreshWalletStatusText();
+}
+function setLang(l){
+  LANG = l;
+  localStorage.setItem('francCoqLang', l);
+  applyLang();
+}
+
+// ============ SPARKLES ============
 function spawnSparkles() {
   const c = document.getElementById('sparkleContainer');
   for (let i = 0; i < 12; i++) {
@@ -263,19 +364,26 @@ function spawnSparkles() {
   }
 }
 
-// Detect $FRANC holder status
+// ============ $FRANC HOLDER DETECTION ============
 let isHolder = false;
-let lives = 1;
+let _lastStatusKey = 'wChecking';
+
+function refreshWalletStatusText(){
+  if (isHolder) return;
+  const el = document.getElementById('walletStatus');
+  if (el) el.textContent = t(_lastStatusKey);
+}
 
 async function checkHolderStatus() {
   const statusEl = document.getElementById('walletStatus');
   const unlockBtn = document.getElementById('unlockBtn');
-  
+
   if (!tg?.initData) {
-    statusEl.textContent = 'Open via Telegram to connect';
+    _lastStatusKey = 'wOpenTelegram';
+    refreshWalletStatusText();
     return;
   }
-  
+
   try {
     const res = await fetch(BACKEND + '/check-franc', {
       method: 'POST',
@@ -283,59 +391,62 @@ async function checkHolderStatus() {
       body: JSON.stringify({ initData: tg.initData })
     });
     const d = await res.json();
-    
+
     if (d.walletLinked && d.hasFranc) {
-      // HOLDER mode
+      // HOLDER mode — open padlock, unlimited
       isHolder = true;
-      lives = d.lives || 10;
       const bal = d.balance ? Number(d.balance).toLocaleString() : '?';
-      
       unlockBtn.classList.remove('btn-unlock');
       unlockBtn.classList.add('btn-holder');
       unlockBtn.innerHTML = `
-        <div class="btn-unlock-main">🪙 $FRANC HOLDER · UNLIMITED</div>
-        <div class="btn-holder-sub">${bal} $FRANC detected</div>
+        <div class="btn-unlock-main">${t('holderMain')}</div>
+        <div class="btn-holder-sub">${t('holderSub')(bal)}</div>
       `;
       unlockBtn.onclick = null;
       unlockBtn.style.cursor = 'default';
     } else if (d.walletLinked) {
-      // Connected but no $FRANC
-      statusEl.textContent = 'Wallet linked · no $FRANC · 10 min trial';
+      _lastStatusKey = 'wLinkedNoFranc';
+      refreshWalletStatusText();
     } else {
-      // Not connected
-      statusEl.textContent = 'Wallet not connected · 10 min trial';
+      _lastStatusKey = 'wNotConnected';
+      refreshWalletStatusText();
     }
   } catch (e) {
-    statusEl.textContent = 'Connection error · 10 min trial';
+    _lastStatusKey = 'wError';
+    refreshWalletStatusText();
   }
 }
 
-function startGame() {
-  // Pass holder status via query string
-  const url = GAME_URL + '?mode=' + (isHolder ? 'unlimited' : 'trial') + '&t=' + Date.now();
-  window.location.href = url;
+// ============ NAVIGATION ============
+function gameUrl(extra) {
+  let url = GAME_URL + '?mode=' + (isHolder ? 'unlimited' : 'trial') + '&lang=' + LANG + '&t=' + Date.now();
+  if (extra) url += extra;
+  return url;
 }
-
+function resumeGame() {
+  window.location.href = gameUrl('');
+}
+function newGame() {
+  if (confirm(t('newConfirm'))) {
+    window.location.href = gameUrl('&new=1');
+  }
+}
 function openWallet() {
   if (tg) {
-    // Open wallet mini-app inside Telegram
     window.location.href = WALLET_URL;
   } else {
     window.open(WALLET_URL, '_blank');
   }
 }
 
-// Init
+// ============ INIT ============
 window.addEventListener('load', () => {
   spawnSparkles();
-  if (tg) {
-    tg.ready();
-    tg.expand();
-  }
+  applyLang();
+  if (tg) { tg.ready(); tg.expand(); }
   checkHolderStatus();
 });
 
-// Refresh status when returning to the page (e.g. after wallet linking)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) checkHolderStatus();
 });
