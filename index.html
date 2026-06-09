@@ -303,7 +303,8 @@ const I18N = {
     wError: 'Connection error · 10 min trial',
     wChecking: 'Wallet not connected · checking…',
     holderMain: '🪙 $FRANC HOLDER · UNLIMITED',
-    holderSub: (b) => `${b} $FRANC detected`
+    holderSub: (b) => `${b} $FRANC detected`,
+    unlockedStars: 'Unlocked via ⭐'
   },
   fr: {
     sub: 'TAPE LE COQ · BÂTIS L\'EMPIRE<br>LES HOLDERS <b>$FRANC</b> JOUENT SANS LIMITE',
@@ -321,7 +322,8 @@ const I18N = {
     wError: 'Erreur de connexion · essai 10 min',
     wChecking: 'Wallet non connecté · vérification…',
     holderMain: '🪙 HOLDER $FRANC · ILLIMITÉ',
-    holderSub: (b) => `${b} $FRANC détecté`
+    holderSub: (b) => `${b} $FRANC détecté`,
+    unlockedStars: 'Débloqué via ⭐'
   }
 };
 function t(k){ return I18N[LANG][k] !== undefined ? I18N[LANG][k] : I18N.en[k]; }
@@ -366,6 +368,8 @@ function spawnSparkles() {
 
 // ============ $FRANC HOLDER DETECTION ============
 let isHolder = false;
+let francBalance = 0;
+let unlockReason = localStorage.getItem('flc_reason') || null;  // "solana" | "ton" | "stars" | null
 let _lastStatusKey = 'wChecking';
 
 function refreshWalletStatusText(){
@@ -392,19 +396,38 @@ async function checkHolderStatus() {
     });
     const d = await res.json();
 
-    if (d.walletLinked && d.hasFranc) {
-      // HOLDER mode — open padlock, unlimited
-      isHolder = true;
-      const bal = d.balance ? Number(d.balance).toLocaleString() : '?';
+    // === Verdict de déblocage (rétrocompatible) ===
+    const walletLinked = !!(d && d.walletLinked);
+    // Nouveau backend → d.unlocked ; ancien backend → fallback hasFranc.
+    isHolder = !!(d && (d.unlocked ?? (d.walletLinked && d.hasFranc)));
+    // Raison : "solana" | "ton" | "stars" | null
+    unlockReason = (d && d.reason) || (isHolder ? 'solana' : null);
+    // Solde réel (0 pour un déblocage via Stars)
+    francBalance = isHolder ? Number(d.balance || 0) : 0;
+    localStorage.setItem('flc_holder', JSON.stringify(isHolder));
+    localStorage.setItem('flc_balance', String(francBalance));
+    localStorage.setItem('flc_walletLinked', JSON.stringify(walletLinked));
+    localStorage.setItem('flc_reason', unlockReason || '');
+
+    // === Rendu du bouton wallet ===
+    if (isHolder) {
       unlockBtn.classList.remove('btn-unlock');
       unlockBtn.classList.add('btn-holder');
+      let subHtml;
+      if (unlockReason === 'stars') {
+        subHtml = t('unlockedStars');
+      } else {
+        const sym = unlockReason === 'ton' ? '💎' : '◎';   // 💎 TON · ◎ Solana
+        const bal = francBalance ? Number(francBalance).toLocaleString() : '?';
+        subHtml = `${sym} · ${t('holderSub')(bal)}`;
+      }
       unlockBtn.innerHTML = `
         <div class="btn-unlock-main">${t('holderMain')}</div>
-        <div class="btn-holder-sub">${t('holderSub')(bal)}</div>
+        <div class="btn-holder-sub">${subHtml}</div>
       `;
       unlockBtn.onclick = null;
       unlockBtn.style.cursor = 'default';
-    } else if (d.walletLinked) {
+    } else if (walletLinked) {
       _lastStatusKey = 'wLinkedNoFranc';
       refreshWalletStatusText();
     } else {
