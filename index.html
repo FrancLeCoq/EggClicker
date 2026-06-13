@@ -148,7 +148,7 @@
     font-size: 17px;
     letter-spacing: 2px;
   }
-  .btn-unlock-main::before { content: '🔒'; font-size: 18px; }
+  .lock-ico { font-size: 20px; line-height: 1; flex-shrink: 0; }
   .btn-unlock-sub {
     font-family: 'Fredoka One', cursive;
     font-size: 11px;
@@ -166,7 +166,6 @@
     gap: 4px;
     padding: 14px;
   }
-  .btn-holder .btn-unlock-main::before { content: '🔓'; }
   .btn-holder-sub {
     font-family: 'Fredoka One', cursive;
     font-size: 11px;
@@ -252,7 +251,7 @@
   <button class="btn btn-new" id="newBtn" onclick="newGame()"><span id="newTxt">New game</span></button>
 
   <button class="btn btn-unlock" id="unlockBtn" onclick="openWallet()">
-    <div class="btn-unlock-main" id="unlockMain">Connect wallet</div>
+    <div class="btn-unlock-main"><span class="lock-ico" id="lockIco">🔒</span> <span id="unlockMain">Connect wallet</span></div>
     <div class="btn-unlock-sub" id="walletStatus">Wallet not connected · checking…</div>
   </button>
 
@@ -422,7 +421,7 @@ async function checkHolderStatus() {
         subHtml = `${sym} · ${t('holderSub')(bal)}`;
       }
       unlockBtn.innerHTML = `
-        <div class="btn-unlock-main">${t('holderMain')}</div>
+        <div class="btn-unlock-main"><span class="lock-ico">🔓</span> ${t('holderMain')}</div>
         <div class="btn-holder-sub">${subHtml}</div>
       `;
       unlockBtn.onclick = null;
