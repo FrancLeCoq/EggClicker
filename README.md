@@ -10,39 +10,6 @@ Egg Clicker is a French-rooster-themed idle clicker where you tap Francis Le Coq
 
 ---
 
-## File Structure
-
-```
-game.html          ← entire game (HTML + CSS + JS, ~1 700 lines)
-assets/
-  chick.png        ← Curious Chick sprite
-  hen.png          ← Laying Hen sprite
-  coop.png         ← Chicken Coop sprite
-  farm.png         ← Farm Cooperative sprite
-  auto.png         ← Automated Farm sprite
-  factory.png      ← Egg Factory sprite
-  lab.png          ← Genetic Lab sprite
-  station.png      ← Orbital Station sprite
-  franc.png        ← $FRANC Dimension sprite
-  paradox.png      ← Rooster Paradox sprite
-  coq.png          ← Main rooster click target
-  besace.png       ← Storage Satchel icon
-  gants_caoutchouc.png
-  botte_caoutchouc.png
-  gants_or.png
-  botte_or.png
-  soleil.png       ← Sun (celestial)
-  lune.png         ← Moon (celestial)
-  nuage1.png       ← Cloud variant 1
-  nuage2.png       ← Cloud variant 2
-  chasseur.png     ← Hunter (fox event)
-  ferme.mp3        ← Default background music
-  ferme apaisante.mp3 ← Soothing Music upgrade track
-  rain.mp3         ← Rain ambiance loop
-```
-
----
-
 ## How to Play
 
 The game opens on a **start screen** with:
