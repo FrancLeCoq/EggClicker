@@ -1455,8 +1455,9 @@ function renderDecorations(layer){
     const file=isGold?'botte_or.png':'botte_caoutchouc.png';
     addDecorB(layer,file,key,30,60,42,48);
   }
-  // Plume d'Or: appear under coq when prestige is available
-  if(calcPlumes()>=1){
+  // Plume d'Or: visible under the coq when prestige is available now,
+  // OR permanently once the player has earned at least one feather (kept across resets)
+  if(calcPlumes()>=1 || (ST.pl||0)>=1){
     addDecorB(layer,'plume_or.png','plume_or',50,0,85,32,'anim-plume','prestige');
   }
 }
